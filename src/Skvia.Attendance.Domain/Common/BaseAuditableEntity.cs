@@ -1,6 +1,6 @@
 namespace Skvia.Attendance.Domain.Common;
 
-public abstract class BaseAuditableBaseEntity : BaseEntity
+public abstract class BaseAuditableEntity : BaseEntity
 {
     public DateTimeOffset Created { get; set; }
 

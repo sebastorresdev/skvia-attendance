@@ -11,6 +11,5 @@
     <Project Path="src/Skvia.Attendance.Application/Skvia.Attendance.Application.csproj" Id="81db21e7-688a-412d-ad6e-babbbe5e7758" />
     <Project Path="src/Skvia.Attendance.Domain/Skvia.Attendance.Domain.csproj" Id="386ab27e-e7f9-4a20-bb53-35d1c709bfa9" />
     <Project Path="src/Skvia.Attendance.Infrastructure/Skvia.Attendance.Infrastructure.csproj" Id="4cc89fde-119a-43eb-ad2a-46fbb0771464" />
-    <Project Path="src/Skvia.Attendance.SharedKernel/Skvia.Attendance.SharedKernel.csproj" Id="9bc4ba58-c07b-4959-bec8-50dda2bfc78a" />
   </Folder>
 </Solution>

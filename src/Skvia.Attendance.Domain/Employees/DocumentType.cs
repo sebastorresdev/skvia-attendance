@@ -1,6 +1,8 @@
 namespace Skvia.Attendance.Domain.Employees;
 
-public class DocumentType
+public enum DocumentType
 {
-    
+    Dni = 0,
+    Ce = 1,
+    Passport = 2,
 }
