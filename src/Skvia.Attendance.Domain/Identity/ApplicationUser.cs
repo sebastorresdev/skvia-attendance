@@ -15,7 +15,7 @@ public class ApplicationUser : IdentityUser<Guid>
         BranchUsers = new HashSet<BranchUser>();
     }
 
-    public string? BranchId { get; set; }
+    public Guid? BranchId { get; set; }
     public virtual Branch? Branch { get; set; }
 
     public virtual ICollection<ApplicationUserClaim> UserClaims { get; set; }
@@ -23,7 +23,7 @@ public class ApplicationUser : IdentityUser<Guid>
     public virtual ICollection<ApplicationUserLogin> Logins { get; set; }
     public virtual ICollection<ApplicationUserToken> Tokens { get; set; }
     public ICollection<BranchUser> BranchUsers { get; set; } 
-    public string DisplayName { get; set; } = null!;
+    public string? DisplayName { get; set; }
     public bool IsActive { get; set; }
     public bool IsArchived { get; set; }
     public string? ProfilePhotoUrl { get; set; }

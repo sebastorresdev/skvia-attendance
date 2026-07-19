@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Common.Models;
+using Skvia.Attendance.Application.Identity.DTOs;
 
 namespace Skvia.Attendance.Application.Common.Interfaces;
 

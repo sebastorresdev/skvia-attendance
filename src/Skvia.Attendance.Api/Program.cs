@@ -1,50 +1,43 @@
-using Scalar.AspNetCore;
-
+using Serilog;
 using Skvia.Attendance.Infrastructure;
-using Skvia.Attendance.Infrastructure.Data;
-using Skvia.Attendance.Infrastructure.Identity;
+using Skvia.Attendance.Application;
 using Skvia.Attendance.Api;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.AddServiceDefaults();
-
-builder.AddInfrastructureServices()
-    .AddWebServices();
-
-WebApplication app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    await app.InitialiseDatabaseAsync();
+    Log.Information("Iniciando el servidor web de la API...");
 
-    app.MapOpenApi("/api/{documentName}/openapi.json");
+    var builder = WebApplication.CreateBuilder(args);
 
-    app.MapScalarApiReference(options =>
-    {
-        options
-        .WithTitle("BUBBA BAG — API Docs")
-        .WithTheme(ScalarTheme.Saturn)
-        .AddDocument("v1", "Versión 1", routePattern: "/api/v1/openapi.json")
-        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    builder.Services.AddSerilog((services, loggerConfiguration) => loggerConfiguration
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
 
-    });
+    builder
+        .AddInfrastructureServices()
+        .AddApplicationServices()
+        .AddWebServices();
+
+    var app = builder.Build();
+
+    await app.AddConfigAsync();
+
+    app.Run();
+
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "El host de la API terminó inesperadamente.");
+    return 1;
+}
+finally
+{
+    Log.CloseAndFlush();
 }
 
-app.UseExceptionHandler();
-
-app.UseHttpsRedirection();
-
-app.UseCors("AllowAll");
-
-app.UseStaticFiles();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.Map("/", () => Results.Redirect("/scalar"));
-
-app.MapDefaultEndpoints();
-
-app.Run();
+return 0;

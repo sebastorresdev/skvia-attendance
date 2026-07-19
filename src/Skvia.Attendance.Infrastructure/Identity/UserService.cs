@@ -3,7 +3,8 @@ using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 
 using Skvia.Attendance.Application.Common.Interfaces;
-using Skvia.Attendance.Application.Common.Models;
+using Skvia.Attendance.Application.Identity.DTOs;
+using Skvia.Attendance.Application.Identity.Extensions;
 using Skvia.Attendance.Domain.Identity;
 using Skvia.Attendance.Infrastructure.Identity.Domain;
 

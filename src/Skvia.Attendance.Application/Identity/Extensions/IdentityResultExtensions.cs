@@ -1,8 +1,6 @@
-using ErrorOr;
-
 using Microsoft.AspNetCore.Identity;
 
-namespace Skvia.Attendance.Infrastructure.Identity;
+namespace Skvia.Attendance.Application.Identity.Extensions;
 
 public static class IdentityResultExtensions
 {
