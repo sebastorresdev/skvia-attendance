@@ -71,9 +71,7 @@ public static class DependencyInjection
         .AddRoles<ApplicationRole>()
         .AddSignInManager()
         .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddDefaultTokenProviders()
-        .AddApiEndpoints();
-
+        .AddDefaultTokenProviders();
 
         return builder;
 

@@ -43,8 +43,6 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapIdentityApi<ApplicationUser>();
-
 app.Map("/", () => Results.Redirect("/scalar"));
 
 app.MapDefaultEndpoints();
