@@ -1,0 +1,29 @@
+using Skvia.Attendance.Api.Common.Extensions;
+using Skvia.Attendance.Application.Common.Messaging;
+using Skvia.Attendance.Application.Users.DTOs;
+using Skvia.Attendance.Application.Users.Queries.GetUsers;
+
+namespace Skvia.Attendance.Api.Endpoints.Users;
+
+public class GetUsers : IEndpoint
+{
+    public static void Map(RouteGroupBuilder group)
+    {
+        group.MapGet("/", Handle)
+            .WithSummary("Obtener usuarios")
+            .WithDescription("Retorna todos los usuarios del sistema.");
+    }
+
+    private static async Task<IResult> Handle(
+        IQueryHandler<GetUsersQuery, ErrorOr<List<UserResponse>>> handler,
+        CancellationToken ct)
+    {
+        var query = new GetUsersQuery();
+
+        var result = await handler.HandleAsync(query, ct);
+
+        return result.Match(
+            TypedResults.Ok,
+            ResultExtensions.ToProblem);
+    }
+}

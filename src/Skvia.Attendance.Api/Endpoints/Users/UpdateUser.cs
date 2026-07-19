@@ -1,41 +1,43 @@
 using Skvia.Attendance.Api.Common.Extensions;
 using Skvia.Attendance.Application.Common.Messaging;
-using Skvia.Attendance.Application.Users.Commands.CreateUser;
+using Skvia.Attendance.Application.Users.Commands.UpdateUser;
 using Skvia.Attendance.Contracts.Users;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 
-public class CreateUser : IEndpoint
+public class UpdateUser : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
     {
-        group.MapPost("/", Handle)
-            .WithSummary("Crear Usuario")
-            .Produces(StatusCodes.Status201Created);
+        group.MapPut("/{userId:guid}", Handle)
+            .WithSummary("Actualizar Usuario")
+            .Produces(StatusCodes.Status204NoContent);
     }
 
     private static async Task<IResult> Handle(
-        CreateUserRequest request,
-        ICommandHandler<CreateUserCommand, ErrorOr<Guid>> handler,
+        Guid userId,
+        UpdateUserRequest request,
+        ICommandHandler<UpdateUserCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var command = request.ToCommand();
+        var command = request.ToCommand(userId);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
-            userId => TypedResults.Created($"/api/users/{userId}", new CreateUserResponse(userId)),
+            _ => TypedResults.NoContent(),
             ResultExtensions.ToProblem);
     }
 }
 
-public static class CreateUserExtension
+public static class UpdateUserExtension
 {
-    public static CreateUserCommand ToCommand(this CreateUserRequest request)
+    public static UpdateUserCommand ToCommand(this UpdateUserRequest request, Guid userId)
     {
-        return new CreateUserCommand(
+        return new UpdateUserCommand(
+            UserId: userId,
             UserName: request.UserName,
-            Password: request.Password,
+            IsActive: request.IsActive,
             DisplayName: request.DisplayName,
             Email: request.Email,
             PhoneNumber: request.PhoneNumber,
@@ -45,4 +47,3 @@ public static class CreateUserExtension
         );
     }
 }
-

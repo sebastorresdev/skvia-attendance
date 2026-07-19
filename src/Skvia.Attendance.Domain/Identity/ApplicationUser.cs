@@ -22,7 +22,7 @@ public class ApplicationUser : IdentityUser<Guid>
     public virtual ICollection<ApplicationUserRole> UserRoles { get; set; }
     public virtual ICollection<ApplicationUserLogin> Logins { get; set; }
     public virtual ICollection<ApplicationUserToken> Tokens { get; set; }
-    public ICollection<BranchUser> BranchUsers { get; set; } 
+    public ICollection<BranchUser> BranchUsers { get; set; }
     public string? DisplayName { get; set; }
     public bool IsActive { get; set; }
     public bool IsArchived { get; set; }

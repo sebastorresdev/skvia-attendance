@@ -1,5 +1,3 @@
-﻿using ErrorOr;
-
 namespace Skvia.Attendance.Infrastructure.Identity.Domain;
 
 public static class UserErrors
@@ -50,4 +48,7 @@ public static class UserErrors
     public static Error Unauthenticated => Error.Unauthorized(
         code: "User.Unauthenticated",
         description: "El usuario no se encuentra autenticado o la sesión ha expirado.");
+
+    public static Error UnexpectedError(string message) =>
+        Error.Unexpected(code: "UserException", description: message);
 }

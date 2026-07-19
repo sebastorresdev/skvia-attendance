@@ -1,12 +1,12 @@
-namespace Skvia.Attendance.Application.Identity.Commands.CreateUser;
+namespace Skvia.Attendance.Application.Users.Commands.CreateUser;
 
 public record CreateUserCommand(
     string UserName,
     string Password,
+    string Email,
     string? DisplayName,
-    string? Email,
     string? PhoneNumber,
     string? PhotoUrl,
     List<Guid> BranchIds,
-    List<Guid> RoleIds
+    List<string> Roles
 ) : ICommand<ErrorOr<Guid>>;

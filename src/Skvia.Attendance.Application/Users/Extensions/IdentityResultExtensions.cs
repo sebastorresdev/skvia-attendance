@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Skvia.Attendance.Application.Identity.Extensions;
+namespace Skvia.Attendance.Application.Users.Extensions;
 
 public static class IdentityResultExtensions
 {

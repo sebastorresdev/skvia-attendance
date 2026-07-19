@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Skvia.Attendance.Application.Common.Security.Roles;
+using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Identity;
 
 namespace Skvia.Attendance.Infrastructure.Data;
@@ -66,6 +67,11 @@ public class ApplicationDbContextInitialiser
 
     public async Task TrySeedAsync()
     {
+        // Default branches
+        var branch = Branch.Create("SKVIA_01", "Sede principal");
+
+        _context.Branches.Add(branch);
+
         // Default roles
         var administratorRole = new ApplicationRole
         {
@@ -86,12 +92,14 @@ public class ApplicationDbContextInitialiser
             {
                 DisplayName = "Admin",
                 UserName = "administrator@localhost",
-                Email = "administrator@localhost"
+                Email = "administrator@localhost",
             };
 
             await _userManager.CreateAsync(
                 administrator,
                 "Administrator1!");
+
+            administrator.BranchUsers.Add(new BranchUser { BranchId = branch.Id, UserId = administrator.Id });
 
             await _userManager.AddToRoleAsync(
                 administrator,
