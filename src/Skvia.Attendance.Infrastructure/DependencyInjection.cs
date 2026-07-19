@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Infrastructure.Data;
+using Skvia.Attendance.Infrastructure.Data.Interceptors;
 using Skvia.Attendance.Infrastructure.Identity;
+using Skvia.Attendance.Infrastructure.Security.CurrentUserProvider;
 
 namespace Skvia.Attendance.Infrastructure;
 
@@ -14,15 +16,17 @@ public static class DependencyInjection
 {
     public static IHostApplicationBuilder AddInfrastructureServices(this IHostApplicationBuilder builder)
     {
+        // Auditorias
+        builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         // 2. Registro clásico adaptado con las convenciones necesarias
         builder.Services.AddDbContext<ApplicationDbContext>((sp, opt) =>
         {
-            //var interceptor = sp.GetRequiredService<ISaveChangesInterceptor>();
+            var interceptor = sp.GetRequiredService<ISaveChangesInterceptor>();
 
             // Nota: El connectionString real ya lo manejará automáticamente el orquestador a nivel de infraestructura
             string? connectionString = builder.Configuration.GetConnectionString("bubba-db"); // Nombre de tu recurso en AppHost
 
-            opt.UseNpgsql(connectionString);/*.AddInterceptors(interceptor);*/
+            opt.UseNpgsql(connectionString).AddInterceptors(interceptor);
             opt.UseSnakeCaseNamingConvention();
         });
 
@@ -33,6 +37,9 @@ public static class DependencyInjection
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
+        // Security
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
 
         // Authentication
         builder.Services.AddAuthentication()
@@ -62,7 +69,9 @@ public static class DependencyInjection
             options.SignIn.RequireConfirmedEmail = false;
         })
         .AddRoles<ApplicationRole>()
+        .AddSignInManager()
         .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders()
         .AddApiEndpoints();
 
 

@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
-
-using Skvia.Attendance.Api.Common.Constants;
 
 namespace Skvia.Attendance.Api.Common.OpenApi;
 
@@ -17,17 +16,17 @@ internal sealed class BearerSecuritySchemeTransformer(
     {
         IEnumerable<AuthenticationScheme> authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
 
-        if (authenticationSchemes.Any(authScheme => authScheme.Name == AuthScheme.Bearer))
+        if (authenticationSchemes.Any(authScheme => authScheme.Name == IdentityConstants.BearerScheme))
         {
             var securitySchemes = new Dictionary<string, IOpenApiSecurityScheme>
             {
-                [AuthScheme.Bearer] = new OpenApiSecurityScheme
+                ["Bearer"] = new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.Http,
                     Name = "Authorization",
                     Scheme = "bearer",
                     In = ParameterLocation.Header,
-                    Description = "Type into the textbox: Bearer {your JWT token}.",
+                    // Description = "Escribe en el cuadro de texto: Bearer {tu token JWT}.",
                     BearerFormat = "Json Web Token",
                 },
             };

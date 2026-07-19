@@ -8,6 +8,9 @@ public class Branch : BaseAuditableEntity
     public string Name { get; private set; } = null!;
     public string? Address { get; private set; }
 
+    private readonly List<BranchUser> _branchUsers = [];
+    public IReadOnlyCollection<BranchUser> BranchUsers => _branchUsers.AsReadOnly();
+
     private Branch() { } // EF Core
 
     public static Branch Create(string code, string name, string? address = null)
