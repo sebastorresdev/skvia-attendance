@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Skvia.Attendance.Application.Common.Interfaces;
+using Skvia.Attendance.Domain.Identity;
 using Skvia.Attendance.Infrastructure.Data;
 using Skvia.Attendance.Infrastructure.Data.Interceptors;
-using Skvia.Attendance.Infrastructure.Identity;
 using Skvia.Attendance.Infrastructure.Security.CurrentUserProvider;
 
 namespace Skvia.Attendance.Infrastructure;

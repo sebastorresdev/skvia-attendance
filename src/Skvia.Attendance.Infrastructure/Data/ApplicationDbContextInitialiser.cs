@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Skvia.Attendance.Application.Common.Security.Roles;
-using Skvia.Attendance.Infrastructure.Identity;
+using Skvia.Attendance.Domain.Identity;
 
 namespace Skvia.Attendance.Infrastructure.Data;
 

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 using Skvia.Attendance.Application.Common.Interfaces;
-using Skvia.Attendance.Infrastructure.Identity;
+using Skvia.Attendance.Domain.Identity;
 
 namespace Skvia.Attendance.Infrastructure.Data;
 

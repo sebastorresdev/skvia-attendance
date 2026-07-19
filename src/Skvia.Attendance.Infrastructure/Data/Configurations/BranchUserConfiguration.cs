@@ -1,5 +1,4 @@
 using Skvia.Attendance.Domain.Branches;
-using Skvia.Attendance.Infrastructure.Identity;
 
 namespace Skvia.Attendance.Infrastructure.Data.Configurations;
 
@@ -14,8 +13,8 @@ public class UserBranchConfiguration : IEntityTypeConfiguration<BranchUser>
             .HasForeignKey(bu => bu.BranchId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<ApplicationUser>()
-            .WithMany()
+        builder.HasOne(bu => bu.User)
+            .WithMany(u => u.BranchUsers)
             .HasForeignKey(bu => bu.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
