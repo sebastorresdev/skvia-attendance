@@ -11,7 +11,6 @@ public class GetUserById : IEndpoint
     {
         group.MapGet("/{userId:guid}", Handle)
             .WithSummary("Obtener usuario por ID")
-            .WithDescription("Retorna los detalles de un usuario específico por su ID.")
             .Produces<UserDetailResponse>();
     }
 

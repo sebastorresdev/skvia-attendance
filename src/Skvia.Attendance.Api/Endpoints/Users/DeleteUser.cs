@@ -9,7 +9,8 @@ public class DeleteUser : IEndpoint
     public static void Map(RouteGroupBuilder group)
     {
         group.MapDelete("/{userId:guid}", Handle)
-            .WithSummary("Eliminar Usuario");
+            .WithSummary("Eliminar Usuario")
+            .RequireAuthorization();
     }
 
     private static async Task<IResult> Handle(

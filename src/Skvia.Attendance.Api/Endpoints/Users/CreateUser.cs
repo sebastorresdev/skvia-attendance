@@ -11,6 +11,7 @@ public class CreateUser : IEndpoint
     {
         group.MapPost("/", Handle)
             .WithSummary("Crear Usuario")
+            .RequireAuthorization()
             .Produces(StatusCodes.Status201Created);
     }
 

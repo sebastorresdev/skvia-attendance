@@ -10,8 +10,7 @@ public class GetUsers : IEndpoint
     public static void Map(RouteGroupBuilder group)
     {
         group.MapGet("/", Handle)
-            .WithSummary("Obtener usuarios")
-            .WithDescription("Retorna todos los usuarios del sistema.");
+            .WithSummary("Obtener usuarios");
     }
 
     private static async Task<IResult> Handle(

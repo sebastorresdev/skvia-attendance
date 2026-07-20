@@ -11,6 +11,7 @@ public class UpdateUser : IEndpoint
     {
         group.MapPut("/{userId:guid}", Handle)
             .WithSummary("Actualizar Usuario")
+            .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent);
     }
 

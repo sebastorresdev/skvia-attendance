@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Domain.Branches;
+using Skvia.Attendance.Domain.Employees;
 using Skvia.Attendance.Domain.Identity;
 
 namespace Skvia.Attendance.Infrastructure.Data;
@@ -16,9 +17,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<BranchUser> BranchUsers => Set<BranchUser>();
     public DbSet<Branch> Branches => Set<Branch>();
+    public DbSet<Employee> Employees => Set<Employee>();
+
 
     public override DatabaseFacade Database => base.Database;
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

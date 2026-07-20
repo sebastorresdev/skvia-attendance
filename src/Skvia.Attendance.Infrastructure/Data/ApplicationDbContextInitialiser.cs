@@ -75,7 +75,7 @@ public class ApplicationDbContextInitialiser
         // Default roles
         var administratorRole = new ApplicationRole
         {
-            Name = Roles.Administrator
+            Name = Roles.Administrator,
         };
 
         if (!await _roleManager.RoleExistsAsync(administratorRole.Name!))
@@ -93,6 +93,7 @@ public class ApplicationDbContextInitialiser
                 DisplayName = "Admin",
                 UserName = "administrator@localhost",
                 Email = "administrator@localhost",
+                IsActive = true,
             };
 
             await _userManager.CreateAsync(
