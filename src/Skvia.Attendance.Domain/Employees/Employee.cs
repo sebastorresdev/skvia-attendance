@@ -1,4 +1,3 @@
-using Skvia.Attendance.Domain.Common;
 using Skvia.Attendance.Domain.EmployeeSchedules;
 
 namespace Skvia.Attendance.Domain.Employees;

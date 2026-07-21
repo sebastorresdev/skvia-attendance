@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Users.Extensions;
 using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Identity;
