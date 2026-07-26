@@ -2,8 +2,8 @@ using Skvia.Attendance.Domain.Employees;
 
 namespace Skvia.Attendance.Application.Employees.DTOs;
 
-public record GetEmployeeByIdResponse(
-    Guid Id,
+public record EmployeeDetailResponse(
+    Guid EmployeeId,
     string Code,
     string FirstName,
     string LastName,

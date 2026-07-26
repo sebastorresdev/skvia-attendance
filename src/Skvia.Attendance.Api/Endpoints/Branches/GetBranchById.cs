@@ -1,6 +1,5 @@
 using Skvia.Attendance.Application.Branches.DTOs;
 using Skvia.Attendance.Application.Branches.Queries.GetBranchById;
-using Skvia.Attendance.Contracts.Branch;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 
@@ -9,12 +8,13 @@ public class GetBranchById : IEndpoint
     public static void Map(RouteGroupBuilder group)
         => group.MapGet("/{id:guid}", Handle)
                 .WithSummary("Obtener sede por ID")
-                .WithDescription("Retorna los detalles de una sede específica por su ID.");
+                .WithDescription("Retorna los detalles de una sede específica por su ID.")
+                .Produces<BranchDetailResponse>();
 
 
     private static async Task<IResult> Handle(
         Guid id,
-        IQueryHandler<GetBranchByIdQuery, ErrorOr<GetBranchByIdResult>> handler,
+        IQueryHandler<GetBranchByIdQuery, ErrorOr<BranchDetailResponse>> handler,
         CancellationToken ct)
     {
         var query = new GetBranchByIdQuery(id);
@@ -22,15 +22,7 @@ public class GetBranchById : IEndpoint
         var result = await handler.HandleAsync(query, ct);
 
         return result.Match(
-            branchResult => TypedResults.Ok(branchResult.ToResponse()),
+            TypedResults.Ok,
             ResultExtensions.ToProblem);
-    }
-}
-
-public static class GetBranchByIdExtension
-{
-    public static BranchDetailResponse ToResponse(this GetBranchByIdResult result)
-    {
-        return new BranchDetailResponse(result.Id, result.Code, result.Name, result.Address);
     }
 }

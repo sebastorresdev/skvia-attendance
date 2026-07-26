@@ -48,18 +48,31 @@ public class CreateUserCommandHandler(
                     return result.ToApplicationError();
                 }
 
-                if (command.Roles.Count != 0)
+                if (command.RoleIds.Count != 0)
                 {
-                    IdentityResult roleResult =
-                        await userManager.AddToRolesAsync(
-                            newUser,
-                            command.Roles);
-
-                    if (!roleResult.Succeeded)
+                    var userRoles = command.RoleIds.Select(roleId => new ApplicationUserRole
                     {
-                        return roleResult.ToApplicationError();
-                    }
+                        RoleId = roleId,
+                        UserId = newUser.Id
+                    });
+
+                    dbContext.ApplicationUserRole.AddRange(userRoles);
+
+                    await dbContext.SaveChangesAsync(cancellationToken);
                 }
+
+                //if (command.Roles.Count != 0)
+                //{
+                //    IdentityResult roleResult =
+                //        await userManager.AddToRolesAsync(
+                //            newUser,
+                //            command.Roles);
+
+                //    if (!roleResult.Succeeded)
+                //    {
+                //        return roleResult.ToApplicationError();
+                //    }
+                //}
 
                 if (command.BranchIds.Count != 0)
                 {

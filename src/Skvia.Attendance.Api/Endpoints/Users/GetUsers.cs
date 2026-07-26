@@ -1,5 +1,3 @@
-using Skvia.Attendance.Api.Common.Extensions;
-using Skvia.Attendance.Application.Common.Messaging;
 using Skvia.Attendance.Application.Users.DTOs;
 using Skvia.Attendance.Application.Users.Queries.GetUsers;
 
@@ -10,7 +8,9 @@ public class GetUsers : IEndpoint
     public static void Map(RouteGroupBuilder group)
     {
         group.MapGet("/", Handle)
-            .WithSummary("Obtener usuarios");
+            .WithSummary("Obtener usuarios")
+            .Produces<List<UserResponse>>()
+            .ProducesProblem(StatusCodes.Status500InternalServerError);
     }
 
     private static async Task<IResult> Handle(

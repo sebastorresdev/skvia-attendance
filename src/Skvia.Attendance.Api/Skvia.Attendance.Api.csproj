@@ -14,7 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\aspire\Skvia.Attendance.ServiceDefaults\Skvia.Attendance.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Skvia.Attendance.Application\Skvia.Attendance.Application.csproj" />
-    <ProjectReference Include="..\Skvia.Attendance.Contracts\Skvia.Attendance.Contracts.csproj" />
     <ProjectReference Include="..\Skvia.Attendance.Infrastructure\Skvia.Attendance.Infrastructure.csproj" />
   </ItemGroup>
 

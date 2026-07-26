@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
-
 using System.Text.Json.Serialization;
+
+using Microsoft.AspNetCore.Mvc;
 
 namespace Skvia.Attendance.Api.Models;
 

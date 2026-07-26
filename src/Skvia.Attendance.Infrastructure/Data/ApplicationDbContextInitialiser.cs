@@ -69,8 +69,10 @@ public class ApplicationDbContextInitialiser
     {
         // Default branches
         var branch = Branch.Create("SKVIA_01", "Sede principal");
+        var branch2 = Branch.Create("SKVIA_02", "Sede base");
 
         _context.Branches.Add(branch);
+        _context.Branches.Add(branch2);
 
         // Default roles
         var administratorRole = new ApplicationRole
@@ -78,27 +80,39 @@ public class ApplicationDbContextInitialiser
             Name = Roles.Administrator,
         };
 
-        if (!await _roleManager.RoleExistsAsync(administratorRole.Name!))
+        if (!await _roleManager.RoleExistsAsync(administratorRole.Name))
         {
             await _roleManager.CreateAsync(administratorRole);
         }
 
+        var basicRole = new ApplicationRole
+        {
+            Name = "basic",
+        };
+
+        if (!await _roleManager.RoleExistsAsync(basicRole.Name))
+        {
+            await _roleManager.CreateAsync(basicRole);
+        }
+
         // Default users
-        ApplicationUser? administrator = await _userManager.FindByNameAsync("administrator@localhost");
+        ApplicationUser? administrator = await _userManager.FindByNameAsync("admin");
 
         if (administrator is null)
         {
             administrator = new ApplicationUser
             {
                 DisplayName = "Admin",
-                UserName = "administrator@localhost",
-                Email = "administrator@localhost",
+                UserName = "admin",
+                Email = "admin@skvia.pe",
                 IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                LastModifiedAt = DateTime.UtcNow,
             };
 
             await _userManager.CreateAsync(
                 administrator,
-                "Administrator1!");
+                "Password123*");
 
             administrator.BranchUsers.Add(new BranchUser { BranchId = branch.Id, UserId = administrator.Id });
 

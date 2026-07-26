@@ -15,7 +15,7 @@ public class GetUsersQueryHandler(UserManager<ApplicationUser> userManager) : IQ
                 UserId: user.Id,
                 UserName: user.UserName!,
                 IsActive: user.IsActive,
-                BranchNames: user.BranchUsers.Select(bu => bu.Branch.Name).ToList(),
+                BranchName: user.BranchUsers.Select(bu => bu.Branch.Name).First(),
                 RoleNames: user.UserRoles.Select(ur => ur.Role.Name!).ToList(),
                 Email: user.Email,
                 PhotoUrl: user.ProfilePhotoUrl,

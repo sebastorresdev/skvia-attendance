@@ -1,6 +1,5 @@
 using Skvia.Attendance.Application.Branches.DTOs;
 using Skvia.Attendance.Application.Branches.Queries.GetBranches;
-using Skvia.Attendance.Contracts.Branch;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 
@@ -9,10 +8,11 @@ public class GetBranches : IEndpoint
     public static void Map(RouteGroupBuilder group)
         => group.MapGet("/", Handle)
             .WithSummary("Obtener sedes")
-            .WithDescription("Retorna todas las sedes del sistema.");
+            .WithDescription("Retorna todas las sedes del sistema.")
+            .Produces<BranchResponse>();
 
     private static async Task<IResult> Handle(
-        IQueryHandler<GetBranchesQuery, ErrorOr<List<GetBranchResult>>> handler,
+        IQueryHandler<GetBranchesQuery, ErrorOr<List<BranchResponse>>> handler,
         CancellationToken ct)
     {
         var query = new GetBranchesQuery();
@@ -20,16 +20,7 @@ public class GetBranches : IEndpoint
         var result = await handler.HandleAsync(query, ct);
 
         return result.Match(
-            res => TypedResults.Ok(res.Select(r => r.ToResponse()).ToList()),
+            TypedResults.Ok,
             ResultExtensions.ToProblem);
     }
 }
-
-public static class GetBranchesExtension
-{
-    public static BranchResponse ToResponse(this GetBranchResult result)
-    {
-        return new BranchResponse(result.Id, result.Code, result.Name, result.Address);
-    }
-}
-

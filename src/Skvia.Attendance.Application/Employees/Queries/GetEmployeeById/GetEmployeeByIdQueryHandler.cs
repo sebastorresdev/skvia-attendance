@@ -3,14 +3,14 @@ using Skvia.Attendance.Domain.Employees;
 
 namespace Skvia.Attendance.Application.Employees.Queries.GetEmployeeById;
 
-public class GetEmployeeByIdQueryHandler(IApplicationDbContext db) : IQueryHandler<GetEmployeeByIdQuery, ErrorOr<GetEmployeeByIdResponse>>
+public class GetEmployeeByIdQueryHandler(IApplicationDbContext db) : IQueryHandler<GetEmployeeByIdQuery, ErrorOr<EmployeeDetailResponse>>
 {
-    public async Task<ErrorOr<GetEmployeeByIdResponse>> HandleAsync(GetEmployeeByIdQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<EmployeeDetailResponse>> HandleAsync(GetEmployeeByIdQuery query, CancellationToken cancellationToken)
     {
         var employee = await db.Employees
             .AsNoTracking()
             .Where(e => e.Id == query.EmployeeId)
-            .Select(e => new GetEmployeeByIdResponse(
+            .Select(e => new EmployeeDetailResponse(
                 e.Id,
                 e.Code,
                 e.FirstName,

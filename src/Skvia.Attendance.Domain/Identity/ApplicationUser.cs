@@ -27,6 +27,6 @@ public class ApplicationUser : IdentityUser<Guid>
     public bool IsActive { get; set; }
     public bool IsArchived { get; set; }
     public string? ProfilePhotoUrl { get; set; }
-    public DateTime? CreatedAt { get; set; }
-    public DateTime? LastModifiedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime LastModifiedAt { get; set; }
 }

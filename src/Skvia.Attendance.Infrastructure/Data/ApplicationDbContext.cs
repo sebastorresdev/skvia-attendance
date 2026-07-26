@@ -18,8 +18,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<BranchUser> BranchUsers => Set<BranchUser>();
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<Employee> Employees => Set<Employee>();
-
-
+    public DbSet<ApplicationUserRole> ApplicationUserRole => Set<ApplicationUserRole>();
     public override DatabaseFacade Database => base.Database;
     protected override void OnModelCreating(ModelBuilder builder)
     {

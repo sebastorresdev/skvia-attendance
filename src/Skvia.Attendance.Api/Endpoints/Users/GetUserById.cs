@@ -1,5 +1,3 @@
-using Skvia.Attendance.Api.Common.Extensions;
-using Skvia.Attendance.Application.Common.Messaging;
 using Skvia.Attendance.Application.Users.DTOs;
 using Skvia.Attendance.Application.Users.Queries.GetUserById;
 
@@ -11,7 +9,8 @@ public class GetUserById : IEndpoint
     {
         group.MapGet("/{userId:guid}", Handle)
             .WithSummary("Obtener usuario por ID")
-            .Produces<UserDetailResponse>();
+            .Produces<UserDetailResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> Handle(

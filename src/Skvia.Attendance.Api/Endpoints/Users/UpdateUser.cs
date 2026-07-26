@@ -1,7 +1,4 @@
-using Skvia.Attendance.Api.Common.Extensions;
-using Skvia.Attendance.Application.Common.Messaging;
 using Skvia.Attendance.Application.Users.Commands.UpdateUser;
-using Skvia.Attendance.Contracts.Users;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 
@@ -12,39 +9,23 @@ public class UpdateUser : IEndpoint
         group.MapPut("/{userId:guid}", Handle)
             .WithSummary("Actualizar Usuario")
             .RequireAuthorization()
-            .Produces(StatusCodes.Status204NoContent);
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 
     private static async Task<IResult> Handle(
         Guid userId,
-        UpdateUserRequest request,
+        UpdateUserCommand command,
         ICommandHandler<UpdateUserCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var command = request.ToCommand(userId);
+        if (userId != command.UserId)
+            return TypedResults.BadRequest();
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
             _ => TypedResults.NoContent(),
             ResultExtensions.ToProblem);
-    }
-}
-
-public static class UpdateUserExtension
-{
-    public static UpdateUserCommand ToCommand(this UpdateUserRequest request, Guid userId)
-    {
-        return new UpdateUserCommand(
-            UserId: userId,
-            UserName: request.UserName,
-            IsActive: request.IsActive,
-            DisplayName: request.DisplayName,
-            Email: request.Email,
-            PhoneNumber: request.PhoneNumber,
-            PhotoUrl: request.PhotoUrl,
-            BranchIds: [.. request.BranchIds.Select(id => Guid.TryParse(id, out var guid) ? guid : Guid.Empty)],
-            Roles: request.Roles
-        );
     }
 }

@@ -9,4 +9,4 @@ public record UpdateUserCommand(
     string? PhoneNumber,
     string? PhotoUrl,
     List<Guid> BranchIds,
-    List<string> Roles) : ICommand<ErrorOr<Success>>;
+    List<Guid> RoleIds) : ICommand<ErrorOr<Success>>;

@@ -1,5 +1,3 @@
-﻿using ErrorOr;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 
 using Skvia.Attendance.Api.Models;
@@ -27,7 +25,7 @@ public static class ResultExtensions
             Title = error.Code,
             Detail = error.Description,
             Type = GetProblemType(statusCode),
-            Errors = null // 👈 Negocio puro: viaja explícitamente como NULL
+            Errors = null
         };
 
         return TypedResults.Problem(apiProblem);

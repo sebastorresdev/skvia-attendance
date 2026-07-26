@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace Skvia.Attendance.Application.Users.Commands.CreateUser;
 
 public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
@@ -15,9 +13,12 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("El correo es obligatorio.");
 
-        RuleForEach(x => x.BranchIds)
-            .Must(id => id != Guid.Empty)
-            .WithMessage("BranchId inválido.");
+        RuleFor(x => x.BranchIds)
+        .NotNull().WithMessage("BranchIds es requerido.")
+        .NotEmpty().WithMessage("Debe seleccionar al menos una sucursal.");
+
+        RuleFor(x => x.RoleIds)
+        .NotNull().WithMessage("RoleIds es requerido.");
     }
 }
 

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Users.Extensions;
 using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Identity;
@@ -44,6 +43,7 @@ public class UpdateUserCommandHandler(
         existingUser.IsActive = command.IsActive;
         existingUser.Email = command.Email;
         existingUser.DisplayName = command.DisplayName;
+        existingUser.PhoneNumber = command.PhoneNumber;
         existingUser.ProfilePhotoUrl = command.PhotoUrl;
         existingUser.LastModifiedAt = DateTime.UtcNow;
 
@@ -52,10 +52,17 @@ public class UpdateUserCommandHandler(
         if (!result.Succeeded)
             return result.ToApplicationError();
 
-        if (command.Roles.Count != 0)
+        if (command.RoleIds.Count != 0)
         {
-            // TODO: Aqui si el rol name no existe lanza una excepcion, revisa a futuro mejorar.
-            await userManager.AddToRolesAsync(existingUser, command.Roles);
+            var userRoles = command.RoleIds.Select(roleId => new ApplicationUserRole
+            {
+                RoleId = roleId,
+                UserId = existingUser.Id
+            });
+
+            dbContext.ApplicationUserRole.AddRange(userRoles);
+
+            await dbContext.SaveChangesAsync(cancellationToken);
         }
 
         return Result.Success;

@@ -8,5 +8,5 @@ public record CreateUserCommand(
     string? PhoneNumber,
     string? PhotoUrl,
     List<Guid> BranchIds,
-    List<string> Roles
+    List<Guid> RoleIds
 ) : ICommand<ErrorOr<Guid>>;
