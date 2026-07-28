@@ -1,7 +1,8 @@
 using Serilog;
-using Skvia.Attendance.Infrastructure;
-using Skvia.Attendance.Application;
+
 using Skvia.Attendance.Api;
+using Skvia.Attendance.Application;
+using Skvia.Attendance.Infrastructure;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -32,8 +33,8 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "El host de la API terminó inesperadamente.");
-    return 1;
+    Log.Fatal(ex, "Error crítico al mapear endpoints o iniciar la aplicación: {Message}", ex.Message);
+    throw;
 }
 finally
 {

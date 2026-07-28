@@ -1,23 +1,26 @@
+using Microsoft.AspNetCore.Mvc;
+
+using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Users.Commands.DeleteUser;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 
-public class DeleteUser : IEndpoint
+public class DeleteBatchUsers : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
     {
-        group.MapDelete("/{userId:guid}", Handle)
-            .WithSummary("Eliminar Usuario")
-            .RequireAuthorization();
+        group.MapDelete("/batch", Handle)
+            .WithSummary("Eliminar Usuarios")
+            .RequireAuthorization()
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ProblemResponse>(StatusCodes.Status500InternalServerError);
     }
 
     private static async Task<IResult> Handle(
-        Guid userId,
+        [FromBody] DeleteUserCommand command,
         ICommandHandler<DeleteUserCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var command = new DeleteUserCommand([userId]);
-
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(

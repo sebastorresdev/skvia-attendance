@@ -1,22 +1,19 @@
 using Microsoft.AspNetCore.Identity;
 
-using Skvia.Attendance.Application.Users.Extensions;
 using Skvia.Attendance.Domain.Identity;
-using Skvia.Attendance.Infrastructure.Identity.Domain;
 
 namespace Skvia.Attendance.Application.Users.Commands.DeleteUser;
 
-public class DeleteUserCommandHandler(UserManager<ApplicationUser> userManager) : ICommandHandler<DeleteUserCommand, ErrorOr<Success>>
+public class DeleteUserCommandHandler(UserManager<ApplicationUser> userManager, IApplicationDbContext dbContext) : ICommandHandler<DeleteUserCommand, ErrorOr<Success>>
 {
     public async Task<ErrorOr<Success>> HandleAsync(DeleteUserCommand query, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(query.UserId.ToString());
+        var affectedRows = await userManager.Users
+            .Where(u => query.UserIds.Contains(u.Id))
+            .ExecuteDeleteAsync(cancellationToken);
 
-        if (user is null) return UserErrors.UserNotFound;
-
-        var result = await userManager.DeleteAsync(user);
-
-        if (!result.Succeeded) return result.ToApplicationError();
+        if (affectedRows <= 0)
+            return Error.Conflict("No se pudo eliminar los usuarios");
 
         return Result.Success;
     }

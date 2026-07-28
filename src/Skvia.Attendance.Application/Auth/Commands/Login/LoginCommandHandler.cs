@@ -48,6 +48,21 @@ public class LoginCommandHandler(
 
         }
 
-        return await signInManager.CreateUserPrincipalAsync(user);
+        var principal = await signInManager.CreateUserPrincipalAsync(user);
+
+        //if (principal.Identity is ClaimsIdentity identity)
+        //{
+        //    // 2. Inyectamos el ID con la clave exacta que espera tu CurrentUserProvider
+        //    identity.AddClaim(new Claim("id", user.Id.ToString()));
+
+        //    // 3. Obtenemos los permisos usando tu servicio y los agregamos como claims
+        //    var permissions = await permissionService.GetPermissionsAsync(user);
+        //    foreach (var permission in permissions)
+        //    {
+        //        identity.AddClaim(new Claim("permissions", permission));
+        //    }
+        //}
+
+        return principal;
     }
 }

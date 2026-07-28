@@ -1,4 +1,4 @@
-﻿namespace Skvia.Attendance.Application.Common.Models;
+namespace Skvia.Attendance.Application.Common.Models;
 
 public record CurrentUser(
     Guid Id,

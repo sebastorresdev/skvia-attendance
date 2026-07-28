@@ -9,6 +9,7 @@ using Skvia.Attendance.Domain.Identity;
 using Skvia.Attendance.Infrastructure.Data;
 using Skvia.Attendance.Infrastructure.Data.Interceptors;
 using Skvia.Attendance.Infrastructure.Security.CurrentUserProvider;
+using Skvia.Attendance.Infrastructure.Services;
 
 namespace Skvia.Attendance.Infrastructure;
 
@@ -72,6 +73,9 @@ public static class DependencyInjection
         .AddSignInManager()
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
+
+        // Services
+        builder.Services.AddScoped<IUserPermissionService, UserPermissionService>();
 
         return builder;
 

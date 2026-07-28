@@ -1,8 +1,13 @@
+using System.ComponentModel;
+using System.Reflection;
+using System.Security.Claims;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using Skvia.Attendance.Application.Common.Security.Permissions;
 using Skvia.Attendance.Application.Common.Security.Roles;
 using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Identity;
@@ -85,6 +90,13 @@ public class ApplicationDbContextInitialiser
             await _roleManager.CreateAsync(administratorRole);
         }
 
+        // REGISTRAMOS LOS PERMISOS AL ROL ADMIN
+        foreach (var permission in GetPermissionsFromConstants())
+        {
+            var claim = new Claim("permissions", permission);
+            await _roleManager.AddClaimAsync(administratorRole, claim);
+        }
+
         var basicRole = new ApplicationRole
         {
             Name = "basic",
@@ -121,6 +133,53 @@ public class ApplicationDbContextInitialiser
                 Roles.Administrator);
         }
 
+        var claim2 = new Claim("permissions", "Permissions.Branches.Create");
+        await _userManager.AddClaimAsync(administrator, claim2);
+
         await _context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Extrae de forma dinámica todas las constantes de permisos, lee su atributo [Description] 
+    /// y mapea los objetos listos para impactar en la base de datos.
+    /// </summary>
+    private static List<string> GetPermissionsFromConstants()
+    {
+        // TODO: revisar la implementacion de los permisos para un PermissionViewModel
+
+        var permissions = new List<string>();
+
+        // Obtiene todas las clases anidadas (Branches, Users, etc.) dentro de Permissions
+        var modules = typeof(Permissions).GetNestedTypes(BindingFlags.Public | BindingFlags.Static);
+
+        foreach (var module in modules)
+        {
+            // Filtra solo los campos constantes de tipo string
+            var fields = module.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string));
+
+            foreach (var fi in fields)
+            {
+                var codeValue = fi.GetRawConstantValue()?.ToString();
+                if (string.IsNullOrEmpty(codeValue)) continue;
+
+                // Buscamos si la constante tiene el atributo [Description] encima
+                var descriptionAttribute = fi.GetCustomAttribute<DescriptionAttribute>();
+
+                // Si lo tiene usa el texto amigable (ej: "Crear Sucursal"), si no, usa el nombre del campo técnico
+                var amigableName = descriptionAttribute?.Description ?? fi.Name;
+
+                permissions.Add(codeValue);
+
+                //permissions.Add(new Permission
+                //{
+                //    Code = codeValue, // Tu set nativo de la entidad se encargará de rellenar el NormalizedCode 🚀
+                //    Name = amigableName,
+                //    Description = $"Permite realizar la acción de {amigableName.ToLower()} en el sistema."
+                //});
+            }
+        }
+
+        return permissions;
     }
 }

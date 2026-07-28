@@ -1,3 +1,3 @@
 namespace Skvia.Attendance.Application.Users.Commands.DeleteUser;
 
-public record DeleteUserCommand(Guid UserId) : ICommand<ErrorOr<Success>>;
+public record DeleteUserCommand(List<Guid> UserIds) : ICommand<ErrorOr<Success>>;

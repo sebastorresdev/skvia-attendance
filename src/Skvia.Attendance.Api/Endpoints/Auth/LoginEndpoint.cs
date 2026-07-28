@@ -1,6 +1,5 @@
 using System.Security.Claims;
 
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 
 using Skvia.Attendance.Application.Auth.Commands.Login;
@@ -9,11 +8,12 @@ namespace Skvia.Attendance.Api.Endpoints.Auth;
 
 public class LoginEndpoint : IEndpoint
 {
+    private record AuthTokenResponse(string TokenType, string AccessToken, int ExpiresIn, string RefreshToken);
     public static void Map(RouteGroupBuilder group)
         => group.MapPost("/login", Handle)
              .WithSummary("Iniciar sesión de usuario")
              .AllowAnonymous()
-             .Produces<SignInHttpResult>();
+             .Produces<AuthTokenResponse>();
 
     private static async Task<IResult> Handle(
         LoginCommand command,

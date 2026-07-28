@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
+using Microsoft.AspNetCore.Http;
+
+using Skvia.Attendance.Application.Common.Constants;
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Common.Models;
-
-using System.Security.Claims;
 
 namespace Skvia.Attendance.Infrastructure.Security.CurrentUserProvider;
 
@@ -18,17 +19,17 @@ public class CurrentUserProvider(IHttpContextAccessor _httpContextAccessor) : IC
 
         ArgumentNullException.ThrowIfNull(_httpContextAccessor);
 
-        var id = Guid.Parse(GetSingleClaimValue("id"));
-        var permissions = GetClaimValues("permissions");
+        var id = Guid.Parse(GetSingleClaimValue(ClaimTypes.NameIdentifier));
         var roles = GetClaimValues(ClaimTypes.Role);
+        var permissions = GetClaimValues(CustomClaimTypes.Permissions);
 
-        return new CurrentUser(id, permissions, roles);
+        return new CurrentUser(id, roles, permissions);
     }
 
     private List<string> GetClaimValues(string claimType) =>
         [.. _httpContextAccessor.HttpContext!.User.Claims
             .Where(claim => claim.Type == claimType)
-            .Select(claim => claim.Value)];
+            .Select(claim => claim.Value).Distinct()];
 
     private string GetSingleClaimValue(string claimType) =>
         _httpContextAccessor.HttpContext!.User.Claims
