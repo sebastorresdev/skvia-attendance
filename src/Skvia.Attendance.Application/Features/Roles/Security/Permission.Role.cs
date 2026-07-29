@@ -2,13 +2,13 @@ using System.ComponentModel;
 
 using Skvia.Attendance.Application.Common.Attributes;
 
-namespace Skvia.Attendance.Application.Common.Security.Permissions;
+namespace Skvia.Attendance.Application.Common.Security;
 
-public static partial class Permissions
+public static partial class Permission
 {
     [DisplayName("Permisos de Roles")]
     [Description("Define los permisos para la administración de roles")]
-    public static class Roles
+    public static class Role
     {
         [PermissionInfo("Ver Roles", "Permite ver la lista de roles")]
         public const string View = "Permissions.Roles.View";

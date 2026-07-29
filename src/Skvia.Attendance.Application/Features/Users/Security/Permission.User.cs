@@ -2,13 +2,13 @@ using System.ComponentModel;
 
 using Skvia.Attendance.Application.Common.Attributes;
 
-namespace Skvia.Attendance.Application.Common.Security.Permissions;
+namespace Skvia.Attendance.Application.Common.Security;
 
-public static partial class Permissions
+public static partial class Permission
 {
     [DisplayName("Permisos de Usuarios")]
     [Description("Define los permisos para la administración de usuarios")]
-    public static class Users
+    public static class User
     {
         [PermissionInfo("Ver Usuarios", "Permite ver la lista de usuarios")]
         public const string View = "Permissions.Users.View";

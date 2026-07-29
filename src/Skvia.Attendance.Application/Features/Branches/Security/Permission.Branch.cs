@@ -2,13 +2,13 @@ using System.ComponentModel;
 
 using Skvia.Attendance.Application.Common.Attributes;
 
-namespace Skvia.Attendance.Application.Common.Security.Permissions;
+namespace Skvia.Attendance.Application.Common.Security;
 
-public static partial class Permissions
+public static partial class Permission
 {
     [DisplayName("Permisos Sedes")]
     [Description("Establece los permisos para las operaciones con sedes")]
-    public static class Branches
+    public static class Branch
     {
         [PermissionInfo("Crear Sucursal", "Permite crear una sucursal")]
         public const string Create = "Permissions.Branches.Create";

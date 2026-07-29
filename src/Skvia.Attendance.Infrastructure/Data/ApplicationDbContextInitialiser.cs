@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-using Skvia.Attendance.Application.Common.Constants;
-using Skvia.Attendance.Application.Common.Security.Permissions;
+using Skvia.Attendance.Application.Common.Security;
+using Skvia.Attendance.Application.Common.Security.Roles;
 using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Identity;
 
@@ -150,7 +150,7 @@ public class ApplicationDbContextInitialiser
         var permissions = new List<string>();
 
         // Obtiene todas las clases anidadas (Branches, Users, etc.) dentro de Permissions
-        var modules = typeof(Permissions).GetNestedTypes(BindingFlags.Public | BindingFlags.Static);
+        var modules = typeof(Permission).GetNestedTypes(BindingFlags.Public | BindingFlags.Static);
 
         foreach (var module in modules)
         {

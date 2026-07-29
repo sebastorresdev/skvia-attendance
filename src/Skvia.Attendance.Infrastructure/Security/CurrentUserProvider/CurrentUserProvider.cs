@@ -21,7 +21,7 @@ public class CurrentUserProvider(IHttpContextAccessor _httpContextAccessor) : IC
 
         var id = Guid.Parse(GetSingleClaimValue(ClaimTypes.NameIdentifier));
         var roles = GetClaimValues(ClaimTypes.Role);
-        var permissions = GetClaimValues(CustomClaimTypes.Permissions);
+        var permissions = GetClaimValues(CustomClaimTypes.Permission);
 
         return new CurrentUser(id, roles, permissions);
     }

@@ -2,19 +2,16 @@ using System.ComponentModel;
 using System.Reflection;
 
 using Skvia.Attendance.Application.Common.Attributes;
-using Skvia.Attendance.Application.Features.Permissions.DTOs;
-namespace Skvia.Attendance.Application.Features.Permissions.Queries.GetPermissions;
 
-public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, ErrorOr<List<PermissionGroupDto>>>
+namespace Skvia.Attendance.Application.Common.Security.Permissions;
+
+public static class PermissionCatalog
 {
-    public async Task<ErrorOr<List<PermissionGroupDto>>> HandleAsync(
-        GetPermissionsQuery query,
-        CancellationToken cancellationToken)
+    public static List<PermissionCatalogGroupDto> GetAll()
     {
-        var permissions = new List<PermissionGroupDto>();
+        var permissions = new List<PermissionCatalogGroupDto>();
 
-        var groups = typeof(Common.Security.Permissions.Permissions)
-            .GetNestedTypes(BindingFlags.Public | BindingFlags.Static);
+        var groups = typeof(Permission).GetNestedTypes(BindingFlags.Public | BindingFlags.Static);
 
         foreach (var group in groups)
         {
@@ -24,7 +21,7 @@ public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Err
             var groupDescription = group.GetCustomAttribute<DescriptionAttribute>()?.Description
                                   ?? string.Empty;
 
-            var permissionsItem = new List<PermissionItemDto>();
+            var permissionsItem = new List<PermissionCatalogItemDto>();
 
             var fields = group.GetFields(BindingFlags.Public | BindingFlags.Static);
 
@@ -34,19 +31,17 @@ public class GetPermissionsQueryHandler : IQueryHandler<GetPermissionsQuery, Err
                 if (attr == null)
                     continue;
 
-                permissionsItem.Add(new PermissionItemDto
-                (
+                permissionsItem.Add(new PermissionCatalogItemDto(
                     Key: field.GetValue(null)?.ToString() ?? "",
                     Display: attr.Display,
                     Description: attr.Description
                 ));
             }
 
-            permissions.Add(new PermissionGroupDto
-            (
-               Group: groupDisplay,
-               GroupDescription: groupDescription,
-               Permissions: permissionsItem
+            permissions.Add(new PermissionCatalogGroupDto(
+                Group: groupDisplay,
+                GroupDescription: groupDescription,
+                Permissions: permissionsItem
             ));
         }
 

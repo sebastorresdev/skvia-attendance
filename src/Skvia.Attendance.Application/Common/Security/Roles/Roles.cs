@@ -1,4 +1,4 @@
-namespace Skvia.Attendance.Application.Common.Constants;
+namespace Skvia.Attendance.Application.Common.Security.Roles;
 
 public static class Roles
 {

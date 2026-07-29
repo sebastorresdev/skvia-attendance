@@ -2,14 +2,14 @@ using System.ComponentModel;
 
 using Skvia.Attendance.Application.Common.Attributes;
 
-namespace Skvia.Attendance.Application.Common.Security.Permissions;
+namespace Skvia.Attendance.Application.Common.Security;
 
 
-public partial class Permissions
+public static partial class Permission
 {
     [DisplayName("Permisos Empleados")]
     [Description("Establece los permisos para las operaciones con empleados.")]
-    public static class Employees
+    public static class Employee
     {
         [PermissionInfo("Ver Empleado", "Permite ver la lista de empleados.")]
         public const string View = "Permissions.Employees.View";
