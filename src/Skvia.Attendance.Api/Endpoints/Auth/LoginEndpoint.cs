@@ -2,7 +2,7 @@ using System.Security.Claims;
 
 using Microsoft.AspNetCore.Identity;
 
-using Skvia.Attendance.Application.Auth.Commands.Login;
+using Skvia.Attendance.Application.Features.Auth.Commands.Login;
 
 namespace Skvia.Attendance.Api.Endpoints.Auth;
 

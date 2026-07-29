@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Users.Commands.UpdateUser;
+using Skvia.Attendance.Application.Features.Users.Commands.UpdateUser;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 

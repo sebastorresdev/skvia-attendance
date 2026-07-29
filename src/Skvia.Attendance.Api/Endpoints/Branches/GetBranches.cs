@@ -1,5 +1,5 @@
-using Skvia.Attendance.Application.Branches.DTOs;
-using Skvia.Attendance.Application.Branches.Queries.GetBranches;
+using Skvia.Attendance.Application.Features.Branches.DTOs;
+using Skvia.Attendance.Application.Features.Branches.Queries.GetBranches;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 

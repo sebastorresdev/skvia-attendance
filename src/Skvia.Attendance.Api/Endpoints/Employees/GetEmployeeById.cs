@@ -1,5 +1,5 @@
-using Skvia.Attendance.Application.Employees.DTOs;
-using Skvia.Attendance.Application.Employees.Queries.GetEmployeeById;
+using Skvia.Attendance.Application.Features.Employees.DTOs;
+using Skvia.Attendance.Application.Features.Employees.Queries.GetEmployeeById;
 
 namespace Skvia.Attendance.Api.Endpoints.Employees;
 

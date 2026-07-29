@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Users.Commands.DeleteUser;
+using Skvia.Attendance.Application.Features.Users.Commands.DeleteUser;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 

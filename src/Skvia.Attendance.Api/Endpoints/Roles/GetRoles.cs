@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Roles.Queries.GetRoles;
+using Skvia.Attendance.Application.Features.Roles.Queries.GetRoles;
 
 namespace Skvia.Attendance.Api.Endpoints.Roles;
 

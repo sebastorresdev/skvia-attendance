@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Employees.Commands.DeleteEmployee;
+using Skvia.Attendance.Application.Features.Employees.Commands.DeleteEmployee;
 
 namespace Skvia.Attendance.Api.Endpoints.Employees;
 

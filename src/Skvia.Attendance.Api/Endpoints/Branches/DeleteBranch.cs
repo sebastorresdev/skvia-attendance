@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Branches.Commands.DeleteBranch;
+using Skvia.Attendance.Application.Features.Branches.Commands.DeleteBranch;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 

@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Users.Commands.UploadUserAvatar;
+using Skvia.Attendance.Application.Features.Users.Commands.UploadUserAvatar;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 

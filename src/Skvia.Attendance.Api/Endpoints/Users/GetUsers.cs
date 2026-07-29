@@ -1,5 +1,5 @@
-using Skvia.Attendance.Application.Users.DTOs;
-using Skvia.Attendance.Application.Users.Queries.GetUsers;
+using Skvia.Attendance.Application.Features.Users.DTOs;
+using Skvia.Attendance.Application.Features.Users.Queries.GetUsers;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 

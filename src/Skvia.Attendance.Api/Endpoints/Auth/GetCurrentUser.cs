@@ -1,6 +1,6 @@
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Auth.Queries.GetCurrentUser;
 using Skvia.Attendance.Application.Common.Models;
+using Skvia.Attendance.Application.Features.Auth.Queries.GetCurrentUser;
 
 namespace Skvia.Attendance.Api.Endpoints.Auth;
 

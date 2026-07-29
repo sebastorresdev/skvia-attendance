@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Employees.Commands.UpdateEmployee;
+using Skvia.Attendance.Application.Features.Employees.Commands.UpdateEmployee;
 
 namespace Skvia.Attendance.Api.Endpoints.Employees;
 

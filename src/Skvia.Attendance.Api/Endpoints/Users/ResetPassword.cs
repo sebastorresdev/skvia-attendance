@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Users.Commands.ResetPassword;
+using Skvia.Attendance.Application.Features.Users.Commands.ResetPassword;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 

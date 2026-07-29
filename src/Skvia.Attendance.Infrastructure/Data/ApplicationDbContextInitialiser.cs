@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using Skvia.Attendance.Application.Common.Constants;
 using Skvia.Attendance.Application.Common.Security.Permissions;
-using Skvia.Attendance.Application.Common.Security.Roles;
 using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Identity;
 

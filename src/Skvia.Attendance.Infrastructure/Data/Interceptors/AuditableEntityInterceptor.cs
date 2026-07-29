@@ -30,7 +30,7 @@ public class AuditableEntityInterceptor(ICurrentUserProvider currentUserProvider
         {
             // 🌟 Intentamos obtener el usuario real si existe HttpContext
             CurrentUser currentUser = currentUserProvider.GetCurrentUser();
-            userId = currentUser?.Id;
+            userId = currentUser?.UserId;
         }
         catch (InvalidOperationException)
         {

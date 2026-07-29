@@ -1,4 +1,4 @@
-﻿using Skvia.Attendance.Application.Branches.Commands.ArchiveBranch;
+using Skvia.Attendance.Application.Features.Branches.Commands.ArchiveBranch;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 

@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Users.Commands.CreateUser;
+using Skvia.Attendance.Application.Features.Users.Commands.CreateUser;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 

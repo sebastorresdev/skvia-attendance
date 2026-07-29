@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Employees.Commands.CreateEmployee;
+using Skvia.Attendance.Application.Features.Employees.Commands.CreateEmployee;
 
 namespace Skvia.Attendance.Api.Endpoints.Employees;
 

@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Branches.Commands.UpdateBranch;
+using Skvia.Attendance.Application.Features.Branches.Commands.UpdateBranch;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 
