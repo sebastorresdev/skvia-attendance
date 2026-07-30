@@ -21,7 +21,9 @@ public class SetUserPermissionOverrides : IEndpoint
         ICommandHandler<SetUserPermissionOverridesCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var result = await handler.HandleAsync(command, cancellationToken);
+        var newCommand = command with { UserId = userId };
+
+        var result = await handler.HandleAsync(newCommand, cancellationToken);
 
         return result.Match(
             _ => TypedResults.NoContent(),
