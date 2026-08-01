@@ -7,9 +7,9 @@ namespace Skvia.Attendance.Application.Common.Security.Permissions;
 
 public static class PermissionCatalog
 {
-    public static List<PermissionCatalogGroupDto> GetAll()
+    public static List<PermissionCatalogGroupResponse> GetAll()
     {
-        var permissions = new List<PermissionCatalogGroupDto>();
+        var permissions = new List<PermissionCatalogGroupResponse>();
 
         var groups = typeof(Permission).GetNestedTypes(BindingFlags.Public | BindingFlags.Static);
 
@@ -21,7 +21,7 @@ public static class PermissionCatalog
             var groupDescription = group.GetCustomAttribute<DescriptionAttribute>()?.Description
                                   ?? string.Empty;
 
-            var permissionsItem = new List<PermissionCatalogItemDto>();
+            var permissionsItem = new List<PermissionCatalogItemResponse>();
 
             var fields = group.GetFields(BindingFlags.Public | BindingFlags.Static);
 
@@ -31,14 +31,14 @@ public static class PermissionCatalog
                 if (attr == null)
                     continue;
 
-                permissionsItem.Add(new PermissionCatalogItemDto(
+                permissionsItem.Add(new PermissionCatalogItemResponse(
                     Key: field.GetValue(null)?.ToString() ?? "",
                     Display: attr.Display,
                     Description: attr.Description
                 ));
             }
 
-            permissions.Add(new PermissionCatalogGroupDto(
+            permissions.Add(new PermissionCatalogGroupResponse(
                 Group: groupDisplay,
                 GroupDescription: groupDescription,
                 Permissions: permissionsItem

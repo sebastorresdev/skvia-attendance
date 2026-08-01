@@ -2,6 +2,7 @@ using System.Security.Claims;
 
 using Microsoft.AspNetCore.Identity;
 
+using Skvia.Attendance.Api.Endpoints.Auth.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Auth.Commands.Login;
 
@@ -26,10 +27,11 @@ public sealed class Login : IEndpoint
             .Produces<ApiProblemDetails>(StatusCodes.Status401Unauthorized);
 
     private static async Task<IResult> Handle(
-        LoginCommand command,
+        LoginRequest request,
         ICommandHandler<LoginCommand, ErrorOr<ClaimsPrincipal>> handler,
         CancellationToken cancellationToken)
     {
+        var command = new LoginCommand(request.UserName, request.Password);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(

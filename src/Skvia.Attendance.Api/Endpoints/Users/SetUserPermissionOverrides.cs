@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.SetUserPermissionOverrides;
 
@@ -19,13 +20,13 @@ public sealed class SetUserPermissionOverrides : IEndpoint
 
     private static async Task<IResult> Handle(
         Guid userId,
-        [FromBody] SetUserPermissionOverridesCommand command,
+        [FromBody] SetUserPermissionOverridesRequest request,
         ICommandHandler<SetUserPermissionOverridesCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var commandWithUserId = command with { UserId = userId };
+        var command = new SetUserPermissionOverridesCommand(userId, request.PermissionKeys);
 
-        var result = await handler.HandleAsync(commandWithUserId, cancellationToken);
+        var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
             _ => TypedResults.NoContent(),

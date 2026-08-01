@@ -1,3 +1,4 @@
+using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.ResetPassword;
 
@@ -15,10 +16,11 @@ public sealed class ResetPassword : IEndpoint
             .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound);
 
     private static async Task<IResult> Handle(
-        ResetPasswordCommand command,
+        ResetPasswordRequest request,
         ICommandHandler<ResetPasswordCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
+        var command = new ResetPasswordCommand(request.UserId, request.NewPassword, request.ConfirmNewPassword);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(

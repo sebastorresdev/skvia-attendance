@@ -1,3 +1,4 @@
+using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.UpdateUser;
 
@@ -17,13 +18,22 @@ public sealed class UpdateUser : IEndpoint
 
     private static async Task<IResult> Handle(
         Guid userId,
-        UpdateUserCommand command,
+        UpdateUserRequest request,
         ICommandHandler<UpdateUserCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var commandWithUserId = command with { UserId = userId };
+        var command = new UpdateUserCommand(
+            userId,
+            request.UserName,
+            request.IsActive,
+            request.Email,
+            request.DisplayName,
+            request.PhoneNumber,
+            request.PhotoUrl,
+            request.BranchIds,
+            request.RoleIds);
 
-        var result = await handler.HandleAsync(commandWithUserId, cancellationToken);
+        var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
             _ => TypedResults.NoContent(),

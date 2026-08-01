@@ -20,5 +20,5 @@ public interface IUserAccountService
     Task<ErrorOr<ClaimsPrincipal>> AuthenticateAsync(LoginCommand command, CancellationToken cancellationToken);
     Task<ErrorOr<UserDetailResponse>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken);
     Task<ErrorOr<List<UserResponse>>> GetUsersAsync(CancellationToken cancellationToken);
-    Task<ErrorOr<List<PermissionGroupDto>>> GetUserPermissionsAsync(Guid userId, CancellationToken cancellationToken);
+    Task<ErrorOr<List<PermissionGroupResponse>>> GetUserPermissionsAsync(Guid userId, CancellationToken cancellationToken);
 }

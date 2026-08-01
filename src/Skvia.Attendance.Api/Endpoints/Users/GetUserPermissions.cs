@@ -11,13 +11,13 @@ public sealed class GetUserPermissions : IEndpoint
             .WithName(nameof(GetUserPermissions))
             .WithSummary("Obtener permisos de usuario")
             .WithDescription("Obtiene el catálogo completo de permisos marcando cuáles tiene asignados el usuario y su origen.")
-            .Produces<List<PermissionGroupDto>>(StatusCodes.Status200OK)
+            .Produces<List<PermissionGroupResponse>>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound);
 
     private static async Task<IResult> Handle(
         Guid userId,
-        IQueryHandler<GetUserPermissionsQuery, ErrorOr<List<PermissionGroupDto>>> handler,
+        IQueryHandler<GetUserPermissionsQuery, ErrorOr<List<PermissionGroupResponse>>> handler,
         CancellationToken cancellationToken)
     {
         var query = new GetUserPermissionsQuery(userId);

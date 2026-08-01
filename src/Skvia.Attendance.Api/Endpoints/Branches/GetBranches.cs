@@ -1,26 +1,28 @@
+using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Branches.DTOs;
 using Skvia.Attendance.Application.Features.Branches.Queries.GetBranches;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 
-public class GetBranches : IEndpoint
+public sealed class GetBranches : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
         => group.MapGet("/", Handle)
-            .WithSummary("Obtener sedes")
-            .WithDescription("Retorna todas las sedes del sistema.")
-            .Produces<BranchResponse>();
+            .WithName(nameof(GetBranches))
+            .WithSummary("Obtener sucursales")
+            .WithDescription("Obtiene el listado completo de sucursales/sedes registradas en el sistema.")
+            .Produces<List<BranchResponse>>(StatusCodes.Status200OK)
+            .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest);
 
     private static async Task<IResult> Handle(
         IQueryHandler<GetBranchesQuery, ErrorOr<List<BranchResponse>>> handler,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
         var query = new GetBranchesQuery();
-
-        var result = await handler.HandleAsync(query, ct);
+        var result = await handler.HandleAsync(query, cancellationToken);
 
         return result.Match(
             TypedResults.Ok,
-            ResultExtensions.ToProblem);
+            errors => errors.ToProblem());
     }
 }

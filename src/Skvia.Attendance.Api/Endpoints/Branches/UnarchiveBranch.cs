@@ -1,15 +1,19 @@
+using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Branches.Commands.UnarchiveBranch;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 
-public class UnarchiveBranch : IEndpoint
+public sealed class UnarchiveBranch : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
     {
         group.MapPatch("/{id:guid}/unarchive", Handle)
-            .WithSummary("Desarchiva sucursal")
-            .WithDescription("Desarchiv una sucursal en el sistema.")
-            .Produces(StatusCodes.Status204NoContent);
+            .WithName(nameof(UnarchiveBranch))
+            .WithSummary("Desarchivar sucursal")
+            .WithDescription("Desarchiva una sucursal en el sistema.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound);
     }
 
     private static async Task<IResult> Handle(
@@ -18,11 +22,10 @@ public class UnarchiveBranch : IEndpoint
         CancellationToken cancellationToken)
     {
         var command = new UnarchiveBranchCommand(id);
-
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
-            _ => Results.NoContent(),
-            ResultExtensions.ToProblem);
+            _ => TypedResults.NoContent(),
+            errors => errors.ToProblem());
     }
 }

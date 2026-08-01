@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 using Skvia.Attendance.Application.Common.Interfaces;
-using Skvia.Attendance.Application.Common.Models;
+using Skvia.Attendance.Application.Features.Auth.DTOs;
 using Skvia.Attendance.Domain.Common;
 
 namespace Skvia.Attendance.Infrastructure.Data.Interceptors;
@@ -29,7 +29,7 @@ public class AuditableEntityInterceptor(ICurrentUserProvider currentUserProvider
         try
         {
             // 🌟 Intentamos obtener el usuario real si existe HttpContext
-            CurrentUser currentUser = currentUserProvider.GetCurrentUser();
+            CurrentUserResponse currentUser = currentUserProvider.GetCurrentUser();
             userId = currentUser?.UserId;
         }
         catch (InvalidOperationException)

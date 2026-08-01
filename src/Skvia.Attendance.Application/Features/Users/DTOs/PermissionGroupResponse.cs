@@ -1,7 +1,7 @@
 namespace Skvia.Attendance.Application.Features.Users.DTOs;
 
-public record PermissionGroupDto(
+public record PermissionGroupResponse(
     string Group,
     string GroupDescription,
-    List<PermissionItemDto> Permissions
+    List<PermissionItemResponse> Permissions
 );

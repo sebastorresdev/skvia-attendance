@@ -1,3 +1,3 @@
-namespace Skvia.Attendance.Application.Features.Roles.Queries.GetRoles;
+namespace Skvia.Attendance.Application.Features.Roles.DTOs;
 
 public record RoleResponse(Guid RoleId, string Name, string? Description);

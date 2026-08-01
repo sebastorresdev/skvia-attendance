@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.DeleteUser;
 
@@ -18,10 +19,11 @@ public sealed class DeleteBatchUsers : IEndpoint
             .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
-        [FromBody] DeleteUserCommand command,
+        [FromBody] DeleteUsersBatchRequest request,
         ICommandHandler<DeleteUserCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
+        var command = new DeleteUserCommand(request.UserIds);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(

@@ -1,8 +1,8 @@
-﻿using Skvia.Attendance.Application.Common.Models;
+using Skvia.Attendance.Application.Features.Auth.DTOs;
 
 namespace Skvia.Attendance.Application.Common.Interfaces;
 
 public interface ICurrentUserProvider
 {
-    CurrentUser GetCurrentUser();
+    CurrentUserResponse GetCurrentUser();
 }

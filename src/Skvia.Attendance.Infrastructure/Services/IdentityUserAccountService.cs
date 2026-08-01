@@ -300,7 +300,7 @@ public class IdentityUserAccountService(
         return users;
     }
 
-    public async Task<ErrorOr<List<PermissionGroupDto>>> GetUserPermissionsAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<ErrorOr<List<PermissionGroupResponse>>> GetUserPermissionsAsync(Guid userId, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByIdAsync(userId.ToString());
         if (user is null)
@@ -330,7 +330,7 @@ public class IdentityUserAccountService(
         var overrideKeys = userClaims.Where(c => c.Type == CustomClaimTypes.Permission).Select(c => c.Value).ToHashSet();
 
         var catalog = PermissionCatalog.GetAll();
-        var result = catalog.Select(g => new PermissionGroupDto(
+        var result = catalog.Select(g => new PermissionGroupResponse(
             g.Group,
             g.GroupDescription,
             g.Permissions.Select(p =>
@@ -338,7 +338,7 @@ public class IdentityUserAccountService(
                 var fromRole = rolePermissionKeys.Contains(p.Key);
                 var fromOverride = overrideKeys.Contains(p.Key);
 
-                return new PermissionItemDto(
+                return new PermissionItemResponse(
                     p.Key,
                     p.Display,
                     p.Description,

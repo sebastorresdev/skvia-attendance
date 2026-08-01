@@ -1,28 +1,33 @@
+using Skvia.Attendance.Api.Endpoints.Branches.Requests;
+using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Branches.Commands.UpdateBranch;
 
 namespace Skvia.Attendance.Api.Endpoints.Branches;
 
-public class UpdateBranch : IEndpoint
+public sealed class UpdateBranch : IEndpoint
 {
-    public record UpdateBranchRequest(string Code, string Name, string TimeZoneId, string? Address);
     public static void Map(RouteGroupBuilder group)
         => group.MapPut("/{id:guid}", Handle)
+            .WithName(nameof(UpdateBranch))
             .WithSummary("Actualizar sucursal")
             .WithDescription("Modifica los datos de una tienda/sucursal existente.")
-            .Produces(StatusCodes.Status204NoContent);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound)
+            .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
         Guid id,
         UpdateBranchRequest request,
         ICommandHandler<UpdateBranchCommand, ErrorOr<Success>> handler,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        var command = new UpdateBranchCommand(id, request.Name, request.Code, request.Address);
+        var command = new UpdateBranchCommand(id, request.Code, request.Name, request.Address);
 
-        var result = await handler.HandleAsync(command, ct);
+        var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
-            _ => Results.NoContent(),
-            ResultExtensions.ToProblem);
+            _ => TypedResults.NoContent(),
+            errors => errors.ToProblem());
     }
 }

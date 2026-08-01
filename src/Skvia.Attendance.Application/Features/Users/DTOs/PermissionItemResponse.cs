@@ -1,6 +1,6 @@
 namespace Skvia.Attendance.Application.Features.Users.DTOs;
 
-public record PermissionItemDto(
+public record PermissionItemResponse(
     string Key,
     string Display,
     string Description,

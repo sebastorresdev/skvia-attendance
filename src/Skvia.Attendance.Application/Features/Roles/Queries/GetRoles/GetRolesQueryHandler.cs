@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
+using Skvia.Attendance.Application.Features.Roles.DTOs;
 using Skvia.Attendance.Domain.Identity;
 
 namespace Skvia.Attendance.Application.Features.Roles.Queries.GetRoles;

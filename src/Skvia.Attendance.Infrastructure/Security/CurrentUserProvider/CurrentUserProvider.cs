@@ -4,17 +4,17 @@ using Microsoft.AspNetCore.Http;
 
 using Skvia.Attendance.Application.Common.Constants;
 using Skvia.Attendance.Application.Common.Interfaces;
-using Skvia.Attendance.Application.Common.Models;
+using Skvia.Attendance.Application.Features.Auth.DTOs;
 
 namespace Skvia.Attendance.Infrastructure.Security.CurrentUserProvider;
 
 public class CurrentUserProvider(IHttpContextAccessor _httpContextAccessor) : ICurrentUserProvider
 {
-    public CurrentUser GetCurrentUser()
+    public CurrentUserResponse GetCurrentUser()
     {
         if (_httpContextAccessor.HttpContext == null)
         {
-            return new CurrentUser(Guid.Empty, [], []);
+            return new CurrentUserResponse(Guid.Empty, [], []);
         }
 
         ArgumentNullException.ThrowIfNull(_httpContextAccessor);
@@ -23,7 +23,7 @@ public class CurrentUserProvider(IHttpContextAccessor _httpContextAccessor) : IC
         var roles = GetClaimValues(ClaimTypes.Role);
         var permissions = GetClaimValues(CustomClaimTypes.Permission);
 
-        return new CurrentUser(id, roles, permissions);
+        return new CurrentUserResponse(id, roles, permissions);
     }
 
     private List<string> GetClaimValues(string claimType) =>

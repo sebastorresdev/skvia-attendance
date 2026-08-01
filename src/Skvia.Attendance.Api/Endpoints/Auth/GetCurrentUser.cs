@@ -1,5 +1,5 @@
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Common.Models;
+using Skvia.Attendance.Application.Features.Auth.DTOs;
 using Skvia.Attendance.Application.Features.Auth.Queries.GetCurrentUser;
 
 namespace Skvia.Attendance.Api.Endpoints.Auth;
@@ -11,12 +11,12 @@ public sealed class GetCurrentUser : IEndpoint
             .WithName(nameof(GetCurrentUser))
             .WithSummary("Obtener usuario autenticado")
             .WithDescription("Retorna la información del usuario que se encuentra actualmente autenticado en la sesión.")
-            .Produces<CurrentUser>(StatusCodes.Status200OK)
+            .Produces<CurrentUserResponse>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status401Unauthorized)
             .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound);
 
     private static async Task<IResult> Handle(
-        IQueryHandler<GetCurrentUserQuery, ErrorOr<CurrentUser>> handler,
+        IQueryHandler<GetCurrentUserQuery, ErrorOr<CurrentUserResponse>> handler,
         CancellationToken cancellationToken)
     {
         var query = new GetCurrentUserQuery();

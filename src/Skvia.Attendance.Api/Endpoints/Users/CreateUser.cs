@@ -1,3 +1,4 @@
+using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.CreateUser;
 
@@ -6,6 +7,7 @@ namespace Skvia.Attendance.Api.Endpoints.Users;
 public sealed class CreateUser : IEndpoint
 {
     public record CreateUserResponse(Guid UserId);
+
     public static void Map(RouteGroupBuilder group)
         => group.MapPost("/", Handle)
             .WithName(nameof(CreateUser))
@@ -16,10 +18,20 @@ public sealed class CreateUser : IEndpoint
             .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
-        CreateUserCommand command,
+        CreateUserRequest request,
         ICommandHandler<CreateUserCommand, ErrorOr<Guid>> handler,
         CancellationToken cancellationToken)
     {
+        var command = new CreateUserCommand(
+            request.UserName,
+            request.Password,
+            request.Email,
+            request.DisplayName,
+            request.PhoneNumber,
+            request.PhotoUrl,
+            request.BranchIds,
+            request.RoleIds);
+
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
