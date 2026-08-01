@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 namespace Skvia.Attendance.Application.Features.Users.Commands.UploadUserAvatar;
 
 public sealed class UploadUserAvatarCommandHandler(
-    IWebHostEnvironment env,
+    IWebHostEnvironment environment,
     IHttpContextAccessor httpContextAccessor)
     : ICommandHandler<UploadUserAvatarCommand, ErrorOr<FileUploadResponse>>
 {
@@ -16,7 +16,7 @@ public sealed class UploadUserAvatarCommandHandler(
         var fileExtension = Path.GetExtension(command.FileName).ToLowerInvariant();
 
         // 2. Carpeta dentro de wwwroot
-        var uploadDirectory = Path.Combine(env.WebRootPath, "uploads", "users");
+        var uploadDirectory = Path.Combine(environment.WebRootPath, "uploads", "users");
 
         // 3. Nombre único
         var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";

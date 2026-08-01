@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Skvia.Attendance.Application.Features.Employees.Commands.UpdateEmployee;
 
-public class UpdateEmployeeCommandHandler(IApplicationDbContext db) : ICommandHandler<UpdateEmployeeCommand, ErrorOr<Success>>
+public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICommandHandler<UpdateEmployeeCommand, ErrorOr<Success>>
 {
     public async Task<ErrorOr<Success>> HandleAsync(UpdateEmployeeCommand command, CancellationToken cancellationToken)
     {
-        var employee = await db.Employees.FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
+        var employee = await dbContext.Employees.FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (employee is null)
         {
@@ -19,7 +19,7 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext db) : ICommandHa
         // Check for duplicate document number if it's being changed and belongs to another employee
         if (employee.DocumentIdentifier.Type != documentIdentifier.Type || employee.DocumentIdentifier.Number != documentIdentifier.Number)
         {
-            if (await db.Employees.AnyAsync(e => e.DocumentIdentifier.Type == documentIdentifier.Type && e.DocumentIdentifier.Number == documentIdentifier.Number && e.Id != command.Id, cancellationToken))
+            if (await dbContext.Employees.AnyAsync(e => e.DocumentIdentifier.Type == documentIdentifier.Type && e.DocumentIdentifier.Number == documentIdentifier.Number && e.Id != command.Id, cancellationToken))
             {
                 return EmployeeErrors.DocumentExists(command.DocumentNumber);
             }
@@ -37,7 +37,7 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext db) : ICommandHa
             command.Department,
             command.PhotoUrl);
 
-        await db.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success;
     }

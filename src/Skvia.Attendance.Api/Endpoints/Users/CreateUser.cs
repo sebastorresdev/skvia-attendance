@@ -6,7 +6,7 @@ namespace Skvia.Attendance.Api.Endpoints.Users;
 
 public sealed class CreateUser : IEndpoint
 {
-    public record CreateUserResponse(Guid UserId);
+    public record CreateUserResponse(Guid Id);
 
     public static void Map(RouteGroupBuilder group)
         => group.MapPost("/", Handle)

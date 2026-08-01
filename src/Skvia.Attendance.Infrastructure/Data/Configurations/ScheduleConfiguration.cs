@@ -1,6 +1,6 @@
 using Skvia.Attendance.Domain.Schedules;
 
-namespace BubbaSuite.Infrastructure.Persistence.Configurations;
+namespace Skvia.Attendance.Infrastructure.Data.Configurations;
 
 public class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
 {

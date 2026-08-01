@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Skvia.Attendance.Application.Features.Employees.Queries.GetEmployeeById;
 
-public class GetEmployeeByIdQueryHandler(IApplicationDbContext db) : IQueryHandler<GetEmployeeByIdQuery, ErrorOr<EmployeeDetailResponse>>
+public class GetEmployeeByIdQueryHandler(IApplicationDbContext dbContext) : IQueryHandler<GetEmployeeByIdQuery, ErrorOr<EmployeeDetailResponse>>
 {
     public async Task<ErrorOr<EmployeeDetailResponse>> HandleAsync(GetEmployeeByIdQuery query, CancellationToken cancellationToken)
     {
-        var employee = await db.Employees
+        var employee = await dbContext.Employees
             .AsNoTracking()
             .Where(e => e.Id == query.EmployeeId)
             .Select(e => new EmployeeDetailResponse(

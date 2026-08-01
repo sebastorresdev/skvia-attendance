@@ -1,7 +1,7 @@
 namespace Skvia.Attendance.Application.Features.Users.DTOs;
 
 public record UserResponse(
-    Guid UserId,
+    Guid Id,
     string UserName,
     bool IsActive,
     string BranchName,

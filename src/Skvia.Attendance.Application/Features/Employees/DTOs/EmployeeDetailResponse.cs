@@ -3,7 +3,7 @@ using Skvia.Attendance.Domain.Employees;
 namespace Skvia.Attendance.Application.Features.Employees.DTOs;
 
 public record EmployeeDetailResponse(
-    Guid EmployeeId,
+    Guid Id,
     string Code,
     string FirstName,
     string LastName,

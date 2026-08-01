@@ -264,7 +264,7 @@ public class IdentityUserAccountService(
             .AsNoTracking()
             .Where(user => user.Id == userId)
             .Select(user => new UserDetailResponse(
-                UserId: user.Id,
+                Id: user.Id,
                 DisplayName: user.DisplayName,
                 UserName: user.UserName!,
                 IsActive: user.IsActive,
@@ -286,7 +286,7 @@ public class IdentityUserAccountService(
         List<UserResponse> users = await userManager.Users
             .OrderBy(user => user.NormalizedUserName)
             .Select(user => new UserResponse(
-                UserId: user.Id,
+                Id: user.Id,
                 UserName: user.UserName!,
                 IsActive: user.IsActive,
                 BranchName: user.BranchUsers.Select(bu => bu.Branch.Name).First(),

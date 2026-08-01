@@ -30,7 +30,7 @@ public static class DependencyInjection
             var interceptor = sp.GetRequiredService<ISaveChangesInterceptor>();
 
             // Nota: El connectionString real ya lo manejará automáticamente el orquestador a nivel de infraestructura
-            string? connectionString = builder.Configuration.GetConnectionString("bubba-db"); // Nombre de tu recurso en AppHost
+            string? connectionString = builder.Configuration.GetConnectionString("skvia-attendance-db");
 
             opt.UseNpgsql(connectionString).AddInterceptors(interceptor);
             opt.UseSnakeCaseNamingConvention();

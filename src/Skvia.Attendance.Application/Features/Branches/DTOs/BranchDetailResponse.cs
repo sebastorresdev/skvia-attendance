@@ -1,7 +1,7 @@
 namespace Skvia.Attendance.Application.Features.Branches.DTOs;
 
 public record BranchDetailResponse(
-    Guid BranchId,
+    Guid Id,
     string Code,
     string Name,
     string? Address);

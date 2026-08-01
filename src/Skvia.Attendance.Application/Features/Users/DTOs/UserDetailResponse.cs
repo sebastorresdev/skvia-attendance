@@ -1,7 +1,7 @@
 namespace Skvia.Attendance.Application.Features.Users.DTOs;
 
 public record UserDetailResponse(
-    Guid UserId,
+    Guid Id,
     string? DisplayName,
     string UserName,
     bool IsActive,

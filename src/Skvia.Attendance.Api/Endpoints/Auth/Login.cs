@@ -22,6 +22,7 @@ public sealed class Login : IEndpoint
             .WithSummary("Iniciar sesión")
             .WithDescription("Autentica a un usuario con sus credenciales y genera un token de acceso.")
             .AllowAnonymous()
+            .RequireRateLimiting("StrictLogin")
             .Produces<AuthTokenResponse>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ApiProblemDetails>(StatusCodes.Status401Unauthorized);

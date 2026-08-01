@@ -12,6 +12,7 @@ public sealed class GetRoles : IEndpoint
             .WithName(nameof(GetRoles))
             .WithSummary("Obtener roles")
             .WithDescription("Obtiene el listado de roles del sistema disponibles para asignación de usuarios.")
+            .CacheOutput("CatalogCache")
             .Produces<List<RoleResponse>>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest);
     }

@@ -12,10 +12,11 @@ public sealed class UploadUserAvatar : IEndpoint
             .WithName(nameof(UploadUserAvatar))
             .WithSummary("Subir foto de usuario")
             .WithDescription("Sube la foto de perfil del usuario y retorna los detalles del archivo cargado.")
-            .DisableAntiforgery()
             .Produces<FileUploadResponse>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
-            .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict);
+            .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict)
+            .DisableAntiforgery()
+            .WithRequestTimeout("UploadPolicy");
 
     private static async Task<IResult> Handle(
         [FromForm] IFormFile? avatar,

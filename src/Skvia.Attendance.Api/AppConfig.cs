@@ -20,7 +20,7 @@ public static class AppConfig
             app.MapScalarApiReference(options =>
             {
                 options
-                .WithTitle("BUBBA BAG — API Docs")
+                .WithTitle("SKVIA Attendance — API Docs")
                 .WithTheme(ScalarTheme.Laserwave)
                 .AddDocument("v1", "Versión 1", routePattern: "/api/openapi/{documentName}.json")
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
@@ -33,6 +33,12 @@ public static class AppConfig
         app.UseHttpsRedirection();
 
         app.UseCors("AllowAll");
+
+        app.UseRequestTimeouts();
+
+        app.UseRateLimiter();
+
+        app.UseOutputCache();
 
         app.UseStaticFiles();
 

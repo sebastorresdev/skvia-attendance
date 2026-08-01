@@ -1,3 +1,3 @@
 namespace Skvia.Attendance.Api.Endpoints.Employees.Responses;
 
-public record CreateEmployeeResponse(Guid EmployeeId);
+public record CreateEmployeeResponse(Guid Id);
