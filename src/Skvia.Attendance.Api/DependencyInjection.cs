@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using Skvia.Attendance.Api.Common.Exceptions;
+using Skvia.Attendance.Api.Common.Health;
 using Skvia.Attendance.Api.Common.OpenApi;
 
 namespace Skvia.Attendance.Api;
@@ -22,7 +23,7 @@ public static class DependencyInjection
 
         builder.Services.AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
-            .AddCheck("database", () => HealthCheckResult.Healthy(), tags: ["ready"]);
+            .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
 
         builder.Services.AddCors(opt =>
         {

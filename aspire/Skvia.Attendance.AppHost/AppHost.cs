@@ -9,7 +9,7 @@ var postgresServer = builder.AddPostgres("postgres")
     .WithPgAdmin();
 
 // 🚀 2. Declaramos la base de datos específica dentro del servidor Postgres
-var database = postgresServer.AddDatabase("bubba-db");
+var database = postgresServer.AddDatabase("skvia-attendance-db");
 
 // 🚀 3. Agregamos el proyecto WebApi y le inyectamos la referencia de la base de datos
 builder.AddProject<Projects.Skvia_Attendance_Api>("skvia-attendance-api")

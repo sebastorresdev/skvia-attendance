@@ -45,6 +45,8 @@ public static class AppConfig
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.UseMiddleware<Skvia.Attendance.Api.Common.Middleware.UserContextLoggingMiddleware>();
+
         app.Map("/", () => Results.Redirect("/scalar"));
 
         app.MapDefaultEndpoints();
