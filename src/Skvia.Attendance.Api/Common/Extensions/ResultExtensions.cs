@@ -15,15 +15,14 @@ public static class ResultExtensions
             ErrorType.Conflict => StatusCodes.Status409Conflict,
             ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
             ErrorType.Forbidden => StatusCodes.Status403Forbidden,
-            _ => StatusCodes.Status400BadRequest
+            _ => StatusCodes.Status500InternalServerError
         };
 
-        // 🌟 Instanciamos tu objeto personalizado con el diccionario de errores en NULL
         var apiProblem = new ProblemResponse
         {
             Status = statusCode,
-            Title = error.Code,
-            Detail = error.Description,
+            Title = string.IsNullOrWhiteSpace(error.Code) ? "ApplicationError" : error.Code,
+            Detail = string.IsNullOrWhiteSpace(error.Description) ? "The operation could not be completed." : error.Description,
             Type = GetProblemType(statusCode),
             Errors = null
         };
@@ -46,13 +45,11 @@ public static class ResultExtensions
             return TypedResults.Problem(internalProblem);
         }
 
-        // Si hay errores y todos son de tipo validación
         if (errors.All(error => error.Type == ErrorType.Validation))
         {
             return ContextualValidationProblem(errors);
         }
 
-        // Errores mixtos o de negocio: procesamos el primero
         var firstError = errors.First();
         return ToProblem(firstError);
     }
@@ -76,14 +73,13 @@ public static class ResultExtensions
                 group => group.Select(e => e.Description).ToArray()
             );
 
-        // 🌟 Instanciamos tu objeto personalizado rellenando la propiedad tipada
         var apiProblem = new ProblemResponse
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "Validation.ValidationError",
-            Detail = "Errors de validations",
+            Detail = "Errors de validación",
             Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
-            Errors = errorsDictionary // 👈 Aquí inyectamos el diccionario estructurado
+            Errors = errorsDictionary
         };
 
         return TypedResults.Problem(apiProblem);

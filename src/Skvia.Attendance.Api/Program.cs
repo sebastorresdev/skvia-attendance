@@ -1,11 +1,16 @@
 using Serilog;
+using Serilog.Events;
 
 using Skvia.Attendance.Api;
 using Skvia.Attendance.Application;
 using Skvia.Attendance.Infrastructure;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+    .MinimumLevel.Override("System", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("Application", "Skvia.Attendance.Api")
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}")
     .CreateBootstrapLogger();
 
 try

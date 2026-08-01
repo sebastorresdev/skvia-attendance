@@ -40,19 +40,22 @@ public class Attendance : BaseEntity
         string photoUrl,
         bool isValidCheckIn,
         TimeOnly scheduledStartTime,
-        string operationTimeZoneId) // 🚀 Recibe el string de zona ("America/Lima")
+        string operationTimeZoneId,
+        IClock clock,
+        ITimeZoneProvider timeZoneProvider)
     {
         ArgumentOutOfRangeException.ThrowIfEqual(employeeId, Guid.Empty);
         ArgumentOutOfRangeException.ThrowIfEqual(branchId, Guid.Empty);
         ArgumentException.ThrowIfNullOrWhiteSpace(photoUrl);
 
-        var utcNow = DateTimeOffset.UtcNow; // 🌍 Hora exacta en el planeta (Londres)
+        ArgumentNullException.ThrowIfNull(clock);
+        ArgumentNullException.ThrowIfNull(timeZoneProvider);
 
-        // 🔮 Conversión mágica en memoria para calcular la realidad de la tienda
-        var branchTimeZone = TimeZoneInfo.FindSystemTimeZoneById(operationTimeZoneId);
+        var utcNow = clock.UtcNow;
+        var branchTimeZone = timeZoneProvider.GetTimeZone(operationTimeZoneId);
         var localTime = TimeZoneInfo.ConvertTime(utcNow, branchTimeZone);
 
-        var currentTime = TimeOnly.FromDateTime(localTime.DateTime); // Dará 09:01 AM si entró puntual
+        var currentTime = TimeOnly.FromDateTime(localTime.DateTime);
         var currentDate = DateOnly.FromDateTime(localTime.DateTime);
 
         var minutesLate = currentTime > scheduledStartTime
@@ -72,39 +75,41 @@ public class Attendance : BaseEntity
         };
     }
 
-    public void StartBreak(string photoUrl)
+    public void StartBreak(string photoUrl, IClock clock)
     {
+        ArgumentNullException.ThrowIfNull(clock);
         ArgumentException.ThrowIfNullOrWhiteSpace(photoUrl, "La foto es requerida.");
         if (CheckOut.HasValue) throw new DomainException("No se puede iniciar break después del check-out.");
         if (BreakStart.HasValue) throw new DomainException("El refrigerio ya fue iniciado.");
 
-        BreakStart = DateTimeOffset.UtcNow;
+        BreakStart = clock.UtcNow;
         PhotoBreakStart = photoUrl.Trim();
     }
 
-    public void EndBreak(string photoUrl)
+    public void EndBreak(string photoUrl, IClock clock)
     {
+        ArgumentNullException.ThrowIfNull(clock);
         ArgumentException.ThrowIfNullOrWhiteSpace(photoUrl, "La foto es requerida.");
         if (!BreakStart.HasValue) throw new DomainException("No se puede finalizar un refrigerio no iniciado.");
         if (BreakEnd.HasValue) throw new DomainException("El refrigerio ya fue finalizado.");
 
-        BreakEnd = DateTimeOffset.UtcNow; // UTC
+        BreakEnd = clock.UtcNow;
         PhotoBreakEnd = photoUrl.Trim();
     }
 
-    public void RegisterCheckOut(Guid branchId, string photoUrl, bool isValidCheckOut, int totalMinutesScheduled)
+    public void RegisterCheckOut(Guid branchId, string photoUrl, bool isValidCheckOut, int totalMinutesScheduled, IClock clock)
     {
+        ArgumentNullException.ThrowIfNull(clock);
         ArgumentOutOfRangeException.ThrowIfEqual(branchId, Guid.Empty);
         ArgumentException.ThrowIfNullOrWhiteSpace(photoUrl);
         if (CheckOut.HasValue) throw new DomainException("La asistencia ya tiene un check-out.");
         if (BreakStart.HasValue && !BreakEnd.HasValue) throw new DomainException("Termina el break primero.");
 
-        CheckOut = DateTimeOffset.UtcNow; // UTC
+        CheckOut = clock.UtcNow;
         CheckOutBranchId = branchId;
         PhotoCheckOut = photoUrl.Trim();
         IsValidCheckOut = isValidCheckOut;
 
-        // 🧠 Como ambos valores están en UTC, la resta matemática es perfecta a nivel planetario
         int totalMinutes = (int)(CheckOut.Value - CheckIn).TotalMinutes;
 
         if (BreakStart.HasValue && BreakEnd.HasValue)

@@ -1,4 +1,4 @@
-namespace Skvia.Attendance.Infrastructure.Identity.Domain;
+namespace Skvia.Attendance.Domain.Identity;
 
 public static class UserErrors
 {

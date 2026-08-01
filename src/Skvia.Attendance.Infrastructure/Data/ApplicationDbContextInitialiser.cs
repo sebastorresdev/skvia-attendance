@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using Skvia.Attendance.Application.Common.Security;
 using Skvia.Attendance.Application.Common.Security.Roles;
@@ -33,21 +34,26 @@ public class ApplicationDbContextInitialiser
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly SeedOptions _seedOptions;
 
-    public ApplicationDbContextInitialiser(ILogger<ApplicationDbContextInitialiser> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+    public ApplicationDbContextInitialiser(
+        ILogger<ApplicationDbContextInitialiser> logger,
+        ApplicationDbContext context,
+        UserManager<ApplicationUser> userManager,
+        RoleManager<ApplicationRole> roleManager,
+        IOptions<SeedOptions> seedOptions)
     {
         _logger = logger;
         _context = context;
         _userManager = userManager;
         _roleManager = roleManager;
+        _seedOptions = seedOptions.Value;
     }
 
     public async Task InitialiseAsync()
     {
         try
         {
-            // See https://jasontaylor.dev/ef-core-database-initialisation-strategies
-            await _context.Database.EnsureDeletedAsync();
             await _context.Database.EnsureCreatedAsync();
         }
         catch (Exception ex)
@@ -72,6 +78,30 @@ public class ApplicationDbContextInitialiser
 
     public async Task TrySeedAsync()
     {
+        if (!_seedOptions.Enabled)
+        {
+            _logger.LogInformation("Seed de datos deshabilitado por configuración.");
+            return;
+        }
+
+        var adminUserName = !string.IsNullOrWhiteSpace(_seedOptions.AdminUserName)
+            ? _seedOptions.AdminUserName
+            : Environment.GetEnvironmentVariable("SKVIA_ADMIN_USERNAME") ?? "admin";
+
+        var adminEmail = !string.IsNullOrWhiteSpace(_seedOptions.AdminEmail)
+            ? _seedOptions.AdminEmail
+            : Environment.GetEnvironmentVariable("SKVIA_ADMIN_EMAIL") ?? "admin@skvia.pe";
+
+        var adminPassword = !string.IsNullOrWhiteSpace(_seedOptions.AdminPassword)
+            ? _seedOptions.AdminPassword
+            : Environment.GetEnvironmentVariable("SKVIA_ADMIN_PASSWORD");
+
+        if (string.IsNullOrWhiteSpace(adminPassword))
+        {
+            _logger.LogWarning("No se configuró una contraseña para el usuario administrador; se omite el seed.");
+            return;
+        }
+
         // Default branches
         var branch = Branch.Create("SKVIA_01", "Sede principal");
         var branch2 = Branch.Create("SKVIA_02", "Sede base");
@@ -108,15 +138,15 @@ public class ApplicationDbContextInitialiser
         }
 
         // Default users
-        ApplicationUser? administrator = await _userManager.FindByNameAsync("admin");
+        ApplicationUser? administrator = await _userManager.FindByNameAsync(adminUserName);
 
         if (administrator is null)
         {
             administrator = new ApplicationUser
             {
                 DisplayName = "Admin",
-                UserName = "admin",
-                Email = "admin@skvia.pe",
+                UserName = adminUserName,
+                Email = adminEmail,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 LastModifiedAt = DateTime.UtcNow,
@@ -124,7 +154,7 @@ public class ApplicationDbContextInitialiser
 
             await _userManager.CreateAsync(
                 administrator,
-                "Password123*");
+                adminPassword);
 
             administrator.BranchUsers.Add(new BranchUser { BranchId = branch.Id, UserId = administrator.Id });
 
@@ -145,8 +175,6 @@ public class ApplicationDbContextInitialiser
     /// </summary>
     private static List<string> GetPermissionsFromConstants()
     {
-        // TODO: revisar la implementacion de los permisos para un PermissionViewModel
-
         var permissions = new List<string>();
 
         // Obtiene todas las clases anidadas (Branches, Users, etc.) dentro de Permissions
@@ -170,13 +198,6 @@ public class ApplicationDbContextInitialiser
                 var amigableName = descriptionAttribute?.Description ?? fi.Name;
 
                 permissions.Add(codeValue);
-
-                //permissions.Add(new Permission
-                //{
-                //    Code = codeValue, // Tu set nativo de la entidad se encargará de rellenar el NormalizedCode 🚀
-                //    Name = amigableName,
-                //    Description = $"Permite realizar la acción de {amigableName.ToLower()} en el sistema."
-                //});
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 using Skvia.Attendance.Api.Endpoints;
 
@@ -12,20 +12,16 @@ public static class EndpointExtensions
             .Where(t => t is { IsAbstract: false, IsInterface: false }
                         && t.IsAssignableTo(typeof(IEndpoint)));
 
-        // 🌟 Agrupamos de forma segura usando el último segmento del Namespace
         var grouped = endpointTypes.GroupBy(t =>
         {
             var ns = t.Namespace ?? "";
             var segments = ns.Split('.');
-
-            // Retorna el último segmento (ej: "Auth", "Branches") convertido a minúsculas
             return segments[^1].ToLower();
         });
 
         foreach (var group in grouped)
         {
-            // Esto creará correctamente: /api/auth, /api/branches, etc.
-            var routeGroup = app.MapGroup($"/api/{group.Key}")
+            var routeGroup = app.MapGroup($"/api/v1/{group.Key}")
                 .WithTags(group.Key);
 
             foreach (var type in group)
@@ -35,12 +31,46 @@ public static class EndpointExtensions
             }
         }
 
+        app.MapGet("/api/health/live", () => Results.Ok(new { status = "Alive" }))
+            .WithName("LiveHealth")
+            .WithTags("Health")
+            .AllowAnonymous();
+
+        app.MapHealthChecks("/api/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("ready"),
+            ResponseWriter = WriteHealthResponse
+        })
+            .WithName("ReadyHealth")
+            .WithTags("Health")
+            .AllowAnonymous();
+
+        app.MapHealthChecks("/api/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("live"),
+            ResponseWriter = WriteHealthResponse
+        })
+            .WithName("LiveHealthChecks")
+            .WithTags("Health")
+            .AllowAnonymous();
+
         return app;
     }
 
-    // public static RouteHandlerBuilder WithPermission(this RouteHandlerBuilder app, string permission)
-    // {
-    //     return app.RequireAuthorization(permission)
-    //         .ProducesProblemForbidden();
-    // }
+    private static Task WriteHealthResponse(HttpContext context, Microsoft.Extensions.Diagnostics.HealthChecks.HealthReport report)
+    {
+        context.Response.ContentType = "application/json";
+        return context.Response.WriteAsJsonAsync(new
+        {
+            status = report.Status.ToString(),
+            duration = report.TotalDuration,
+            checks = report.Entries.Select(entry => new
+            {
+                name = entry.Key,
+                status = entry.Value.Status.ToString(),
+                description = entry.Value.Description,
+                duration = entry.Value.Duration
+            })
+        });
+    }
 }

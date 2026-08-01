@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Skvia.Attendance.Application.Common.Interfaces;
+using Skvia.Attendance.Domain.Common;
 using Skvia.Attendance.Domain.Identity;
 using Skvia.Attendance.Infrastructure.Data;
 using Skvia.Attendance.Infrastructure.Data.Interceptors;
@@ -19,6 +20,10 @@ public static class DependencyInjection
     {
         // Auditorias
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        builder.Services.AddSingleton<IClock, SystemClock>();
+        builder.Services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();
+        builder.Services.Configure<SeedOptions>(builder.Configuration.GetSection(SeedOptions.SectionName));
+
         // 2. Registro clásico adaptado con las convenciones necesarias
         builder.Services.AddDbContext<ApplicationDbContext>((sp, opt) =>
         {
@@ -76,6 +81,7 @@ public static class DependencyInjection
 
         // Services
         builder.Services.AddScoped<IUserPermissionService, UserPermissionService>();
+        builder.Services.AddScoped<IUserAccountService, IdentityUserAccountService>();
 
         return builder;
 

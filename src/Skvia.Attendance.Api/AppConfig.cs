@@ -15,14 +15,14 @@ public static class AppConfig
         {
             await app.InitialiseDatabaseAsync();
 
-            app.MapOpenApi("/api/{documentName}/openapi.json");
+            app.MapOpenApi("/api/openapi/{documentName}.json");
 
             app.MapScalarApiReference(options =>
             {
                 options
                 .WithTitle("BUBBA BAG — API Docs")
-                .WithTheme(ScalarTheme.Saturn)
-                .AddDocument("v1", "Versión 1", routePattern: "/api/v1/openapi.json")
+                .WithTheme(ScalarTheme.Laserwave)
+                .AddDocument("v1", "Versión 1", routePattern: "/api/openapi/{documentName}.json")
                 .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
 
             });

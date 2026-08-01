@@ -16,9 +16,11 @@ internal sealed class GlobalExceptionHandler(
     {
         logger.LogError(
             exception,
-            "Unhandled exception {ExceptionType}. TraceId: {TraceId}",
+            "Unhandled exception {ExceptionType}. TraceId: {TraceId}. Path: {Path}. Method: {Method}",
             exception.GetType().Name,
-            httpContext.TraceIdentifier);
+            httpContext.TraceIdentifier,
+            httpContext.Request.Path,
+            httpContext.Request.Method);
 
         var (statusCode, title, detail) = MapException(exception);
 
