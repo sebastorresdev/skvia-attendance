@@ -1,3 +1,5 @@
+using Skvia.Attendance.Domain.Employees;
+
 namespace Skvia.Attendance.Application.Features.Employees.Commands.UpdateEmployee;
 
 public record UpdateEmployeeCommand(
@@ -5,7 +7,7 @@ public record UpdateEmployeeCommand(
     string Code,
     string FirstName,
     string LastName,
-    int DocumentType,
+    DocumentType DocumentType,
     string DocumentNumber,
     DateTimeOffset HireDate,
     string? Email = null,

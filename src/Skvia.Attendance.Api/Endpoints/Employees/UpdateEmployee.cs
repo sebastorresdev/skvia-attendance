@@ -8,7 +8,8 @@ public class UpdateEmployee : IEndpoint
     {
         group.MapPut("/{id:guid}", Handle)
             .WithSummary("Actualizar Empleado")
-            .Produces(StatusCodes.Status204NoContent);
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest); // Add bad request for mismatching IDs
     }
 
     private static async Task<IResult> Handle(
@@ -17,6 +18,11 @@ public class UpdateEmployee : IEndpoint
         ICommandHandler<UpdateEmployeeCommand, ErrorOr<Success>> handler,
         CancellationToken ct)
     {
+        if (id != command.Id)
+        {
+            return TypedResults.BadRequest(new { Message = "Route ID and command ID do not match." });
+        }
+
         var result = await handler.HandleAsync(command, ct);
 
         return result.Match(

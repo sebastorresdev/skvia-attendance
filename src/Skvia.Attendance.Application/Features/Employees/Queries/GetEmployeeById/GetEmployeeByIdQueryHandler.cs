@@ -1,5 +1,6 @@
 using Skvia.Attendance.Application.Features.Employees.DTOs;
 using Skvia.Attendance.Domain.Employees;
+using Microsoft.EntityFrameworkCore;
 
 namespace Skvia.Attendance.Application.Features.Employees.Queries.GetEmployeeById;
 
@@ -15,16 +16,16 @@ public class GetEmployeeByIdQueryHandler(IApplicationDbContext db) : IQueryHandl
                 e.Code,
                 e.FirstName,
                 e.LastName,
-                e.DocumentType,
-                e.DocumentNumber,
-                e.Email,
-                e.Phone,
+                e.DocumentIdentifier.Type,
+                e.DocumentIdentifier.Number,
+                e.Email != null ? e.Email.Value.Value : null,
+                e.Phone != null ? e.Phone.Value.Value : null,
                 e.Position,
                 e.Department,
                 e.HireDate,
                 e.PhotoUrl))
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (employee is null)
         {
             return EmployeeErrors.NotFound;

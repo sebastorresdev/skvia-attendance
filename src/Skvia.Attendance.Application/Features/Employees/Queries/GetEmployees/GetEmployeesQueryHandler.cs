@@ -1,4 +1,5 @@
 using Skvia.Attendance.Application.Features.Employees.DTOs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Skvia.Attendance.Application.Features.Employees.Queries.GetEmployees;
 
@@ -14,6 +15,10 @@ public class GetEmployeesQueryHandler(IApplicationDbContext db) : IQueryHandler<
                 Code: e.Code,
                 FirstName: e.FirstName,
                 LastName: e.LastName,
+                DocumentType: e.DocumentIdentifier.Type,
+                DocumentNumber: e.DocumentIdentifier.Number,
+                Email: e.Email != null ? e.Email.Value.Value : null,
+                Phone: e.Phone != null ? e.Phone.Value.Value : null,
                 Department: e.Department,
                 PhotoUrl: e.PhotoUrl
             ))

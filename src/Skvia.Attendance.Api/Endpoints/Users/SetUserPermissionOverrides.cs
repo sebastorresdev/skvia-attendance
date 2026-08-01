@@ -5,28 +5,30 @@ using Skvia.Attendance.Application.Features.Users.Commands.SetUserPermissionOver
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 
-public class SetUserPermissionOverrides : IEndpoint
+public sealed class SetUserPermissionOverrides : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
-    {
-        group.MapPut("/{userId}/permissions/overrides", handle)
-            .WithSummary("Reemplaza los permisos individuales (overrides) del usuario")
+        => group.MapPut("/{userId:guid}/permissions/overrides", Handle)
+            .WithName(nameof(SetUserPermissionOverrides))
+            .WithSummary("Reemplazar permisos individuales de usuario")
+            .WithDescription("Reemplaza el conjunto de excepciones/anulaciones (overrides) de permisos directamente asignados a un usuario.")
             .Produces(StatusCodes.Status204NoContent)
-            .Produces<ProblemResponse>(StatusCodes.Status409Conflict);
-    }
+            .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound)
+            .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict);
 
-    private static async Task<IResult> handle(
+    private static async Task<IResult> Handle(
         Guid userId,
         [FromBody] SetUserPermissionOverridesCommand command,
         ICommandHandler<SetUserPermissionOverridesCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var newCommand = command with { UserId = userId };
+        var commandWithUserId = command with { UserId = userId };
 
-        var result = await handler.HandleAsync(newCommand, cancellationToken);
+        var result = await handler.HandleAsync(commandWithUserId, cancellationToken);
 
         return result.Match(
             _ => TypedResults.NoContent(),
-            ResultExtensions.ToProblem);
+            errors => errors.ToProblem());
     }
 }

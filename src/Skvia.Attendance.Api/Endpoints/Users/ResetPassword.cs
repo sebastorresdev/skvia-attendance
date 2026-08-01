@@ -1,15 +1,18 @@
+using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.ResetPassword;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 
-public class ResetPassword : IEndpoint
+public sealed class ResetPassword : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
-    {
-        group.MapPost("/reset-password", Handle)
-            .WithSummary("Reseto de contraseña. Solo el usuario con rol admin puede realizar esta operación")
-            .Produces(StatusCodes.Status204NoContent);
-    }
+        => group.MapPost("/reset-password", Handle)
+            .WithName(nameof(ResetPassword))
+            .WithSummary("Restablecer contraseña")
+            .WithDescription("Restablece la contraseña de un usuario. Requiere permisos de administración.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound);
 
     private static async Task<IResult> Handle(
         ResetPasswordCommand command,
@@ -20,6 +23,6 @@ public class ResetPassword : IEndpoint
 
         return result.Match(
             _ => TypedResults.NoContent(),
-            ResultExtensions.ToProblem);
+            errors => errors.ToProblem());
     }
 }

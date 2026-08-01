@@ -1,5 +1,5 @@
 using Skvia.Attendance.Domain.Employees;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace Skvia.Attendance.Application.Features.Employees.Commands.CreateEmployee;
 
@@ -14,9 +14,9 @@ public class CreateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             return EmployeeErrors.CodeExists(command.Code);
         }
 
-        var document = command.DocumentNumber.Trim();
-        
-        if (await dbContext.Employees.AnyAsync(e => e.DocumentNumber == document, cancellationToken))
+        var documentIdentifier = DocumentIdentifier.Create(command.DocumentType, command.DocumentNumber);
+
+        if (await dbContext.Employees.AnyAsync(e => e.DocumentIdentifier.Type == documentIdentifier.Type && e.DocumentIdentifier.Number == documentIdentifier.Number, cancellationToken))
         {
             return EmployeeErrors.DocumentExists(command.DocumentNumber);
         }
@@ -25,15 +25,14 @@ public class CreateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             code: command.Code,
             firstName: command.FirstName,
             lastName: command.LastName,
-            documentType: (DocumentType)command.DocumentType,
-            documentNumber: command.DocumentNumber,
+            documentIdentifier: documentIdentifier,
             hireDate: command.HireDate,
             email: command.Email,
             phone: command.Phone,
             position: command.Position,
             department: command.Department,
             photoUrl: command.PhotoUrl);
-        
+
         dbContext.Employees.Add(employee);
         await dbContext.SaveChangesAsync(cancellationToken);
 

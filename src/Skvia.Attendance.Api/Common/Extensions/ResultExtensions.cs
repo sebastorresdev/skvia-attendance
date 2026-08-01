@@ -4,9 +4,10 @@ using Skvia.Attendance.Api.Models;
 
 namespace Skvia.Attendance.Api.Common.Extensions;
 
+// Extensions/ResultExtensions.cs
 public static class ResultExtensions
 {
-    public static IResult ToProblem(Error error)
+    public static IResult ToProblem(this Error error)
     {
         var statusCode = error.Type switch
         {
@@ -18,40 +19,56 @@ public static class ResultExtensions
             _ => StatusCodes.Status500InternalServerError
         };
 
-        var apiProblem = new ProblemResponse
+        return TypedResults.Problem(new ApiProblemDetails
         {
             Status = statusCode,
-            Title = string.IsNullOrWhiteSpace(error.Code) ? "ApplicationError" : error.Code,
-            Detail = string.IsNullOrWhiteSpace(error.Description) ? "The operation could not be completed." : error.Description,
+            Title = string.IsNullOrWhiteSpace(error.Code)
+                ? "ApplicationError"
+                : error.Code,
+            Detail = string.IsNullOrWhiteSpace(error.Description)
+                ? "The operation could not be completed."
+                : error.Description,
             Type = GetProblemType(statusCode),
             Errors = null
-        };
-
-        return TypedResults.Problem(apiProblem);
+        });
     }
 
-    public static IResult ToProblem(List<Error>? errors)
+    public static IResult ToProblem(this List<Error>? errors)
     {
         if (errors is null || errors.Count == 0)
-        {
-            var internalProblem = new ProblemResponse
+            return TypedResults.Problem(new ApiProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "InternalServerError",
                 Detail = "Ocurrió un error inesperado al procesar la solicitud.",
-                Type = GetProblemType(StatusCodes.Status500InternalServerError),
-                Errors = null
-            };
-            return TypedResults.Problem(internalProblem);
-        }
+                Type = GetProblemType(StatusCodes.Status500InternalServerError)
+            });
 
-        if (errors.All(error => error.Type == ErrorType.Validation))
+        if (errors.All(e => e.Type == ErrorType.Validation))
+            return ToValidationProblem(errors);
+
+        return errors.First().ToProblem();
+    }
+
+    public static IResult ToProblem(this IEnumerable<Error> errors)
+        => errors.ToList().ToProblem();
+
+    private static ProblemHttpResult ToValidationProblem(List<Error> errors)
+    {
+        var errorsDictionary = errors
+            .GroupBy(e => e.Code)
+            .ToDictionary(
+                g => g.Key,
+                g => g.Select(e => e.Description).ToArray());
+
+        return TypedResults.Problem(new ApiProblemDetails
         {
-            return ContextualValidationProblem(errors);
-        }
-
-        var firstError = errors.First();
-        return ToProblem(firstError);
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Validation.ValidationError",
+            Detail = "Se encontraron errores de validación.",
+            Type = GetProblemType(StatusCodes.Status400BadRequest),
+            Errors = errorsDictionary
+        });
     }
 
     private static string GetProblemType(int statusCode) => statusCode switch
@@ -61,27 +78,7 @@ public static class ResultExtensions
         403 => "https://tools.ietf.org/html/rfc9110#section-15.5.4",
         404 => "https://tools.ietf.org/html/rfc9110#section-15.5.5",
         409 => "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+        500 => "https://tools.ietf.org/html/rfc9110#section-15.6.1",
         _ => "https://tools.ietf.org/html/rfc9110#section-15.6.1"
     };
-
-    private static ProblemHttpResult ContextualValidationProblem(List<Error> errors)
-    {
-        var errorsDictionary = errors
-            .GroupBy(e => e.Code)
-            .ToDictionary(
-                group => group.Key,
-                group => group.Select(e => e.Description).ToArray()
-            );
-
-        var apiProblem = new ProblemResponse
-        {
-            Status = StatusCodes.Status400BadRequest,
-            Title = "Validation.ValidationError",
-            Detail = "Errors de validación",
-            Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1",
-            Errors = errorsDictionary
-        };
-
-        return TypedResults.Problem(apiProblem);
-    }
 }

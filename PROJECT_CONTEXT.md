@@ -43,3 +43,35 @@ Cuando generes código o me ayudes a refactorizar dentro de este IDE, sigue estr
 - **Backend:** Usa sintaxis moderna de C# (Minimal APIs, `MapGroup`, instanciación de servicios con `inject` o DI de Minimal APIs, Types explícitos o fuertemente tipados).
 - **Frontend:** Usa Angular moderno (Standalone Components, `inject()`, Signals para manejo de estado si aplica) y componentes nativos de **NG-ZORRO** (`nz-table`, `nz-form`, `nz-modal`, `nz-notification`).
 - **Consultas EF Core:** Mantén las consultas optimizadas (`AsNoTracking()` para lecturas, filtrado directo por `SedeId`).
+
+---
+
+## ♻️ Refactorización de Entidades y Objetos de Valor (Realizado por Gemini)
+
+Se ha llevado a cabo una refactorización significativa en la entidad `Employee` para mejorar la encapsulación, la validación y la consistencia del dominio mediante la introducción de objetos de valor.
+
+**Cambios Clave:**
+
+1.  **Entidad `Employee` (Dominio):**
+    *   Se reemplazaron las propiedades `DocumentType` (int) y `DocumentNumber` (string) por el objeto de valor `DocumentIdentifier`.
+    *   Se reemplazaron las propiedades `Email` (string) y `Phone` (string) por los objetos de valor `Email` y `Phone` respectivamente.
+    *   Los métodos `Create` y `Update` de la entidad `Employee` ahora aceptan y utilizan estos nuevos objetos de valor, delegando la lógica de validación intrínseca a los mismos.
+
+2.  **Objetos de Valor Creados (Dominio):**
+    *   `DocumentIdentifier` (record struct): Encapsula el tipo y número de documento, con validación de longitud.
+    *   `Email` (record struct): Encapsula la dirección de correo electrónico, con validación de formato y longitud.
+    *   `Phone` (record struct): Encapsula el número de teléfono, con validación de formato y longitud.
+
+3.  **Capa de Aplicación (`Skvia.Attendance.Application`):**
+    *   **Comandos (`CreateEmployeeCommand`, `UpdateEmployeeCommand`):** Se actualizaron para usar el `enum DocumentType` del dominio y para aceptar `string?` para `Email` y `Phone`. La conversión a los objetos de valor se realiza en los `CommandHandlers`.
+    *   **Manejadores de Comandos (`CreateEmployeeCommandHandler`, `UpdateEmployeeCommandHandler`):** Se modificaron para construir los objetos de valor `DocumentIdentifier`, `Email` y `Phone` a partir de los datos del comando antes de interactuar con la entidad `Employee`. Se actualizó la lógica de verificación de unicidad para `DocumentIdentifier`.
+    *   **Validadores de Comandos (`CreateEmployeeCommandValidator`, `UpdateEmployeeCommandValidator`):** Se ajustaron para delegar las validaciones de longitud y formato específicas a los objetos de valor, manteniendo las validaciones de presencia y formato general a nivel de comando.
+    *   **DTOs (`EmployeeResponse`, `EmployeeDetailResponse`):** Se actualizaron para incluir las propiedades `DocumentType`, `DocumentNumber`, `Email` y `Phone` de los objetos de valor, exponiéndolos como tipos primitivos (ej. `string?` para Email/Phone) para simplificar el consumo por parte del cliente.
+    *   **Manejadores de Consultas (`GetEmployeesQueryHandler`, `GetEmployeeByIdQueryHandler`):** Se modificaron las proyecciones para extraer correctamente los valores de los objetos de valor (`DocumentIdentifier.Type`, `DocumentIdentifier.Number`, `Email.Value`, `Phone.Value`) al construir los DTOs de respuesta.
+
+4.  **Capa de Infraestructura (`Skvia.Attendance.Infrastructure`):**
+    *   **Configuración de Entidad `Employee` (`EmployeeConfiguration.cs`):**
+        *   `DocumentIdentifier` se configuró como una entidad poseída (`builder.OwnsOne`), mapeando `Type` y `Number` a columnas separadas (`DocumentType` y `DocumentNumber`) en la tabla `employees`. Se estableció un índice único combinado para `DocumentType` y `DocumentNumber`.
+        *   `Email` y `Phone` se configuraron con `ValueConverter` para mapear sus propiedades `Value` a columnas de tipo `string` en la base de datos, manejando la nulabilidad y las longitudes máximas.
+
+Estos cambios mejoran la robustez del modelo de dominio, centralizan la lógica de validación y preparan la aplicación para un manejo de errores más consistente.

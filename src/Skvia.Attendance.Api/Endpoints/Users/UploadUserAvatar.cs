@@ -1,41 +1,47 @@
+using Microsoft.AspNetCore.Mvc;
+
+using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.UploadUserAvatar;
 
 namespace Skvia.Attendance.Api.Endpoints.Users;
 
-public class UploadUserAvatar : IEndpoint
+public sealed class UploadUserAvatar : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
         => group.MapPost("/avatar", Handle)
+            .WithName(nameof(UploadUserAvatar))
             .WithSummary("Subir foto de usuario")
-            .WithDescription("Sube la foto de perfil y retorna la URL usando el pipeline de comandos.")
+            .WithDescription("Sube la foto de perfil del usuario y retorna los detalles del archivo cargado.")
             .DisableAntiforgery()
-            .Produces<FileUploadResponse>();
+            .Produces<FileUploadResponse>(StatusCodes.Status200OK)
+            .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict);
 
     private static async Task<IResult> Handle(
-        IFormFile? avatar, // .NET Minimal APIs mapea multipart/form-data automáticamente aquí
+        [FromForm] IFormFile? avatar,
         ICommandHandler<UploadUserAvatarCommand, ErrorOr<FileUploadResponse>> handler,
-        CancellationToken ct)
+        CancellationToken cancellationToken)
     {
-        // Validación HTTP superficial básica antes de instanciar recursos
         if (avatar is null || avatar.Length == 0)
         {
-            return TypedResults.BadRequest();
+            var error = Error.Validation(
+                code: "Avatar.Empty",
+                description: "El archivo enviado no puede estar vacío.");
+
+            return new[] { error }.ToProblem();
         }
 
-        // Abrimos el stream del archivo directamente desde la petición HTTP
-        var fileStream = avatar.OpenReadStream();
+        using var fileStream = avatar.OpenReadStream();
 
-        // Construimos nuestro comando limpio de aplicación
         var command = new UploadUserAvatarCommand(
             FileStream: fileStream,
             FileName: avatar.FileName,
             FileLength: avatar.Length);
 
-        var result = await handler.HandleAsync(command, ct);
+        var result = await handler.HandleAsync(command, cancellationToken);
 
-        // Retornamos de manera consistente con el patrón Match de ErrorOr
         return result.Match(
             TypedResults.Ok,
-            ResultExtensions.ToProblem);
+            errors => errors.ToProblem());
     }
 }

@@ -22,7 +22,8 @@ public static class EndpointExtensions
         foreach (var group in grouped)
         {
             var routeGroup = app.MapGroup($"/api/v1/{group.Key}")
-                .WithTags(group.Key);
+                .WithTags(group.Key)
+                .RequireAuthorization(); // <--- AÑADIDO: Requiere autorización para todo el grupo
 
             foreach (var type in group)
             {
