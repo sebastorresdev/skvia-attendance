@@ -1,7 +1,9 @@
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
+var postgresPassword = builder.AddParameter("postgres-password", "postgres", secret: true);
+
 // 🚀 1. Creamos el contenedor de PostgreSQL con su nombre técnico
-var postgresServer = builder.AddPostgres("postgres")
+var postgresServer = builder.AddPostgres("postgres", password: postgresPassword)
     .WithImage("postgres")
     .WithImageTag("16")
     .WithHostPort(5433)
