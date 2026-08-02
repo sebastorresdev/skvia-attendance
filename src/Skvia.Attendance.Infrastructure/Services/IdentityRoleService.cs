@@ -8,6 +8,7 @@ using Skvia.Attendance.Application.Common.Security.Roles;
 using Skvia.Attendance.Application.Features.Roles.Commands.CreateRole;
 using Skvia.Attendance.Application.Features.Roles.Commands.DeleteRole;
 using Skvia.Attendance.Application.Features.Roles.Commands.UpdateRole;
+using Skvia.Attendance.Application.Features.Roles.Commands.SetRolePermissions;
 using Skvia.Attendance.Application.Features.Roles.DTOs;
 using Skvia.Attendance.Domain.Identity;
 
@@ -97,7 +98,7 @@ internal class IdentityRoleService(
                     p.Display,
                     p.Description,
                     Granted: fromRole,
-                    Source: null);
+                    Source: fromRole ? "Override" : null);
             }).ToList()
         )).ToList();
 
@@ -128,6 +129,40 @@ internal class IdentityRoleService(
         if (!result.Succeeded)
         {
             return result.ToApplicationError();
+        }
+
+        return Result.Success;
+    }
+
+    public async Task<ErrorOr<Success>> SetRolePermissionsAsync(SetRolePermissionsCommand command, CancellationToken cancellationToken)
+    {
+        var role = await roleManager.FindByIdAsync(command.RoleId.ToString());
+        if (role is null)
+        {
+            return Error.NotFound("Role.NotFound", "Rol no encontrado");
+        }
+
+        var currentClaims = await roleManager.GetClaimsAsync(role);
+        var currentPermissionClaims = currentClaims.Where(c => c.Type == CustomClaimTypes.Permission).ToList();
+
+        // Remove old claims
+        foreach (var claim in currentPermissionClaims)
+        {
+            var removeResult = await roleManager.RemoveClaimAsync(role, claim);
+            if (!removeResult.Succeeded)
+            {
+                return Error.Failure("Permissions.RemoveFailed", "No se pudieron limpiar los permisos actuales del rol");
+            }
+        }
+
+        // Add new claims
+        foreach (var key in command.PermissionKeys)
+        {
+            var addResult = await roleManager.AddClaimAsync(role, new System.Security.Claims.Claim(CustomClaimTypes.Permission, key));
+            if (!addResult.Succeeded)
+            {
+                return Error.Failure("Permissions.AddFailed", "No se pudieron asignar los nuevos permisos al rol");
+            }
         }
 
         return Result.Success;
