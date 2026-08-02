@@ -1,8 +1,8 @@
+using Skvia.Attendance.Application.Common.DTOs;
 using Skvia.Attendance.Application.Features.Roles.Commands.CreateRole;
 using Skvia.Attendance.Application.Features.Roles.Commands.DeleteRole;
 using Skvia.Attendance.Application.Features.Roles.Commands.UpdateRole;
 using Skvia.Attendance.Application.Features.Roles.DTOs;
-using Skvia.Attendance.Application.Features.Users.DTOs;
 
 namespace Skvia.Attendance.Application.Common.Interfaces;
 

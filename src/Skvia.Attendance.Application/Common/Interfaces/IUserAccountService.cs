@@ -1,5 +1,6 @@
 using System.Security.Claims;
 
+using Skvia.Attendance.Application.Common.DTOs;
 using Skvia.Attendance.Application.Features.Auth.Commands.Login;
 using Skvia.Attendance.Application.Features.Users.Commands.CreateUser;
 using Skvia.Attendance.Application.Features.Users.Commands.DeleteUser;

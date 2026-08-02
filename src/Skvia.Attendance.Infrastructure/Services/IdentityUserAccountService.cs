@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 
 using Skvia.Attendance.Application.Common.Constants;
+using Skvia.Attendance.Application.Common.DTOs;
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Common.Security.Permissions;
 using Skvia.Attendance.Application.Features.Auth.Commands.Login;
@@ -12,7 +13,6 @@ using Skvia.Attendance.Application.Features.Users.Commands.ResetPassword;
 using Skvia.Attendance.Application.Features.Users.Commands.SetUserPermissionOverrides;
 using Skvia.Attendance.Application.Features.Users.Commands.UpdateUser;
 using Skvia.Attendance.Application.Features.Users.DTOs;
-using Skvia.Attendance.Application.Features.Users.Extensions;
 using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Identity;
 

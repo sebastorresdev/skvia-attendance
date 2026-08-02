@@ -1,4 +1,4 @@
-using Skvia.Attendance.Application.Features.Users.DTOs;
+using Skvia.Attendance.Application.Common.DTOs;
 
 namespace Skvia.Attendance.Application.Features.Users.Queries.GetUserPermissions;
 
