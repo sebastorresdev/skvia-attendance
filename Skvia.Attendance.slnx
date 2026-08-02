@@ -13,6 +13,7 @@
     <Project Path="src/Skvia.Attendance.Infrastructure/Skvia.Attendance.Infrastructure.csproj" Id="4cc89fde-119a-43eb-ad2a-46fbb0771464" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Skvia.Attendance.Application.Tests/Skvia.Attendance.Application.Tests.csproj" />
     <Project Path="tests/Skvia.Attendance.Domain.Tests/Skvia.Attendance.Domain.Tests.csproj" />
   </Folder>
 </Solution>
