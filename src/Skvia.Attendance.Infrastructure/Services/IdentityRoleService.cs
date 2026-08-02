@@ -7,8 +7,8 @@ using Skvia.Attendance.Application.Common.Security.Permissions;
 using Skvia.Attendance.Application.Common.Security.Roles;
 using Skvia.Attendance.Application.Features.Roles.Commands.CreateRole;
 using Skvia.Attendance.Application.Features.Roles.Commands.DeleteRole;
-using Skvia.Attendance.Application.Features.Roles.Commands.UpdateRole;
 using Skvia.Attendance.Application.Features.Roles.Commands.SetRolePermissions;
+using Skvia.Attendance.Application.Features.Roles.Commands.UpdateRole;
 using Skvia.Attendance.Application.Features.Roles.DTOs;
 using Skvia.Attendance.Domain.Identity;
 
@@ -65,7 +65,7 @@ internal class IdentityRoleService(
 
         return role is null
             ? Error.NotFound("Role.NotFound", $"Rol con Id '{roleId}' no encontrado.")
-            : new RoleResponse(role.Id, role.Name!, role.Description);
+            : new RoleResponse(role.Id, role.Name!, role.Description, role.LastModifiedAt);
     }
 
     public async Task<ErrorOr<List<PermissionGroupResponse>>> GetRolePermissionsAsync(Guid roleId, CancellationToken cancellationToken)
@@ -109,7 +109,7 @@ internal class IdentityRoleService(
     {
         var roles = await roleManager.Roles.ToListAsync(cancellationToken);
 
-        return roles.Select(r => new RoleResponse(r.Id, r.Name!, r.Description)).ToList();
+        return roles.Select(r => new RoleResponse(r.Id, r.Name!, r.Description, r.LastModifiedAt)).ToList();
     }
 
     public async Task<ErrorOr<Success>> UpdateRoleAsync(UpdateRoleCommand command, CancellationToken cancellationToken)

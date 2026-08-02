@@ -126,7 +126,10 @@ public class ApplicationDbContextInitialiser
         {
             existingAdminRole = new ApplicationRole
             {
-                Name = Roles.Administrator
+                Name = Roles.Administrator,
+                Description = "Rol de administrador con todos los permisos del sistema",
+                CreatedAt = DateTime.UtcNow,
+                LastModifiedAt = DateTime.UtcNow,
             };
             await _roleManager.CreateAsync(existingAdminRole);
         }
