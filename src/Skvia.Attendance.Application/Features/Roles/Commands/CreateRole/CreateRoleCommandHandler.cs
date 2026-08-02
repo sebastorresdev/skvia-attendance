@@ -1,5 +1,7 @@
 namespace Skvia.Attendance.Application.Features.Roles.Commands.CreateRole;
 
-internal class CreateRoleCommandHandler
+public class CreateRoleCommandHandler(IIdentityRoleService identityRoleService) : ICommandHandler<CreateRoleCommand, ErrorOr<Guid>>
 {
+    public async Task<ErrorOr<Guid>> HandleAsync(CreateRoleCommand command, CancellationToken cancellationToken)
+        => await identityRoleService.CreateRoleAsync(command, cancellationToken);
 }
