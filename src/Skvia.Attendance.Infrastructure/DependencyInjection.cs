@@ -82,6 +82,7 @@ public static class DependencyInjection
         // Services
         builder.Services.AddScoped<IUserPermissionService, UserPermissionService>();
         builder.Services.AddScoped<IUserAccountService, IdentityUserAccountService>();
+        builder.Services.AddScoped<IRoleService, IdentityRoleService>();
 
         return builder;
 

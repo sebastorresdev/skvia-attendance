@@ -14,7 +14,7 @@ using Skvia.Attendance.Domain.Identity;
 namespace Skvia.Attendance.Infrastructure.Services;
 
 internal class IdentityRoleService(
-    RoleManager<ApplicationRole> roleManager) : IIdentityRoleService
+    RoleManager<ApplicationRole> roleManager) : IRoleService
 {
     public async Task<ErrorOr<Guid>> CreateRoleAsync(CreateRoleCommand command, CancellationToken cancellationToken)
     {

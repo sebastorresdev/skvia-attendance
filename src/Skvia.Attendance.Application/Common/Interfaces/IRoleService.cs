@@ -6,7 +6,7 @@ using Skvia.Attendance.Application.Features.Roles.DTOs;
 
 namespace Skvia.Attendance.Application.Common.Interfaces;
 
-public interface IIdentityRoleService
+public interface IRoleService
 {
     Task<ErrorOr<Guid>> CreateRoleAsync(CreateRoleCommand command, CancellationToken cancellationToken);
     Task<ErrorOr<Success>> UpdateRoleAsync(UpdateRoleCommand command, CancellationToken cancellationToken);
