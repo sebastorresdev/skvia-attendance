@@ -3,7 +3,7 @@ using Skvia.Attendance.Application.Features.Roles.Commands.DeleteRole;
 
 namespace Skvia.Attendance.Api.Endpoints.Roles;
 
-public class DeleteRole
+public class DeleteRole : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
         => group.MapDelete("/{roleId:guid}", Handle)
