@@ -22,7 +22,8 @@ public class IdentityUserAccountService(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     RoleManager<ApplicationRole> roleManager,
-    IApplicationDbContext dbContext) : IUserAccountService
+    IApplicationDbContext dbContext,
+    ICurrentUserProvider currentUserProvider) : IUserAccountService
 {
     public async Task<ErrorOr<Guid>> CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken)
     {
@@ -180,6 +181,15 @@ public class IdentityUserAccountService(
 
     public async Task<ErrorOr<Success>> DeleteUserAsync(DeleteUserCommand command, CancellationToken cancellationToken)
     {
+        var currentUser = currentUserProvider.GetCurrentUser();
+        if (currentUser is not null && currentUser.Id != Guid.Empty)
+        {
+            if (command.UserIds.Contains(currentUser.Id))
+            {
+                return Error.Validation("User.SelfDeletion", "No puedes eliminar tu propio usuario");
+            }
+        }
+
         var affectedRows = await userManager.Users
             .Where(u => command.UserIds.Contains(u.Id))
             .ExecuteDeleteAsync(cancellationToken);

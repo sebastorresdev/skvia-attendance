@@ -103,38 +103,50 @@ public class ApplicationDbContextInitialiser
         }
 
         // Default branches
-        var branch = Branch.Create("SKVIA_01", "Sede principal");
-        var branch2 = Branch.Create("SKVIA_02", "Sede base");
+        var branch = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_01");
+        if (branch is null)
+        {
+            branch = Branch.Create("SKVIA_01", "Sede principal");
+            _context.Branches.Add(branch);
+            await _context.SaveChangesAsync();
+        }
 
-        _context.Branches.Add(branch);
-        _context.Branches.Add(branch2);
+        var branch2 = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_02");
+        if (branch2 is null)
+        {
+            branch2 = Branch.Create("SKVIA_02", "Sede base");
+            _context.Branches.Add(branch2);
+            await _context.SaveChangesAsync();
+        }
 
         // Default roles
-        var administratorRole = new ApplicationRole
-        {
-            Name = Roles.Administrator,
-        };
+        var existingAdminRole = await _roleManager.FindByNameAsync(Roles.Administrator);
 
-        if (!await _roleManager.RoleExistsAsync(administratorRole.Name))
+        if (existingAdminRole is null)
         {
-            await _roleManager.CreateAsync(administratorRole);
+            existingAdminRole = new ApplicationRole
+            {
+                Name = Roles.Administrator
+            };
+            await _roleManager.CreateAsync(existingAdminRole);
         }
 
         // REGISTRAMOS LOS PERMISOS AL ROL ADMIN
+        // Recuperamos los claims actuales para evitar duplicados si el seed vuelve a correr
+        var existingClaims = await _roleManager.GetClaimsAsync(existingAdminRole);
+
         foreach (var permission in GetPermissionsFromConstants())
         {
-            var claim = new Claim("permissions", permission);
-            await _roleManager.AddClaimAsync(administratorRole, claim);
+            if (!existingClaims.Any(c => c.Type == "permissions" && c.Value == permission))
+            {
+                var claim = new Claim("permissions", permission);
+                await _roleManager.AddClaimAsync(existingAdminRole, claim);
+            }
         }
 
-        var basicRole = new ApplicationRole
+        if (!await _roleManager.RoleExistsAsync("basic"))
         {
-            Name = "basic",
-        };
-
-        if (!await _roleManager.RoleExistsAsync(basicRole.Name))
-        {
-            await _roleManager.CreateAsync(basicRole);
+            await _roleManager.CreateAsync(new ApplicationRole { Name = "basic" });
         }
 
         // Default users

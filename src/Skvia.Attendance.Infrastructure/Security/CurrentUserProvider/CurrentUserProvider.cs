@@ -12,14 +12,21 @@ public class CurrentUserProvider(IHttpContextAccessor _httpContextAccessor) : IC
 {
     public CurrentUserResponse GetCurrentUser()
     {
-        if (_httpContextAccessor.HttpContext == null)
+        if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated != true)
         {
             return new CurrentUserResponse(Guid.Empty, [], []);
         }
 
         ArgumentNullException.ThrowIfNull(_httpContextAccessor);
 
-        var id = Guid.Parse(GetSingleClaimValue(ClaimTypes.NameIdentifier));
+        var userIdClaim = _httpContextAccessor.HttpContext.User.Claims
+            .FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var id))
+        {
+            return new CurrentUserResponse(Guid.Empty, [], []);
+        }
+
         var roles = GetClaimValues(ClaimTypes.Role);
         var permissions = GetClaimValues(CustomClaimTypes.Permission);
 
