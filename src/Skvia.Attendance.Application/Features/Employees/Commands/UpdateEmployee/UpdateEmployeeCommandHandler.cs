@@ -35,7 +35,8 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             command.Phone,
             command.Position,
             command.Department,
-            command.PhotoUrl);
+            command.PhotoUrl,
+            command.MainBranchId);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

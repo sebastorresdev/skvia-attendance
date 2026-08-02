@@ -13,4 +13,5 @@ public record CreateEmployeeCommand(
     string? Phone = null,
     string? Position = null,
     string? Department = null,
-    string? PhotoUrl = null) : ICommand<ErrorOr<Guid>>;
+    string? PhotoUrl = null,
+    Guid? MainBranchId = null) : ICommand<ErrorOr<Guid>>;

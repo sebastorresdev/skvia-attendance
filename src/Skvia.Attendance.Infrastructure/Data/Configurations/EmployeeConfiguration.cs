@@ -18,6 +18,11 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(p => p.FirstName).IsRequired().HasMaxLength(EmployeeConstants.FirstNameMaxLength);
         builder.Property(p => p.LastName).IsRequired().HasMaxLength(EmployeeConstants.LastNameMaxLength);
 
+        builder.HasOne<Skvia.Attendance.Domain.Branches.Branch>()
+            .WithMany()
+            .HasForeignKey(e => e.MainBranchId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // Configure DocumentIdentifier as an owned entity
         builder.OwnsOne(p => p.DocumentIdentifier, navigationBuilder =>
         {

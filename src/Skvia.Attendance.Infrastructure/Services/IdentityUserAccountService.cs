@@ -11,6 +11,7 @@ using Skvia.Attendance.Application.Features.Users.Commands.CreateUser;
 using Skvia.Attendance.Application.Features.Users.Commands.DeleteUser;
 using Skvia.Attendance.Application.Features.Users.Commands.ResetPassword;
 using Skvia.Attendance.Application.Features.Users.Commands.SetUserPermissionOverrides;
+using Skvia.Attendance.Application.Features.Users.Commands.ToggleUserStatus;
 using Skvia.Attendance.Application.Features.Users.Commands.UpdateUser;
 using Skvia.Attendance.Application.Features.Users.DTOs;
 using Skvia.Attendance.Domain.Branches;
@@ -144,6 +145,31 @@ public class IdentityUserAccountService(
 
             dbContext.ApplicationUserRole.AddRange(userRoles);
             await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return Result.Success;
+    }
+
+    public async Task<ErrorOr<Success>> ToggleUserStatusAsync(ToggleUserStatusCommand command, CancellationToken cancellationToken)
+    {
+        var user = await userManager.FindByIdAsync(command.UserId.ToString());
+        if (user is null)
+        {
+            return UserErrors.UserNotFound;
+        }
+
+        if (user.IsActive == command.IsActive)
+        {
+            return Result.Success;
+        }
+
+        user.IsActive = command.IsActive;
+        user.LastModifiedAt = DateTime.UtcNow;
+
+        IdentityResult result = await userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            return result.ToApplicationError();
         }
 
         return Result.Success;

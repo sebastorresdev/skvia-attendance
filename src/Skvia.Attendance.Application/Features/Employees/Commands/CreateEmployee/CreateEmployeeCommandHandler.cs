@@ -31,7 +31,8 @@ public class CreateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             phone: command.Phone,
             position: command.Position,
             department: command.Department,
-            photoUrl: command.PhotoUrl);
+            photoUrl: command.PhotoUrl,
+            mainBranchId: command.MainBranchId);
 
         dbContext.Employees.Add(employee);
         await dbContext.SaveChangesAsync(cancellationToken);

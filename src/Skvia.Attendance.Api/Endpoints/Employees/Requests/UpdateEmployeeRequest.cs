@@ -13,4 +13,5 @@ public record UpdateEmployeeRequest(
     string? Phone = null,
     string? Position = null,
     string? Department = null,
-    string? PhotoUrl = null);
+    string? PhotoUrl = null,
+    Guid? MainBranchId = null);

@@ -11,7 +11,8 @@ public record EmployeeDetailResponse(
     string DocumentNumber,
     string? Email,
     string? Phone,
-    string? Position,
     string? Department,
+    string? Position,
     DateTimeOffset HireDate,
-    string? PhotoUrl);
+    string? PhotoUrl,
+    Guid? MainBranchId);

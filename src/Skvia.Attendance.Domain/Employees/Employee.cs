@@ -14,6 +14,7 @@ public class Employee : BaseAuditableEntity
     public string? Department { get; private set; }
     public DateTimeOffset HireDate { get; private set; }
     public string? PhotoUrl { get; private set; }
+    public Guid? MainBranchId { get; private set; }
 
     private readonly List<EmployeeSchedule> _employeeSchedules = [];
     public IReadOnlyCollection<EmployeeSchedule> EmployeeSchedules => _employeeSchedules.AsReadOnly();
@@ -30,7 +31,8 @@ public class Employee : BaseAuditableEntity
         string? phone = null,
         string? position = null,
         string? department = null,
-        string? photoUrl = null)
+        string? photoUrl = null,
+        Guid? mainBranchId = null)
     {
         var employee = new Employee();
 
@@ -52,6 +54,7 @@ public class Employee : BaseAuditableEntity
         employee.Position = position?.Trim();
         employee.Department = department?.Trim();
         employee.PhotoUrl = photoUrl?.Trim();
+        employee.MainBranchId = mainBranchId;
 
         return employee;
     }
@@ -66,7 +69,8 @@ public class Employee : BaseAuditableEntity
         string? phone = null,
         string? position = null,
         string? department = null,
-        string? photoUrl = null)
+        string? photoUrl = null,
+        Guid? mainBranchId = null)
     {
         ArgumentNullException.ThrowIfNull(code);
         ArgumentNullException.ThrowIfNull(firstName);
@@ -86,6 +90,7 @@ public class Employee : BaseAuditableEntity
         Position = position?.Trim();
         Department = department?.Trim();
         PhotoUrl = photoUrl?.Trim();
+        MainBranchId = mainBranchId;
     }
 
     public void UpdateProfile(string? phone, string? position, string? department, string? photoUrl)

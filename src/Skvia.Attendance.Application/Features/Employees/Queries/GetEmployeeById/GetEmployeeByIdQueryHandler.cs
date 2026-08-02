@@ -23,7 +23,8 @@ public class GetEmployeeByIdQueryHandler(IApplicationDbContext dbContext) : IQue
                 e.Position,
                 e.Department,
                 e.HireDate,
-                e.PhotoUrl))
+                e.PhotoUrl,
+                e.MainBranchId))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (employee is null)

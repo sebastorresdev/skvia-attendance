@@ -14,4 +14,5 @@ public record UpdateEmployeeCommand(
     string? Phone = null,
     string? Position = null,
     string? Department = null,
-    string? PhotoUrl = null) : ICommand<ErrorOr<Success>>;
+    string? PhotoUrl = null,
+    Guid? MainBranchId = null) : ICommand<ErrorOr<Success>>;

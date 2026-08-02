@@ -36,7 +36,8 @@ public sealed class UpdateEmployee : IEndpoint
             request.Phone,
             request.Position,
             request.Department,
-            request.PhotoUrl);
+            request.PhotoUrl,
+            request.MainBranchId);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 

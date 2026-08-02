@@ -12,4 +12,6 @@ public record EmployeeResponse(
     string? Email,
     string? Phone,
     string? Department,
-    string? PhotoUrl);
+    string? Position,
+    string? PhotoUrl,
+    Guid? MainBranchId);

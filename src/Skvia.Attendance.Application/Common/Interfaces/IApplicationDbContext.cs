@@ -11,6 +11,8 @@ public interface IApplicationDbContext
     DbSet<BranchUser> BranchUsers { get; }
     DbSet<Branch> Branches { get; }
     DbSet<Employee> Employees { get; }
+    DbSet<Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedule> EmployeeSchedules { get; }
+    DbSet<Skvia.Attendance.Domain.Schedules.Schedule> Schedules { get; }
 
     DbSet<ApplicationUserRole> ApplicationUserRole { get; }
     DatabaseFacade Database { get; }
