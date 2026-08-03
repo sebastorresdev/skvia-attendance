@@ -15,4 +15,6 @@ public record EmployeeDetailResponse(
     string? Position,
     DateTimeOffset HireDate,
     string? PhotoUrl,
-    Guid? MainBranchId);
+    Guid? MainBranchId,
+    string? MainBranchName,
+    EmployeeStatus Status);

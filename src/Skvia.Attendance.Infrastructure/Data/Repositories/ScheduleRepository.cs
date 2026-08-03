@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Skvia.Attendance.Domain.Schedules;
 
 namespace Skvia.Attendance.Infrastructure.Data.Repositories;

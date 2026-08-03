@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Employees;
-using Skvia.Attendance.Domain.Identity;
 using Skvia.Attendance.Domain.EmployeeSchedules;
+using Skvia.Attendance.Domain.Identity;
+using Skvia.Attendance.Domain.Schedules;
 
 namespace Skvia.Attendance.Infrastructure.Data;
 
@@ -19,10 +20,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<BranchUser> BranchUsers => Set<BranchUser>();
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<Employee> Employees => Set<Employee>();
-    public DbSet<Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedule> EmployeeSchedules => Set<Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedule>();
-    public DbSet<Skvia.Attendance.Domain.Schedules.Schedule> Schedules => Set<Skvia.Attendance.Domain.Schedules.Schedule>();
+    public DbSet<EmployeeSchedule> EmployeeSchedules => Set<EmployeeSchedule>();
+    public DbSet<Schedule> Schedules => Set<Schedule>();
     public DbSet<ApplicationUserRole> ApplicationUserRole => Set<ApplicationUserRole>();
     public override DatabaseFacade Database => base.Database;
+
+    public DbSet<Domain.Attendances.Attendance> Attendances => Set<Domain.Attendances.Attendance>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

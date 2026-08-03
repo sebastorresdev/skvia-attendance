@@ -13,6 +13,7 @@ public interface IApplicationDbContext
     DbSet<Employee> Employees { get; }
     DbSet<Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedule> EmployeeSchedules { get; }
     DbSet<Skvia.Attendance.Domain.Schedules.Schedule> Schedules { get; }
+    DbSet<Skvia.Attendance.Domain.Attendances.Attendance> Attendances { get; }
 
     DbSet<ApplicationUserRole> ApplicationUserRole { get; }
     DatabaseFacade Database { get; }

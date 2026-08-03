@@ -59,5 +59,10 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(p => p.Department).IsRequired(false).HasMaxLength(EmployeeConstants.DepartmentMaxLength);
         builder.Property(p => p.HireDate).IsRequired();
         builder.Property(p => p.PhotoUrl).IsRequired(false).HasMaxLength(EmployeeConstants.PhotoUrlMaxLength);
+        
+        builder.Property(p => p.Status)
+            .IsRequired()
+            .HasConversion<int>()
+            .HasDefaultValue(EmployeeStatus.Active);
     }
 }

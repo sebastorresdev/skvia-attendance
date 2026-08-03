@@ -23,7 +23,7 @@ public class EmployeeSchedulesConfiguration : IEntityTypeConfiguration<EmployeeS
         builder.HasOne(es => es.Employee)
             .WithMany(e => e.EmployeeSchedules)
             .HasForeignKey(es => es.EmployeeId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(es => es.Branch)
             .WithMany()

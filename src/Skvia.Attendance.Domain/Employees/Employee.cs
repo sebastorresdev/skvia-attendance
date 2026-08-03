@@ -15,6 +15,7 @@ public class Employee : BaseAuditableEntity
     public DateTimeOffset HireDate { get; private set; }
     public string? PhotoUrl { get; private set; }
     public Guid? MainBranchId { get; private set; }
+    public EmployeeStatus Status { get; private set; }
 
     private readonly List<EmployeeSchedule> _employeeSchedules = [];
     public IReadOnlyCollection<EmployeeSchedule> EmployeeSchedules => _employeeSchedules.AsReadOnly();
@@ -55,6 +56,7 @@ public class Employee : BaseAuditableEntity
         employee.Department = department?.Trim();
         employee.PhotoUrl = photoUrl?.Trim();
         employee.MainBranchId = mainBranchId;
+        employee.Status = EmployeeStatus.Active;
 
         return employee;
     }
@@ -99,6 +101,11 @@ public class Employee : BaseAuditableEntity
         Position = position?.Trim();
         Department = department?.Trim();
         PhotoUrl = photoUrl?.Trim();
+    }
+
+    public void ChangeStatus(EmployeeStatus newStatus)
+    {
+        Status = newStatus;
     }
 
     public void AddEmployeeSchedule(EmployeeSchedule employeeSchedule)

@@ -1,5 +1,4 @@
 using Skvia.Attendance.Domain.Employees;
-using Microsoft.EntityFrameworkCore;
 
 namespace Skvia.Attendance.Application.Features.Employees.Commands.CreateEmployee;
 
