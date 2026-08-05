@@ -33,6 +33,13 @@ public class CreateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             photoUrl: command.PhotoUrl,
             mainBranchId: command.MainBranchId);
 
+        employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
+        
+        if (!string.IsNullOrWhiteSpace(command.ApplicationUserId))
+        {
+            employee.LinkUser(command.ApplicationUserId);
+        }
+
         dbContext.Employees.Add(employee);
         await dbContext.SaveChangesAsync(cancellationToken);
 

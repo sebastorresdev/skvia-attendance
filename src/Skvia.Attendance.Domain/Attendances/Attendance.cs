@@ -31,6 +31,10 @@ public class Attendance : BaseEntity
     public bool IsValidCheckOut { get; private set; }
     public int MinutesWorked { get; private set; }
     public int OvertimeMinutes { get; private set; }
+    public AttendanceSource Source { get; private set; }
+    public double? Latitude { get; private set; }
+    public double? Longitude { get; private set; }
+    public string? DeviceId { get; private set; }
 
     private Attendance() { }
 
@@ -42,7 +46,12 @@ public class Attendance : BaseEntity
         TimeOnly scheduledStartTime,
         string operationTimeZoneId,
         IClock clock,
-        ITimeZoneProvider timeZoneProvider)
+        ITimeZoneProvider timeZoneProvider,
+        AttendanceSource source = AttendanceSource.Kiosk,
+        double? latitude = null,
+        double? longitude = null,
+        string? deviceId = null,
+        int branchTardinessToleranceMinutes = 0)
     {
         ArgumentOutOfRangeException.ThrowIfEqual(employeeId, Guid.Empty);
         ArgumentOutOfRangeException.ThrowIfEqual(branchId, Guid.Empty);
@@ -58,9 +67,11 @@ public class Attendance : BaseEntity
         var currentTime = TimeOnly.FromDateTime(localTime.DateTime);
         var currentDate = DateOnly.FromDateTime(localTime.DateTime);
 
-        var minutesLate = currentTime > scheduledStartTime
+        var difference = currentTime > scheduledStartTime
             ? (int)(currentTime - scheduledStartTime).TotalMinutes
             : 0;
+            
+        var minutesLate = difference > branchTardinessToleranceMinutes ? difference : 0;
 
         return new Attendance
         {
@@ -71,7 +82,11 @@ public class Attendance : BaseEntity
             PhotoCheckIn = photoUrl.Trim(),
             IsValidCheckIn = isValidCheckIn,
             MinutesLate = minutesLate,
-            IsLate = minutesLate > 0
+            IsLate = minutesLate > 0,
+            Source = source,
+            Latitude = latitude,
+            Longitude = longitude,
+            DeviceId = deviceId?.Trim()
         };
     }
 

@@ -26,7 +26,9 @@ public class GetEmployeesQueryHandler(IApplicationDbContext dbContext) : IQueryH
                 e.PhotoUrl,
                 e.MainBranchId,
                 e.MainBranchId.HasValue ? dbContext.Branches.Where(b => b.Id == e.MainBranchId.Value).Select(b => b.Name).FirstOrDefault() : null,
-                e.Status
+                e.Status,
+                e.MobileCheckInEnabled,
+                e.ApplicationUserId
             ))
             .ToListAsync(cancellationToken);
 

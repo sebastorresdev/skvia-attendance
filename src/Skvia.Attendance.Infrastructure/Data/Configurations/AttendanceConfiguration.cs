@@ -28,6 +28,11 @@ public class AttendanceConfiguration : IEntityTypeConfiguration<Domain.Attendanc
         builder.Property(a => a.IsValidCheckIn).IsRequired();
         builder.Property(a => a.IsValidCheckOut).IsRequired();
 
+        builder.Property(a => a.Source).IsRequired().HasConversion<int>();
+        builder.Property(a => a.Latitude).IsRequired(false);
+        builder.Property(a => a.Longitude).IsRequired(false);
+        builder.Property(a => a.DeviceId).IsRequired(false).HasMaxLength(255);
+
         builder.HasOne(a => a.Employee)
             .WithMany()
             .HasForeignKey(a => a.EmployeeId)

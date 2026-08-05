@@ -1,4 +1,7 @@
+using Skvia.Attendance.Domain.Common;
 using Skvia.Attendance.Domain.Employees;
+using ErrorOr;
+using Skvia.Attendance.Application.Common.Interfaces;
 
 namespace Skvia.Attendance.Application.Features.Employees.Commands.UpdateEmployee;
 
@@ -15,4 +18,6 @@ public record UpdateEmployeeCommand(
     string? Position = null,
     string? Department = null,
     string? PhotoUrl = null,
-    Guid? MainBranchId = null) : ICommand<ErrorOr<Success>>;
+    Guid? MainBranchId = null,
+    bool MobileCheckInEnabled = false,
+    string? ApplicationUserId = null) : ICommand<ErrorOr<Success>>;

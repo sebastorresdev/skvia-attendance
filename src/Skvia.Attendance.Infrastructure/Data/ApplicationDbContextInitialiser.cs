@@ -4,6 +4,7 @@ using System.Security.Claims;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -54,7 +55,14 @@ public class ApplicationDbContextInitialiser
     {
         try
         {
-            await _context.Database.EnsureCreatedAsync();
+            if (_context.Database.IsRelational())
+            {
+                await _context.Database.MigrateAsync();
+            }
+            else
+            {
+                await _context.Database.EnsureCreatedAsync();
+            }
         }
         catch (Exception ex)
         {

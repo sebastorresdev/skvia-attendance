@@ -22,7 +22,7 @@ public sealed class UpdateBranch : IEndpoint
         ICommandHandler<UpdateBranchCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateBranchCommand(id, request.Code, request.Name, request.Address);
+        var command = new UpdateBranchCommand(id, request.Code, request.Name, request.Address, request.TardinessToleranceMinutes);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 

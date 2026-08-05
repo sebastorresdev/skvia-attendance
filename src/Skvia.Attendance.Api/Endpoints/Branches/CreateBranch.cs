@@ -21,7 +21,7 @@ public sealed class CreateBranch : IEndpoint
         ICommandHandler<CreateBranchCommand, ErrorOr<Guid>> handler,
         CancellationToken cancellationToken)
     {
-        var command = new CreateBranchCommand(request.Code, request.Name, request.Address);
+        var command = new CreateBranchCommand(request.Code, request.Name, request.Address, request.TardinessToleranceMinutes);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(

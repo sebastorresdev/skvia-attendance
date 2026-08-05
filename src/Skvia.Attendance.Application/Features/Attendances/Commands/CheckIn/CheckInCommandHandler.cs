@@ -27,6 +27,29 @@ public class CheckInCommandHandler(
         if (employee is null)
             return Error.NotFound("Employee.NotFound", "No se encontró un empleado activo con ese código o DNI.");
 
+        // 1.5 Validate Source and Security
+        if (command.Source == AttendanceSource.Kiosk)
+        {
+            if (string.IsNullOrWhiteSpace(command.Token))
+                return Error.Unauthorized("Kiosk.Unauthorized", "Dispositivo no autorizado.");
+
+            var device = await dbContext.KioskDevices
+                .FirstOrDefaultAsync(d => d.Token == command.Token && d.IsActive, cancellationToken);
+
+            if (device is null)
+                return Error.Unauthorized("Kiosk.Unauthorized", "Dispositivo revocado o no encontrado.");
+                
+            if (device.BranchId != command.BranchId)
+                return Error.Unauthorized("Kiosk.InvalidBranch", "El dispositivo no está asignado a esta sede.");
+        }
+        else if (command.Source == AttendanceSource.Mobile)
+        {
+            if (!employee.MobileCheckInEnabled)
+                return Error.Forbidden("Mobile.Forbidden", "No tienes habilitada la marcación móvil. Consulta con RRHH.");
+            
+            // TODO: In the future, check if the current Identity user matches employee.ApplicationUserId
+        }
+
         // 2. Determine Date (using Branch TimeZone)
         // For MVP we assume a default timezone if branch not found, but we should find branch.
         var branch = await dbContext.Branches.FindAsync(new object[] { command.BranchId }, cancellationToken);
@@ -48,6 +71,13 @@ public class CheckInCommandHandler(
         if (!schedule.AssignedStartTime.HasValue)
             return Error.Validation("Schedule.Invalid", "Tu horario de hoy no tiene hora de entrada configurada.");
 
+        // 3.5 Check if already checked in today
+        var alreadyCheckedIn = await dbContext.Attendances
+            .AnyAsync(a => a.EmployeeId == employee.Id && a.Date == currentDate, cancellationToken);
+
+        if (alreadyCheckedIn)
+            return Error.Conflict("Attendance.AlreadyCheckedIn", "Ya has registrado tu asistencia para el día de hoy.");
+
         // 4. Create Attendance
         // For MVP, isValidCheckIn is true, we could add geo-validation later.
         var attendance = Skvia.Attendance.Domain.Attendances.Attendance.CreateCheckIn(
@@ -58,7 +88,12 @@ public class CheckInCommandHandler(
             schedule.AssignedStartTime.Value,
             branch.TimeZoneId,
             clock,
-            timeZoneProvider);
+            timeZoneProvider,
+            command.Source,
+            command.Latitude,
+            command.Longitude,
+            command.DeviceId,
+            branch.TardinessToleranceMinutes);
 
         dbContext.Attendances.Add(attendance);
         await dbContext.SaveChangesAsync(cancellationToken);

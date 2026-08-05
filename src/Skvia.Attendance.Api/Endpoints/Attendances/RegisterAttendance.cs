@@ -5,6 +5,7 @@ using Skvia.Attendance.Application.Common.Interfaces;
 using ErrorOr;
 using Skvia.Attendance.Domain.Common;
 using Skvia.Attendance.Api.Models;
+using Skvia.Attendance.Domain.Attendances;
 
 namespace Skvia.Attendance.Api.Endpoints.Attendances;
 
@@ -34,7 +35,18 @@ public sealed class RegisterAttendance : IEndpoint
         ICommandHandler<CheckInCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var command = new CheckInCommand(request.EmployeeIdentifier, request.BranchId, request.PhotoUrl);
+        var source = request.Source ?? AttendanceSource.Kiosk;
+
+        var command = new CheckInCommand(
+            request.EmployeeIdentifier, 
+            request.BranchId, 
+            request.PhotoUrl,
+            source,
+            request.Latitude,
+            request.Longitude,
+            request.DeviceName,
+            request.DeviceToken);
+
         var result = await handler.HandleAsync(command, cancellationToken);
         
         return result.Match(
@@ -47,7 +59,11 @@ public sealed class RegisterAttendance : IEndpoint
         ICommandHandler<CheckOutCommand, ErrorOr<Success>> handler,
         CancellationToken cancellationToken)
     {
-        var command = new CheckOutCommand(request.EmployeeIdentifier, request.BranchId, request.PhotoUrl);
+        var command = new CheckOutCommand(
+            request.EmployeeIdentifier, 
+            request.BranchId, 
+            request.PhotoUrl);
+
         var result = await handler.HandleAsync(command, cancellationToken);
         
         return result.Match(
@@ -56,4 +72,12 @@ public sealed class RegisterAttendance : IEndpoint
     }
 }
 
-public record AttendanceRequest(string EmployeeIdentifier, Guid BranchId, string PhotoUrl);
+public record AttendanceRequest(
+    string EmployeeIdentifier, 
+    Guid BranchId, 
+    string PhotoUrl,
+    AttendanceSource? Source,
+    double? Latitude,
+    double? Longitude,
+    string? DeviceToken,
+    string? DeviceName);

@@ -1,5 +1,7 @@
 using Skvia.Attendance.Domain.Employees;
 using Microsoft.EntityFrameworkCore;
+using Skvia.Attendance.Application.Common.Interfaces;
+using ErrorOr;
 
 namespace Skvia.Attendance.Application.Features.Employees.Commands.UpdateEmployee;
 
@@ -37,6 +39,13 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             command.Department,
             command.PhotoUrl,
             command.MainBranchId);
+
+        employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
+        
+        if (!string.IsNullOrWhiteSpace(command.ApplicationUserId))
+        {
+            employee.LinkUser(command.ApplicationUserId);
+        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

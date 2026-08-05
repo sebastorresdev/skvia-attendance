@@ -17,4 +17,6 @@ public record EmployeeDetailResponse(
     string? PhotoUrl,
     Guid? MainBranchId,
     string? MainBranchName,
-    EmployeeStatus Status);
+    EmployeeStatus Status,
+    bool MobileCheckInEnabled,
+    string? ApplicationUserId);

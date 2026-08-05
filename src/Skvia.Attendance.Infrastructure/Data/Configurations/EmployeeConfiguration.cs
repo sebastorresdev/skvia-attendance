@@ -64,5 +64,8 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .IsRequired()
             .HasConversion<int>()
             .HasDefaultValue(EmployeeStatus.Active);
+            
+        builder.Property(p => p.ApplicationUserId).IsRequired(false).HasMaxLength(450);
+        builder.Property(p => p.MobileCheckInEnabled).IsRequired().HasDefaultValue(false);
     }
 }

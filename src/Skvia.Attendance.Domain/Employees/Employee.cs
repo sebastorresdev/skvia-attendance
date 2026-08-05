@@ -16,6 +16,9 @@ public class Employee : BaseAuditableEntity
     public string? PhotoUrl { get; private set; }
     public Guid? MainBranchId { get; private set; }
     public EmployeeStatus Status { get; private set; }
+    
+    public string? ApplicationUserId { get; private set; }
+    public bool MobileCheckInEnabled { get; private set; }
 
     private readonly List<EmployeeSchedule> _employeeSchedules = [];
     public IReadOnlyCollection<EmployeeSchedule> EmployeeSchedules => _employeeSchedules.AsReadOnly();
@@ -106,6 +109,17 @@ public class Employee : BaseAuditableEntity
     public void ChangeStatus(EmployeeStatus newStatus)
     {
         Status = newStatus;
+    }
+
+    public void LinkUser(string applicationUserId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(applicationUserId);
+        ApplicationUserId = applicationUserId;
+    }
+
+    public void EnableMobileCheckIn(bool enabled)
+    {
+        MobileCheckInEnabled = enabled;
     }
 
     public void AddEmployeeSchedule(EmployeeSchedule employeeSchedule)

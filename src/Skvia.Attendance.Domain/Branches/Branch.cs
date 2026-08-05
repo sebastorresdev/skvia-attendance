@@ -8,13 +8,14 @@ public class Branch : BaseAuditableEntity
     public string Name { get; private set; } = null!;
     public string? Address { get; private set; }
     public string TimeZoneId { get; private set; } = "America/Lima";
+    public int TardinessToleranceMinutes { get; private set; } = 0;
 
     private readonly List<BranchUser> _branchUsers = [];
     public IReadOnlyCollection<BranchUser> BranchUsers => _branchUsers.AsReadOnly();
 
     private Branch() { } // EF Core
 
-    public static Branch Create(string code, string name, string? address = null, string timeZoneId = "America/Lima")
+    public static Branch Create(string code, string name, string? address = null, string timeZoneId = "America/Lima", int tardinessToleranceMinutes = 0)
     {
         var branch = new Branch();
 
@@ -30,11 +31,12 @@ public class Branch : BaseAuditableEntity
         branch.Name = name.Trim();
         branch.Address = address?.Trim();
         branch.TimeZoneId = timeZoneId.Trim();
+        branch.TardinessToleranceMinutes = tardinessToleranceMinutes >= 0 ? tardinessToleranceMinutes : 0;
 
         return branch;
     }
 
-    public void Update(string code, string name, string? address = null, string? timeZoneId = null)
+    public void Update(string code, string name, string? address = null, string? timeZoneId = null, int? tardinessToleranceMinutes = null)
     {
         ArgumentNullException.ThrowIfNull(code);
         ArgumentNullException.ThrowIfNull(name);
@@ -48,5 +50,7 @@ public class Branch : BaseAuditableEntity
         Address = address?.Trim();
         if (!string.IsNullOrWhiteSpace(timeZoneId))
             TimeZoneId = timeZoneId.Trim();
+        if (tardinessToleranceMinutes.HasValue && tardinessToleranceMinutes.Value >= 0)
+            TardinessToleranceMinutes = tardinessToleranceMinutes.Value;
     }
 }

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,8 +28,12 @@ public static class DependencyInjection
                 .WithScopedLifetime()
         );
 
-        // 1. Capa de Validación (Se ejecuta primero)
-        builder.Services.Decorate(typeof(ICommandHandler<,>), typeof(ValidationDecorator.CommandHandler<,>));
+        // 0. Capa de Autorización (Se ejecuta antes que la validación)
+        builder.Services.TryDecorate(typeof(ICommandHandler<,>), typeof(AuthorizationDecorator<,>));
+        builder.Services.TryDecorate(typeof(IQueryHandler<,>), typeof(AuthorizationQueryDecorator<,>));
+
+        // 1. Capa de Validación
+        builder.Services.TryDecorate(typeof(ICommandHandler<,>), typeof(ValidationDecorator.CommandHandler<,>));
 
         // 2. Capa de Logs (Envuelve a la validación para registrarlo todo)
         builder.Services.TryDecorate(typeof(ICommandHandler<,>), typeof(LoggingDecorator.CommandHandler<,>));
