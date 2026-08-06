@@ -15,6 +15,7 @@ public interface IApplicationDbContext
     DbSet<Skvia.Attendance.Domain.Schedules.Schedule> Schedules { get; }
     DbSet<Skvia.Attendance.Domain.Attendances.Attendance> Attendances { get; }
     DbSet<KioskDevice> KioskDevices { get; }
+    DbSet<Skvia.Attendance.Domain.Justifications.Justification> Justifications { get; }
 
     DbSet<ApplicationUserRole> ApplicationUserRole { get; }
     DatabaseFacade Database { get; }

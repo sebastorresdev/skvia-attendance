@@ -27,6 +27,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Domain.Attendances.Attendance> Attendances => Set<Domain.Attendances.Attendance>();
     public DbSet<KioskDevice> KioskDevices => Set<KioskDevice>();
+    public DbSet<Domain.Justifications.Justification> Justifications => Set<Domain.Justifications.Justification>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
