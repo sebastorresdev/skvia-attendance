@@ -7,4 +7,6 @@ public record GetAttendancesQuery(
     DateOnly StartDate,
     DateOnly EndDate,
     Guid? BranchId = null,
-    string? EmployeeSearch = null) : IQuery<ErrorOr<List<AttendanceResponse>>>;
+    string? EmployeeSearch = null,
+    Guid? EmployeeId = null,
+    string? StatusFilter = null) : IQuery<ErrorOr<List<AttendanceResponse>>>;

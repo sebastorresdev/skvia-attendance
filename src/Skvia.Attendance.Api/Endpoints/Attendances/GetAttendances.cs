@@ -21,10 +21,12 @@ public sealed class GetAttendances : IEndpoint
         [FromQuery] DateOnly endDate,
         [FromQuery] Guid? branchId,
         [FromQuery] string? employeeSearch,
+        [FromQuery] Guid? employeeId,
+        [FromQuery] string? statusFilter,
         IQueryHandler<GetAttendancesQuery, ErrorOr<List<AttendanceResponse>>> handler,
         CancellationToken cancellationToken)
     {
-        var query = new GetAttendancesQuery(startDate, endDate, branchId, employeeSearch);
+        var query = new GetAttendancesQuery(startDate, endDate, branchId, employeeSearch, employeeId, statusFilter);
         var result = await handler.HandleAsync(query, cancellationToken);
 
         return result.Match(

@@ -12,9 +12,11 @@ public class AssignWeeklyScheduleCommandHandler(
     public async Task<ErrorOr<Success>> HandleAsync(AssignWeeklyScheduleCommand request, CancellationToken cancellationToken)
     {
         // 1. Validar que el empleado exista
-        var employeeExists = await context.Employees.AnyAsync(e => e.Id == request.EmployeeId, cancellationToken);
-        if (!employeeExists)
+        var employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == request.EmployeeId, cancellationToken);
+        if (employee is null)
             return Error.NotFound(description: "Empleado no encontrado.");
+
+        var hireDateOnly = DateOnly.FromDateTime(employee.HireDate.Date);
 
         // 2. Obtener horarios existentes para esta semana y eliminarlos
         var existingSchedules = await scheduleRepository.GetByEmployeeAndDateRangeAsync(
@@ -29,6 +31,12 @@ public class AssignWeeklyScheduleCommandHandler(
         var newSchedules = new List<EmployeeSchedule>();
         foreach (var day in request.Days)
         {
+            if (day.Date < hireDateOnly)
+            {
+                return Error.Validation("Employee.InvalidScheduleDate",
+                    $"No se puede programar horario para la fecha {day.Date:dd/MM/yyyy} porque es anterior a la fecha de ingreso del empleado ({hireDateOnly:dd/MM/yyyy}).");
+            }
+
             // Validar si la sucursal existe si no es un día libre/vacaciones que tal vez no envíe sucursal
             // En Retail, hasta los días libres suelen asignarse a la sucursal base, pero por seguridad verificamos:
             if (day.BranchId != Guid.Empty)

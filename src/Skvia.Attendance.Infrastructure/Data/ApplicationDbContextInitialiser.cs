@@ -114,16 +114,32 @@ public class ApplicationDbContextInitialiser
         var branch = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_01");
         if (branch is null)
         {
-            branch = Branch.Create("SKVIA_01", "Sede principal");
+            branch = Branch.Create("SKVIA_01", "Sede Central - San Isidro", "Av. Javier Prado Este 1230, San Isidro, Lima", "America/Lima", 10);
             _context.Branches.Add(branch);
             await _context.SaveChangesAsync();
+        }
+        else if (branch.Name == "Sede principal")
+        {
+            branch.Update("SKVIA_01", "Sede Central - San Isidro", "Av. Javier Prado Este 1230, San Isidro, Lima", "America/Lima", 10);
         }
 
         var branch2 = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_02");
         if (branch2 is null)
         {
-            branch2 = Branch.Create("SKVIA_02", "Sede base");
+            branch2 = Branch.Create("SKVIA_02", "Sede Sur - Arequipa", "Av. Ejército 742, Yanahuara, Arequipa", "America/Lima", 5);
             _context.Branches.Add(branch2);
+            await _context.SaveChangesAsync();
+        }
+        else if (branch2.Name == "Sede base")
+        {
+            branch2.Update("SKVIA_02", "Sede Sur - Arequipa", "Av. Ejército 742, Yanahuara, Arequipa", "America/Lima", 5);
+        }
+
+        var branch3 = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_03");
+        if (branch3 is null)
+        {
+            branch3 = Branch.Create("SKVIA_03", "Sede Norte - Trujillo", "Calle Real 450, Trujillo", "America/Lima", 5);
+            _context.Branches.Add(branch3);
             await _context.SaveChangesAsync();
         }
 
@@ -155,9 +171,40 @@ public class ApplicationDbContextInitialiser
             }
         }
 
-        if (!await _roleManager.RoleExistsAsync("basic"))
+        var basicRole = await _roleManager.FindByNameAsync("basic");
+        if (basicRole is null)
         {
-            await _roleManager.CreateAsync(new ApplicationRole { Name = "basic" });
+            basicRole = new ApplicationRole
+            {
+                Name = "basic",
+                Description = "Rol básico del sistema con accesos limitados",
+                CreatedAt = DateTime.UtcNow,
+                LastModifiedAt = DateTime.UtcNow,
+            };
+            await _roleManager.CreateAsync(basicRole);
+        }
+        else
+        {
+            bool needUpdate = false;
+            if (basicRole.CreatedAt == default)
+            {
+                basicRole.CreatedAt = DateTime.UtcNow;
+                needUpdate = true;
+            }
+            if (basicRole.LastModifiedAt == default)
+            {
+                basicRole.LastModifiedAt = DateTime.UtcNow;
+                needUpdate = true;
+            }
+            if (string.IsNullOrWhiteSpace(basicRole.Description))
+            {
+                basicRole.Description = "Rol básico del sistema con accesos limitados";
+                needUpdate = true;
+            }
+            if (needUpdate)
+            {
+                await _roleManager.UpdateAsync(basicRole);
+            }
         }
 
         // Default users

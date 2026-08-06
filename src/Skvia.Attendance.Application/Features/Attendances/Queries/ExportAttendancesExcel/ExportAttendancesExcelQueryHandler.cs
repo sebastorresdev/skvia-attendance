@@ -1,14 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using Skvia.Attendance.Application.Common.Interfaces;
-using Skvia.Attendance.Application.Common.Messaging;
-using ErrorOr;
+namespace Skvia.Attendance.Application.Features.Attendances.Queries.ExportAttendancesExcel;
 
-namespace Skvia.Attendance.Application.Features.Attendances.Queries.GetAttendances;
-
-public class GetAttendancesQueryHandler(
-    IApplicationDbContext dbContext) : IQueryHandler<GetAttendancesQuery, ErrorOr<List<AttendanceResponse>>>
+public class ExportAttendancesExcelQueryHandler(
+    IApplicationDbContext dbContext,
+    IAttendanceExcelExporter excelExporter) : IQueryHandler<ExportAttendancesExcelQuery, ErrorOr<ExportExcelResult>>
 {
-    public async Task<ErrorOr<List<AttendanceResponse>>> HandleAsync(GetAttendancesQuery query, CancellationToken cancellationToken)
+    public async Task<ErrorOr<ExportExcelResult>> HandleAsync(ExportAttendancesExcelQuery query, CancellationToken cancellationToken)
     {
         var queryable = dbContext.Attendances
             .AsNoTracking()
@@ -46,19 +42,14 @@ public class GetAttendancesQueryHandler(
                 EF.Functions.Like(a.Employee.Code.ToLower(), search));
         }
 
-        var responseList = await queryable
-            .OrderByDescending(a => a.Date)
+        var attendances = await queryable
+            .OrderBy(a => a.Date)
             .ThenBy(a => a.Employee.LastName)
-            .Select(a => new AttendanceResponse(
-                a.Id,
-                a.EmployeeId,
-                a.Employee.FirstName + " " + a.Employee.LastName,
-                a.Employee.Code,
-                a.CheckInBranchId,
-                a.CheckInBranch.Name,
+            .Select(a => new AttendanceExportDto(
                 a.Date,
-                null, // assignedStartTime
-                null, // assignedEndTime
+                a.Employee.Code,
+                $"{a.Employee.LastName}, {a.Employee.FirstName}",
+                a.CheckInBranch.Name,
                 a.CheckIn,
                 a.CheckOut,
                 a.MinutesLate,
@@ -66,6 +57,11 @@ public class GetAttendancesQueryHandler(
             ))
             .ToListAsync(cancellationToken);
 
-        return responseList;
+        var fileContents = excelExporter.ExportAttendances(attendances, query.StartDate, query.EndDate);
+
+        string fileName = $"Reporte_Asistencias_{query.StartDate:yyyyMMdd}_{query.EndDate:yyyyMMdd}.xlsx";
+        string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+        return new ExportExcelResult(fileContents, contentType, fileName);
     }
 }

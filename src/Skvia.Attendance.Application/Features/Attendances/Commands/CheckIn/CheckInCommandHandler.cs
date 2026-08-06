@@ -59,6 +59,10 @@ public class CheckInCommandHandler(
         var localTime = TimeZoneInfo.ConvertTime(clock.UtcNow, timeZoneProvider.GetTimeZone(branch.TimeZoneId));
         var currentDate = DateOnly.FromDateTime(localTime.DateTime);
 
+        var hireDateOnly = DateOnly.FromDateTime(employee.HireDate.Date);
+        if (currentDate < hireDateOnly)
+            return Error.Validation("Employee.NotHiredYet", $"No se puede registrar asistencia antes de la fecha de ingreso del empleado ({hireDateOnly:dd/MM/yyyy}).");
+
         // 3. Find Schedule for today
         var schedule = employee.EmployeeSchedules.FirstOrDefault(s => s.Date == currentDate);
         
