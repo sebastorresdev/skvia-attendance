@@ -1,6 +1,6 @@
 using ErrorOr;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Features.Roles.Commands.UpdateRole;
 
@@ -8,45 +8,47 @@ namespace Skvia.Attendance.Application.Tests.Features.Roles.Commands.UpdateRole;
 
 public class UpdateRoleCommandHandlerTests
 {
-    private readonly Mock<IRoleService> _roleServiceMock;
+    private readonly IRoleService _roleServiceMock;
     private readonly UpdateRoleCommandHandler _handler;
 
     public UpdateRoleCommandHandlerTests()
     {
-        _roleServiceMock = new Mock<IRoleService>();
-        _handler = new UpdateRoleCommandHandler(_roleServiceMock.Object);
+        _roleServiceMock = Substitute.For<IRoleService>();
+        _handler = new UpdateRoleCommandHandler(_roleServiceMock);
     }
 
     [Fact]
-    public async Task HandleAsync_WhenUpdateIsSuccessful_ReturnsSuccess()
+    public async Task HandleAsync_WhenUpdateIsSuccessful_ShouldReturnSuccess()
     {
         // Arrange
         var command = new UpdateRoleCommand(Guid.NewGuid(), "Admin", "Administrador del sistema");
         var successResult = Result.Success;
-        
+
         _roleServiceMock
-            .Setup(x => x.UpdateRoleAsync(command, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(successResult);
+            .UpdateRoleAsync(command, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<ErrorOr<Success>>(successResult));
 
         // Act
         var result = await _handler.HandleAsync(command, CancellationToken.None);
 
         // Assert
         result.IsError.Should().BeFalse();
-        
-        _roleServiceMock.Verify(x => x.UpdateRoleAsync(command, It.IsAny<CancellationToken>()), Times.Once);
+
+        await _roleServiceMock
+            .Received(1)
+            .UpdateRoleAsync(command, Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task HandleAsync_WhenUpdateFails_ReturnsError()
+    public async Task HandleAsync_WhenUpdateFails_ShouldReturnError()
     {
         // Arrange
         var command = new UpdateRoleCommand(Guid.NewGuid(), "Admin", "Administrador del sistema");
-        var errorResult = Error.NotFound(description: "Role not found");
-        
+        ErrorOr<Success> errorResult = Error.NotFound(description: "Role not found");
+
         _roleServiceMock
-            .Setup(x => x.UpdateRoleAsync(command, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(errorResult);
+            .UpdateRoleAsync(command, Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<ErrorOr<Success>>(errorResult));
 
         // Act
         var result = await _handler.HandleAsync(command, CancellationToken.None);
@@ -55,7 +57,9 @@ public class UpdateRoleCommandHandlerTests
         result.IsError.Should().BeTrue();
         result.FirstError.Type.Should().Be(ErrorType.NotFound);
         result.FirstError.Description.Should().Be("Role not found");
-        
-        _roleServiceMock.Verify(x => x.UpdateRoleAsync(command, It.IsAny<CancellationToken>()), Times.Once);
+
+        await _roleServiceMock
+            .Received(1)
+            .UpdateRoleAsync(command, Arg.Any<CancellationToken>());
     }
 }

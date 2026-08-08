@@ -15,5 +15,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/Skvia.Attendance.Application.Tests/Skvia.Attendance.Application.Tests.csproj" />
     <Project Path="tests/Skvia.Attendance.Domain.Tests/Skvia.Attendance.Domain.Tests.csproj" />
+    <Project Path="tests/Skvia.Attendance.Infrastructure.Tests/Skvia.Attendance.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>
