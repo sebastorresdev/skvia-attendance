@@ -1,4 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Roles.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Roles.Commands.UpdateRole;
 
@@ -34,3 +33,5 @@ public class UpdateRole : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record UpdateRoleRequest(string Id, string Name, string Description);

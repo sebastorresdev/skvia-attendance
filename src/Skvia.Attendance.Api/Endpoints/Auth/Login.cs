@@ -2,7 +2,6 @@ using System.Security.Claims;
 
 using Microsoft.AspNetCore.Identity;
 
-using Skvia.Attendance.Api.Endpoints.Auth.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Auth.Commands.Login;
 
@@ -40,3 +39,5 @@ public sealed class Login : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record LoginRequest(string UserName, string Password);

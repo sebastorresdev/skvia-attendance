@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
-using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Common.Interfaces;
-using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using Skvia.Attendance.Domain.Attendances;
 using Skvia.Attendance.Domain.Common;

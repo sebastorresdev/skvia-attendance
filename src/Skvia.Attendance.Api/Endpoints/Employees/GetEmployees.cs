@@ -7,14 +7,12 @@ namespace Skvia.Attendance.Api.Endpoints.Employees;
 public sealed class GetEmployees : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
-    {
-        group.MapGet("/", Handle)
+        => group.MapGet("/", Handle)
             .WithName(nameof(GetEmployees))
             .WithSummary("Obtener empleados")
             .WithDescription("Obtiene el listado completo de empleados registrados en el sistema.")
             .Produces<List<EmployeeResponse>>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest);
-    }
 
     private static async Task<IResult> Handle(
         IQueryHandler<GetEmployeesQuery, ErrorOr<List<EmployeeResponse>>> handler,

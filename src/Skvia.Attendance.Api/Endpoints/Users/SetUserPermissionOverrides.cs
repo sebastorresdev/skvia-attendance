@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.SetUserPermissionOverrides;
 
@@ -33,3 +32,5 @@ public sealed class SetUserPermissionOverrides : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record SetUserPermissionOverridesRequest(List<string> PermissionKeys);

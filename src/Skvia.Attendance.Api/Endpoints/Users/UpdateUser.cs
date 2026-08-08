@@ -1,4 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.UpdateUser;
 
@@ -40,3 +39,13 @@ public sealed class UpdateUser : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record UpdateUserRequest(
+    string UserName,
+    bool IsActive,
+    string Email,
+    string? DisplayName,
+    string? PhoneNumber,
+    string? PhotoUrl,
+    List<Guid> BranchIds,
+    List<Guid> RoleIds);

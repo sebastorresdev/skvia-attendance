@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.DeleteUser;
 
@@ -31,3 +30,5 @@ public sealed class DeleteBatchUsers : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record DeleteUsersBatchRequest(List<Guid> UserIds);

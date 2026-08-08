@@ -1,4 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.CreateUser;
 
@@ -6,8 +5,6 @@ namespace Skvia.Attendance.Api.Endpoints.Users;
 
 public sealed class CreateUser : IEndpoint
 {
-    public record CreateUserResponse(Guid Id);
-
     public static void Map(RouteGroupBuilder group)
         => group.MapPost("/", Handle)
             .WithName(nameof(CreateUser))
@@ -39,3 +36,15 @@ public sealed class CreateUser : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record CreateUserRequest(
+    string UserName,
+    string Password,
+    string Email,
+    string? DisplayName,
+    string? PhoneNumber,
+    string? PhotoUrl,
+    List<Guid> BranchIds,
+    List<Guid> RoleIds);
+
+public record CreateUserResponse(Guid Id);

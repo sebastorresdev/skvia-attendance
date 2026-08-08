@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Skvia.Attendance.Application.Features.Attendances.Commands.CheckIn;
 using Skvia.Attendance.Application.Features.Attendances.Commands.CheckOut;
-using Skvia.Attendance.Application.Common.Interfaces;
-using ErrorOr;
-using Skvia.Attendance.Domain.Common;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Domain.Attendances;
 

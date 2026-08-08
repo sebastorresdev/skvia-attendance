@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Features.Justifications.Commands.ReviewJustification;
-using ErrorOr;
 
 namespace Skvia.Attendance.Api.Endpoints.Justifications;
 

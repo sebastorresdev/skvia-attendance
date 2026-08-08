@@ -1,4 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Branches.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Branches.Commands.UpdateBranch;
 
@@ -31,3 +30,5 @@ public sealed class UpdateBranch : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record UpdateBranchRequest(string Code, string Name, string? Address, int TardinessToleranceMinutes = 0);

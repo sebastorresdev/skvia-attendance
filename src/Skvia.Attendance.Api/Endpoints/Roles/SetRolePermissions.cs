@@ -1,4 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Roles.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Roles.Commands.SetRolePermissions;
 
@@ -29,4 +28,9 @@ public class SetRolePermissions : IEndpoint
             _ => TypedResults.NoContent(),
             errors => errors.ToProblem());
     }
+}
+
+public class SetRolePermissionsRequest
+{
+    public List<string> PermissionKeys { get; set; } = [];
 }

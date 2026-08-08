@@ -1,21 +1,17 @@
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Features.KioskDevices.Commands.AuthorizeDevice;
-using ErrorOr;
 
 namespace Skvia.Attendance.Api.Endpoints.KioskDevices;
 
 public sealed class AuthorizeDevice : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
-    {
-        group.MapPost("/authorize", Handle)
+        => group.MapPost("/authorize", Handle)
             .WithName(nameof(AuthorizeDevice))
             .WithSummary("Autorizar un dispositivo Kiosko")
             .WithDescription("Registra y autoriza un dispositivo y retorna su token.")
             .Produces<AuthorizeDeviceResponse>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest);
-    }
 
     private static async Task<IResult> Handle(
         AuthorizeDeviceCommand request,

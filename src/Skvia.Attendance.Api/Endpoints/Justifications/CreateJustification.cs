@@ -1,17 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Features.Justifications.Commands.CreateJustification;
-using ErrorOr;
 
 namespace Skvia.Attendance.Api.Endpoints.Justifications;
-
-public record CreateJustificationRequest(
-    Guid EmployeeId,
-    DateOnly Date,
-    Skvia.Attendance.Domain.Justifications.JustificationType Type,
-    string Reason,
-    string? DocumentUrl);
 
 public sealed class CreateJustification : IEndpoint
 {
@@ -42,3 +33,10 @@ public sealed class CreateJustification : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record CreateJustificationRequest(
+    Guid EmployeeId,
+    DateOnly Date,
+    Domain.Justifications.JustificationType Type,
+    string Reason,
+    string? DocumentUrl);

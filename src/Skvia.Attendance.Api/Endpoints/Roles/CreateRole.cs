@@ -1,4 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Roles.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Roles.Commands.CreateRole;
 
@@ -33,3 +32,4 @@ public class CreateRole : IEndpoint
             errors => errors.ToProblem());
     }
 }
+public record CreateRoleRequest(string Name, string Description);

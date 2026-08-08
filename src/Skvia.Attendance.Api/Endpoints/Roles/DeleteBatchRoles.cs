@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 
-using Skvia.Attendance.Api.Endpoints.Roles.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Roles.Commands.DeleteRole;
 
@@ -31,3 +30,4 @@ public class DeleteBatchRoles : IEndpoint
             errors => errors.ToProblem());
     }
 }
+public record DeleteRolesBatchRequest(List<Guid> RoleIds);

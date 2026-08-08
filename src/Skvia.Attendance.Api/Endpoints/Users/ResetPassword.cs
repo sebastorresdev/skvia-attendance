@@ -1,4 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Users.Requests;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Users.Commands.ResetPassword;
 
@@ -28,3 +27,5 @@ public sealed class ResetPassword : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record ResetPasswordRequest(string UserId, string NewPassword, string ConfirmNewPassword);

@@ -1,5 +1,3 @@
-using Skvia.Attendance.Api.Endpoints.Branches.Requests;
-using Skvia.Attendance.Api.Endpoints.Branches.Responses;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.Branches.Commands.CreateBranch;
 
@@ -29,3 +27,6 @@ public sealed class CreateBranch : IEndpoint
             errors => errors.ToProblem());
     }
 }
+
+public record CreateBranchRequest(string Code, string Name, string? Address, int TardinessToleranceMinutes = 0);
+public record CreateBranchResponse(Guid Id);

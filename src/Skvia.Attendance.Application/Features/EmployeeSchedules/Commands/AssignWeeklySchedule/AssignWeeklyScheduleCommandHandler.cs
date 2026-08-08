@@ -1,7 +1,4 @@
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Domain.EmployeeSchedules;
-using Skvia.Attendance.Domain.Employees;
-using Skvia.Attendance.Domain.Branches;
 
 namespace Skvia.Attendance.Application.Features.EmployeeSchedules.Commands.AssignWeeklySchedule;
 

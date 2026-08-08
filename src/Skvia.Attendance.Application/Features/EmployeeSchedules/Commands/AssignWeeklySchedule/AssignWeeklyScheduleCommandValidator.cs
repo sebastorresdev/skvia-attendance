@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace Skvia.Attendance.Application.Features.EmployeeSchedules.Commands.AssignWeeklySchedule;
 
 public class AssignWeeklyScheduleCommandValidator : AbstractValidator<AssignWeeklyScheduleCommand>

@@ -2,21 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Skvia.Attendance.Api.Models;
 using Skvia.Attendance.Application.Features.EmployeeSchedules.DTOs;
 using Skvia.Attendance.Application.Features.EmployeeSchedules.Queries.GetEmployeeSchedule;
-using ErrorOr;
 
 namespace Skvia.Attendance.Api.Endpoints.Employees;
 
 public sealed class GetEmployeeSchedule : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
-    {
-        group.MapGet("/{employeeId:guid}/schedules", Handle)
+        => group.MapGet("/{employeeId:guid}/schedules", Handle)
             .WithName(nameof(GetEmployeeSchedule))
             .WithSummary("Obtener horario del empleado")
             .WithDescription("Obtiene los días de horario asignados a un empleado en un rango de fechas.")
             .Produces<List<EmployeeScheduleResponse>>(StatusCodes.Status200OK)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest);
-    }
 
     private static async Task<IResult> Handle(
         Guid employeeId,

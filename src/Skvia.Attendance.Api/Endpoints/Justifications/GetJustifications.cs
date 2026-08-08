@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Features.Justifications.DTOs;
 using Skvia.Attendance.Application.Features.Justifications.Queries.GetJustifications;
 using Skvia.Attendance.Domain.Justifications;
-using ErrorOr;
 
 namespace Skvia.Attendance.Api.Endpoints.Justifications;
 

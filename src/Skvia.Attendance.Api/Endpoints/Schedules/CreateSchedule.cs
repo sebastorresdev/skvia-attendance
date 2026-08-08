@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Features.Schedules.Commands.CreateSchedule;
 
 namespace Skvia.Attendance.Api.Endpoints.Schedules;
@@ -8,14 +7,12 @@ namespace Skvia.Attendance.Api.Endpoints.Schedules;
 public sealed class CreateSchedule : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
-    {
-        group.MapPost("/", Handle)
+        => group.MapPost("/", Handle)
             .WithName(nameof(CreateSchedule))
             .WithSummary("Crear turno base")
             .WithDescription("Crea un nuevo turno predefinido.")
             .Produces<Guid>(StatusCodes.Status201Created)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest);
-    }
 
     private static async Task<IResult> Handle(
         [FromBody] CreateScheduleRequest request,

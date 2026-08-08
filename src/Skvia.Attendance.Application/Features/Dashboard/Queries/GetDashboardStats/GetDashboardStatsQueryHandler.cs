@@ -1,7 +1,3 @@
-using ErrorOr;
-using Microsoft.EntityFrameworkCore;
-using Skvia.Attendance.Application.Common.Interfaces;
-using Skvia.Attendance.Application.Common.Messaging;
 using Skvia.Attendance.Domain.Common;
 using Skvia.Attendance.Domain.Employees;
 

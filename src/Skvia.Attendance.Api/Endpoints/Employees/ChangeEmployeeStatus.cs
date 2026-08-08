@@ -1,24 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Skvia.Attendance.Api.Models;
-using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Features.Employees.Commands.ChangeEmployeeStatus;
 using Skvia.Attendance.Domain.Employees;
-using ErrorOr;
 
 namespace Skvia.Attendance.Api.Endpoints.Employees;
 
 public sealed class ChangeEmployeeStatus : IEndpoint
 {
     public static void Map(RouteGroupBuilder group)
-    {
-        group.MapPut("/{id:guid}/status", Handle)
+        => group.MapPut("/{id:guid}/status", Handle)
             .WithName(nameof(ChangeEmployeeStatus))
             .WithSummary("Cambiar estado de empleado")
             .WithDescription("Cambia el estado de un empleado (Activo, Inactivo, etc).")
             .Produces(StatusCodes.Status204NoContent)
             .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ApiProblemDetails>(StatusCodes.Status404NotFound);
-    }
 
     private static async Task<IResult> Handle(
         Guid id,
