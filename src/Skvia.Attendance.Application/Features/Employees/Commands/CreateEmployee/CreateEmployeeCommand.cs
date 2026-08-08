@@ -19,4 +19,5 @@ public record CreateEmployeeCommand(
     string? PhotoUrl = null,
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
-    string? ApplicationUserId = null) : ICommand<ErrorOr<Guid>>;
+    string? ApplicationUserId = null,
+    bool? RequireFourPointAttendance = null) : ICommand<ErrorOr<Guid>>;

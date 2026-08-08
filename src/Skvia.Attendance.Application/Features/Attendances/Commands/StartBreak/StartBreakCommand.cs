@@ -1,9 +1,9 @@
 using Skvia.Attendance.Domain.Attendances;
 using ErrorOr;
 
-namespace Skvia.Attendance.Application.Features.Attendances.Commands.CheckOut;
+namespace Skvia.Attendance.Application.Features.Attendances.Commands.StartBreak;
 
-public record CheckOutCommand(
+public record StartBreakCommand(
     string EmployeeIdentifier,
     Guid BranchId,
     string PhotoUrl,

@@ -20,4 +20,5 @@ public record UpdateEmployeeCommand(
     string? PhotoUrl = null,
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
-    string? ApplicationUserId = null) : ICommand<ErrorOr<Success>>;
+    string? ApplicationUserId = null,
+    bool? RequireFourPointAttendance = null) : ICommand<ErrorOr<Success>>;

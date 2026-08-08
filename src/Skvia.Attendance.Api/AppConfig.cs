@@ -30,7 +30,7 @@ public static class AppConfig
 
         app.UseExceptionHandler();
 
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
 
         app.UseCors("AllowAll");
 

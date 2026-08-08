@@ -6,16 +6,15 @@ using Skvia.Attendance.Domain.Branches;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
-namespace Skvia.Attendance.Application.Features.Attendances.Commands.CheckOut;
+namespace Skvia.Attendance.Application.Features.Attendances.Commands.EndBreak;
 
-public class CheckOutCommandHandler(
+public class EndBreakCommandHandler(
     IApplicationDbContext dbContext,
     IClock clock,
-    ITimeZoneProvider timeZoneProvider) : ICommandHandler<CheckOutCommand, ErrorOr<Success>>
+    ITimeZoneProvider timeZoneProvider) : ICommandHandler<EndBreakCommand, ErrorOr<Success>>
 {
-    public async Task<ErrorOr<Success>> HandleAsync(CheckOutCommand command, CancellationToken cancellationToken)
+    public async Task<ErrorOr<Success>> HandleAsync(EndBreakCommand command, CancellationToken cancellationToken)
     {
-        // 1. Find Employee
         var identifier = command.EmployeeIdentifier.Trim().ToUpper();
         var employee = await dbContext.Employees
             .Include(e => e.EmployeeSchedules)
@@ -27,10 +26,13 @@ public class CheckOutCommandHandler(
         if (employee is null)
             return Error.NotFound("Employee.NotFound", "No se encontró un empleado activo con ese código o DNI.");
 
-        // 2. Determine Date and validate Source/Policies
         var branch = await dbContext.Branches.FindAsync(new object[] { command.BranchId }, cancellationToken);
         if (branch is null)
             return BranchErrors.NotFound;
+
+        bool isFourPointRequired = employee.RequireFourPointAttendance ?? branch.RequireFourPointAttendance;
+        if (!isFourPointRequired)
+            return Error.Validation("Policy.Invalid", "Tu configuración de asistencia no requiere registro de refrigerio (2 puntos).");
 
         if (command.Source == AttendanceSource.Mobile)
         {
@@ -57,23 +59,19 @@ public class CheckOutCommandHandler(
         var localTime = TimeZoneInfo.ConvertTime(clock.UtcNow, timeZoneProvider.GetTimeZone(branch.TimeZoneId));
         var currentDate = DateOnly.FromDateTime(localTime.DateTime);
 
-        // 3. Find Schedule to get total minutes scheduled
-        var schedule = employee.EmployeeSchedules.FirstOrDefault(s => s.Date == currentDate);
-        
-        if (schedule is null || !schedule.AssignedStartTime.HasValue || !schedule.AssignedEndTime.HasValue)
-            return Error.Validation("Schedule.Invalid", "No tienes horario completo asignado para el día de hoy.");
-
-        var scheduledMinutes = (int)(schedule.AssignedEndTime.Value - schedule.AssignedStartTime.Value).TotalMinutes;
-
-        // 4. Find today's Attendance (CheckIn) without CheckOut
         var attendance = await dbContext.Attendances
             .FirstOrDefaultAsync(a => a.EmployeeId == employee.Id && a.Date == currentDate && !a.CheckOut.HasValue, cancellationToken);
 
         if (attendance is null)
             return Error.Validation("Attendance.NotFound", "No has registrado tu entrada el día de hoy o ya registraste salida.");
 
-        // 5. Register CheckOut
-        attendance.RegisterCheckOut(command.BranchId, command.PhotoUrl, true, scheduledMinutes, clock);
+        if (!attendance.BreakStart.HasValue)
+            return Error.Validation("Attendance.BreakNotStarted", "No has iniciado tu refrigerio.");
+
+        if (attendance.BreakEnd.HasValue)
+            return Error.Validation("Attendance.BreakAlreadyEnded", "Ya finalizaste tu refrigerio.");
+
+        attendance.EndBreak(command.PhotoUrl, clock);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

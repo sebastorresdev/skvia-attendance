@@ -27,7 +27,12 @@ public class CheckInCommandHandler(
         if (employee is null)
             return Error.NotFound("Employee.NotFound", "No se encontró un empleado activo con ese código o DNI.");
 
-        // 1.5 Validate Source and Security
+        // 1.5 Get Branch (Needed for timezone, geofencing, and policies)
+        var branch = await dbContext.Branches.FindAsync(new object[] { command.BranchId }, cancellationToken);
+        if (branch is null)
+            return BranchErrors.NotFound;
+
+        // 1.6 Validate Source, Security, and Policies
         if (command.Source == AttendanceSource.Kiosk)
         {
             if (string.IsNullOrWhiteSpace(command.Token))
@@ -47,15 +52,24 @@ public class CheckInCommandHandler(
             if (!employee.MobileCheckInEnabled)
                 return Error.Forbidden("Mobile.Forbidden", "No tienes habilitada la marcación móvil. Consulta con RRHH.");
             
-            // TODO: In the future, check if the current Identity user matches employee.ApplicationUserId
+            if (branch.RequirePhotoForMobile && string.IsNullOrWhiteSpace(command.PhotoUrl))
+                return Error.Validation("Mobile.PhotoRequired", "La foto es obligatoria para marcación móvil.");
+
+            if (branch.Latitude.HasValue && branch.Longitude.HasValue && branch.GeofenceRadiusMeters.HasValue)
+            {
+                if (!command.Latitude.HasValue || !command.Longitude.HasValue)
+                    return Error.Validation("Mobile.GpsRequired", "Se requiere tu ubicación GPS para marcar en esta sede.");
+
+                var distance = Common.Utils.GeoUtils.CalculateDistanceMeters(
+                    branch.Latitude.Value, branch.Longitude.Value,
+                    command.Latitude.Value, command.Longitude.Value);
+
+                if (distance > branch.GeofenceRadiusMeters.Value)
+                    return Error.Validation("Mobile.GpsOutOfRange", $"Marcación fuera del rango GPS permitido de la sede (Distancia: {Math.Round(distance)}m, Máximo: {branch.GeofenceRadiusMeters.Value}m).");
+            }
         }
 
         // 2. Determine Date (using Branch TimeZone)
-        // For MVP we assume a default timezone if branch not found, but we should find branch.
-        var branch = await dbContext.Branches.FindAsync(new object[] { command.BranchId }, cancellationToken);
-        if (branch is null)
-            return BranchErrors.NotFound;
-
         var localTime = TimeZoneInfo.ConvertTime(clock.UtcNow, timeZoneProvider.GetTimeZone(branch.TimeZoneId));
         var currentDate = DateOnly.FromDateTime(localTime.DateTime);
 

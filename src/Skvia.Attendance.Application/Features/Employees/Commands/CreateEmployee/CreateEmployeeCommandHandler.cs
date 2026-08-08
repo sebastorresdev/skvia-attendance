@@ -34,11 +34,8 @@ public class CreateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             mainBranchId: command.MainBranchId);
 
         employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
-        
-        if (!string.IsNullOrWhiteSpace(command.ApplicationUserId))
-        {
-            employee.LinkUser(command.ApplicationUserId);
-        }
+        employee.LinkUser(command.ApplicationUserId);
+        employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance);
 
         dbContext.Employees.Add(employee);
         await dbContext.SaveChangesAsync(cancellationToken);

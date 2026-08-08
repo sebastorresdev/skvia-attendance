@@ -138,4 +138,44 @@ public class Attendance : BaseEntity
         if (MinutesWorked > totalMinutesScheduled)
             OvertimeMinutes = MinutesWorked - totalMinutesScheduled;
     }
+
+    public void Recalculate(
+        TimeOnly scheduledStartTime,
+        string operationTimeZoneId,
+        ITimeZoneProvider timeZoneProvider,
+        int branchTardinessToleranceMinutes = 0,
+        int totalMinutesScheduled = 0)
+    {
+        ArgumentNullException.ThrowIfNull(timeZoneProvider);
+
+        var branchTimeZone = timeZoneProvider.GetTimeZone(operationTimeZoneId);
+        var localTimeCheckIn = TimeZoneInfo.ConvertTime(CheckIn, branchTimeZone);
+        var currentTime = TimeOnly.FromDateTime(localTimeCheckIn.DateTime);
+
+        var difference = currentTime > scheduledStartTime
+            ? (int)(currentTime - scheduledStartTime).TotalMinutes
+            : 0;
+
+        var minutesLate = difference > branchTardinessToleranceMinutes ? difference : 0;
+        MinutesLate = minutesLate;
+        IsLate = minutesLate > 0;
+
+        if (CheckOut.HasValue)
+        {
+            int totalMinutes = (int)(CheckOut.Value - CheckIn).TotalMinutes;
+
+            if (BreakStart.HasValue && BreakEnd.HasValue)
+            {
+                int breakMinutes = (int)(BreakEnd.Value - BreakStart.Value).TotalMinutes;
+                if (breakMinutes > 0) totalMinutes -= breakMinutes;
+            }
+
+            MinutesWorked = Math.Max(totalMinutes, 0);
+
+            if (totalMinutesScheduled > 0 && MinutesWorked > totalMinutesScheduled)
+                OvertimeMinutes = MinutesWorked - totalMinutesScheduled;
+            else
+                OvertimeMinutes = 0;
+        }
+    }
 }

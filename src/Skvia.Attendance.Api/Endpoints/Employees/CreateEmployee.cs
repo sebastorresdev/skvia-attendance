@@ -32,7 +32,10 @@ public sealed class CreateEmployee : IEndpoint
             request.Position,
             request.Department,
             request.PhotoUrl,
-            request.MainBranchId);
+            request.MainBranchId,
+            request.MobileCheckInEnabled,
+            request.ApplicationUserId,
+            request.RequireFourPointAttendance);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
@@ -54,5 +57,8 @@ public record CreateEmployeeRequest(
     string? Position = null,
     string? Department = null,
     string? PhotoUrl = null,
-    Guid? MainBranchId = null);
+    Guid? MainBranchId = null,
+    bool MobileCheckInEnabled = false,
+    string? ApplicationUserId = null,
+    bool? RequireFourPointAttendance = null);
 public record CreateEmployeeResponse(Guid Id);

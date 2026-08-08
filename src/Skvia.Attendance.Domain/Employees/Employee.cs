@@ -19,6 +19,7 @@ public class Employee : BaseAuditableEntity
     
     public string? ApplicationUserId { get; private set; }
     public bool MobileCheckInEnabled { get; private set; }
+    public bool? RequireFourPointAttendance { get; private set; }
 
     private readonly List<EmployeeSchedule> _employeeSchedules = [];
     public IReadOnlyCollection<EmployeeSchedule> EmployeeSchedules => _employeeSchedules.AsReadOnly();
@@ -111,10 +112,14 @@ public class Employee : BaseAuditableEntity
         Status = newStatus;
     }
 
-    public void LinkUser(string applicationUserId)
+    public void LinkUser(string? applicationUserId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(applicationUserId);
         ApplicationUserId = applicationUserId;
+    }
+
+    public void SetRequireFourPointAttendance(bool? require)
+    {
+        RequireFourPointAttendance = require;
     }
 
     public void EnableMobileCheckIn(bool enabled)

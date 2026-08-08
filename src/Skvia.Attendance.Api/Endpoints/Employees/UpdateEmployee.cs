@@ -35,7 +35,10 @@ public sealed class UpdateEmployee : IEndpoint
             request.Position,
             request.Department,
             request.PhotoUrl,
-            request.MainBranchId);
+            request.MainBranchId,
+            request.MobileCheckInEnabled,
+            request.ApplicationUserId,
+            request.RequireFourPointAttendance);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
@@ -57,4 +60,7 @@ public record UpdateEmployeeRequest(
     string? Position = null,
     string? Department = null,
     string? PhotoUrl = null,
-    Guid? MainBranchId = null);
+    Guid? MainBranchId = null,
+    bool MobileCheckInEnabled = false,
+    string? ApplicationUserId = null,
+    bool? RequireFourPointAttendance = null);
