@@ -9,7 +9,9 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
 {
     public async Task<ErrorOr<Success>> HandleAsync(UpdateEmployeeCommand command, CancellationToken cancellationToken)
     {
-        var employee = await dbContext.Employees.FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
+        var employee = await dbContext.Employees
+            .Include(e => e.SchedulePatterns)
+            .FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (employee is null)
         {
@@ -24,6 +26,14 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             if (await dbContext.Employees.AnyAsync(e => e.DocumentIdentifier.Type == documentIdentifier.Type && e.DocumentIdentifier.Number == documentIdentifier.Number && e.Id != command.Id, cancellationToken))
             {
                 return EmployeeErrors.DocumentExists(command.DocumentNumber);
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(command.ApplicationUserId) && employee.ApplicationUserId != command.ApplicationUserId)
+        {
+            if (await dbContext.Employees.AnyAsync(e => e.ApplicationUserId == command.ApplicationUserId && e.Id != command.Id, cancellationToken))
+            {
+                return EmployeeErrors.UserAlreadyLinked;
             }
         }
 
@@ -43,6 +53,16 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
         employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
         employee.LinkUser(command.ApplicationUserId);
         employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance);
+
+        if (command.SchedulePatterns != null)
+        {
+            var patterns = command.SchedulePatterns.Select(p => 
+                Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedulePattern.Create(
+                    employee.Id, p.DayOfWeek, p.IsWorkDay, p.StartTime, p.EndTime
+                )).ToList();
+                
+            employee.SetSchedulePattern(patterns);
+        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

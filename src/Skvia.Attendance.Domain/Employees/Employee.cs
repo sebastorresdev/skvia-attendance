@@ -24,6 +24,9 @@ public class Employee : BaseAuditableEntity
     private readonly List<EmployeeSchedule> _employeeSchedules = [];
     public IReadOnlyCollection<EmployeeSchedule> EmployeeSchedules => _employeeSchedules.AsReadOnly();
 
+    private readonly List<EmployeeSchedulePattern> _schedulePatterns = [];
+    public IReadOnlyCollection<EmployeeSchedulePattern> SchedulePatterns => _schedulePatterns.AsReadOnly();
+
     private Employee() { }
 
     public static Employee Create(
@@ -130,5 +133,11 @@ public class Employee : BaseAuditableEntity
     public void AddEmployeeSchedule(EmployeeSchedule employeeSchedule)
     {
         _employeeSchedules.Add(employeeSchedule);
+    }
+
+    public void SetSchedulePattern(IEnumerable<EmployeeSchedulePattern> patterns)
+    {
+        _schedulePatterns.Clear();
+        _schedulePatterns.AddRange(patterns);
     }
 }

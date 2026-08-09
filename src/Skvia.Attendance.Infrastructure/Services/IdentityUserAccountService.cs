@@ -291,7 +291,22 @@ public class IdentityUserAccountService(
             return Error.Unauthorized("El nombre de usuario o la contraseña son incorrectos. Inténtalo de nuevo.");
         }
 
-        return await signInManager.CreateUserPrincipalAsync(user);
+        var principal = await signInManager.CreateUserPrincipalAsync(user);
+
+        var userIdString = user.Id.ToString();
+        var employee = await dbContext.Employees
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.ApplicationUserId == userIdString, cancellationToken);
+
+        if (employee != null && employee.MobileCheckInEnabled)
+        {
+            if (principal.Identity is ClaimsIdentity identity)
+            {
+                identity.AddClaim(new Claim(CustomClaimTypes.Permission, "mobile_check_in"));
+            }
+        }
+
+        return principal;
     }
 
     public async Task<ErrorOr<UserDetailResponse>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)

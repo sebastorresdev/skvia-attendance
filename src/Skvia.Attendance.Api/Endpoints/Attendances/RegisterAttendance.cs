@@ -37,45 +37,27 @@ public sealed class RegisterAttendance : IEndpoint
     private static async Task<IResult> HandleMobileClock(
         [FromBody] MobileClockRequest request,
         System.Security.Claims.ClaimsPrincipal user,
-        Skvia.Attendance.Application.Common.Interfaces.IApplicationDbContext dbContext,
-        ICommandHandler<CheckInCommand, ErrorOr<Success>> checkInHandler,
-        ICommandHandler<Skvia.Attendance.Application.Features.Attendances.Commands.StartBreak.StartBreakCommand, ErrorOr<Success>> startBreakHandler,
-        ICommandHandler<Skvia.Attendance.Application.Features.Attendances.Commands.EndBreak.EndBreakCommand, ErrorOr<Success>> endBreakHandler,
-        ICommandHandler<CheckOutCommand, ErrorOr<Success>> checkOutHandler,
+        ICommandHandler<Application.Features.Attendances.Commands.MobileClock.MobileClockCommand, ErrorOr<Application.Features.Attendances.Commands.MobileClock.MobileClockResult>> mobileClockHandler,
         CancellationToken cancellationToken)
     {
         var userName = user.Identity?.Name;
         if (string.IsNullOrEmpty(userName)) return TypedResults.Unauthorized();
 
-        var employee = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync(
-            dbContext.Employees, e => e.ApplicationUserId == user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value || e.Code == userName, cancellationToken);
-            
-        if (employee is null || !employee.MainBranchId.HasValue)
-            return TypedResults.Problem("Empleado no encontrado o sin sede principal asignada.", statusCode: 400);
+        var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        
+        var command = new Application.Features.Attendances.Commands.MobileClock.MobileClockCommand(
+            ApplicationUserId: userId ?? string.Empty,
+            UserName: userName,
+            TipoMarcacion: request.TipoMarcacion,
+            Latitud: request.Latitud,
+            Longitud: request.Longitud,
+            PhotoUrl: request.PhotoUrl
+        );
 
-        ErrorOr<Success> result;
-        var photo = request.PhotoUrl ?? "mobile-default-photo.jpg"; // Default photo for testing
-
-        switch (request.TipoMarcacion.ToUpper())
-        {
-            case "ENTRADA":
-                result = await checkInHandler.HandleAsync(new CheckInCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, request.Latitud, request.Longitud), cancellationToken);
-                break;
-            case "INICIO_REFRIGERIO":
-                result = await startBreakHandler.HandleAsync(new Skvia.Attendance.Application.Features.Attendances.Commands.StartBreak.StartBreakCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, request.Latitud, request.Longitud), cancellationToken);
-                break;
-            case "FIN_REFRIGERIO":
-                result = await endBreakHandler.HandleAsync(new Skvia.Attendance.Application.Features.Attendances.Commands.EndBreak.EndBreakCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, request.Latitud, request.Longitud), cancellationToken);
-                break;
-            case "SALIDA":
-                result = await checkOutHandler.HandleAsync(new CheckOutCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, request.Latitud, request.Longitud), cancellationToken);
-                break;
-            default:
-                return TypedResults.Problem("Tipo de marcación inválido.", statusCode: 400);
-        }
+        var result = await mobileClockHandler.HandleAsync(command, cancellationToken);
 
         return result.Match(
-            _ => TypedResults.Ok(new MobileClockResponse(true, $"Marcación de {request.TipoMarcacion} registrada con éxito.", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), request.TipoMarcacion, request.Latitud, request.Longitud)),
+            success => TypedResults.Ok(success),
             errors => errors.ToProblem());
     }
 

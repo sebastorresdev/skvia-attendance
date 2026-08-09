@@ -21,4 +21,5 @@ public record UpdateEmployeeCommand(
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
     string? ApplicationUserId = null,
-    bool? RequireFourPointAttendance = null) : ICommand<ErrorOr<Success>>;
+    bool? RequireFourPointAttendance = null,
+    List<Skvia.Attendance.Application.Features.Employees.DTOs.SchedulePatternDto>? SchedulePatterns = null) : ICommand<ErrorOr<Success>>;

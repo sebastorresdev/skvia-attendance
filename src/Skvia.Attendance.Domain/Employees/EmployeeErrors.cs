@@ -13,4 +13,8 @@ public static class EmployeeErrors
     public static Error NotFound => Error.NotFound(
         code: "Employee.NotFound",
         description: "El empleado no se encuentra registrado.");
+
+    public static Error UserAlreadyLinked => Error.Conflict(
+        code: "Employee.UserAlreadyLinked",
+        description: "El usuario seleccionado ya se encuentra vinculado a otro empleado.");
 }
