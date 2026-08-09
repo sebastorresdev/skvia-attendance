@@ -17,7 +17,6 @@ public class GenerateSchedulesCommandHandler(IApplicationDbContext dbContext) : 
         }
 
         var employee = await dbContext.Employees
-            .Include(e => e.SchedulePatterns)
             .FirstOrDefaultAsync(e => e.Id == command.EmployeeId, cancellationToken);
 
         if (employee is null)
@@ -30,20 +29,12 @@ public class GenerateSchedulesCommandHandler(IApplicationDbContext dbContext) : 
             return Error.Validation("Schedules.NoMainBranch", "El empleado debe tener una sede principal asignada para generarle horarios.");
         }
 
-        if (command.Patterns != null && command.Patterns.Count > 0)
+        if (command.Patterns == null || command.Patterns.Count == 0)
         {
-            var newPatterns = command.Patterns.Select(p =>
-                EmployeeSchedulePattern.Create(employee.Id, p.DayOfWeek, p.IsWorkDay, p.StartTime, p.EndTime)
-            ).ToList();
-            employee.SetSchedulePattern(newPatterns);
+            return Error.Validation("Schedules.NoPattern", "Debe enviar un patrón de horario configurado.");
         }
 
-        if (employee.SchedulePatterns.Count == 0)
-        {
-            return Error.Validation("Schedules.NoPattern", "El empleado no tiene un patrón de horario configurado.");
-        }
-
-        var patternsDict = employee.SchedulePatterns.ToDictionary(p => p.DayOfWeek);
+        var patternsDict = command.Patterns.ToDictionary(p => p.DayOfWeek);
 
         // Get existing schedules for the period
         var existingSchedules = await dbContext.EmployeeSchedules
@@ -76,7 +67,7 @@ public class GenerateSchedulesCommandHandler(IApplicationDbContext dbContext) : 
 
             if (pattern.IsWorkDay && pattern.StartTime.HasValue && pattern.EndTime.HasValue)
             {
-                var workDayResult = EmployeeSchedule.CreateWorkDay(employee.Id, date, branchId, pattern.StartTime.Value, pattern.EndTime.Value);
+                var workDayResult = EmployeeSchedule.CreateWorkDay(employee.Id, date, branchId, pattern.StartTime.Value, pattern.EndTime.Value, pattern.BaseScheduleId);
                 if (!workDayResult.IsError) newSchedules.Add(workDayResult.Value);
             }
             else

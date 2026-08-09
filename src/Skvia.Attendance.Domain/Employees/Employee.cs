@@ -19,13 +19,13 @@ public class Employee : BaseAuditableEntity
     
     public string? ApplicationUserId { get; private set; }
     public bool MobileCheckInEnabled { get; private set; }
-    public bool? RequireFourPointAttendance { get; private set; }
+    public bool RequireFourPointAttendance { get; private set; } = false;
+    public bool IsAttendanceTracked { get; private set; } = true;
+    public bool AutoCompleteClockOut { get; private set; } = false;
+    public List<Guid> AllowedKioskIds { get; private set; } = [];
 
     private readonly List<EmployeeSchedule> _employeeSchedules = [];
     public IReadOnlyCollection<EmployeeSchedule> EmployeeSchedules => _employeeSchedules.AsReadOnly();
-
-    private readonly List<EmployeeSchedulePattern> _schedulePatterns = [];
-    public IReadOnlyCollection<EmployeeSchedulePattern> SchedulePatterns => _schedulePatterns.AsReadOnly();
 
     private Employee() { }
 
@@ -64,6 +64,7 @@ public class Employee : BaseAuditableEntity
         employee.PhotoUrl = photoUrl?.Trim();
         employee.MainBranchId = mainBranchId;
         employee.Status = EmployeeStatus.Active;
+        employee.IsAttendanceTracked = true;
 
         return employee;
     }
@@ -120,7 +121,7 @@ public class Employee : BaseAuditableEntity
         ApplicationUserId = applicationUserId;
     }
 
-    public void SetRequireFourPointAttendance(bool? require)
+    public void SetRequireFourPointAttendance(bool require)
     {
         RequireFourPointAttendance = require;
     }
@@ -130,14 +131,23 @@ public class Employee : BaseAuditableEntity
         MobileCheckInEnabled = enabled;
     }
 
+    public void SetAttendanceOptions(bool isAttendanceTracked, bool autoCompleteClockOut)
+    {
+        IsAttendanceTracked = isAttendanceTracked;
+        AutoCompleteClockOut = autoCompleteClockOut;
+    }
+
+    public void SetAllowedKioskIds(IEnumerable<Guid>? kioskIds)
+    {
+        AllowedKioskIds.Clear();
+        if (kioskIds != null)
+        {
+            AllowedKioskIds.AddRange(kioskIds.Distinct());
+        }
+    }
+
     public void AddEmployeeSchedule(EmployeeSchedule employeeSchedule)
     {
         _employeeSchedules.Add(employeeSchedule);
-    }
-
-    public void SetSchedulePattern(IEnumerable<EmployeeSchedulePattern> patterns)
-    {
-        _schedulePatterns.Clear();
-        _schedulePatterns.AddRange(patterns);
     }
 }

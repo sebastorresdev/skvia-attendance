@@ -19,4 +19,8 @@ public record EmployeeDetailResponse(
     string? MainBranchName,
     EmployeeStatus Status,
     bool MobileCheckInEnabled,
-    string? ApplicationUserId);
+    string? ApplicationUserId,
+    bool RequireFourPointAttendance,
+    bool IsAttendanceTracked,
+    bool AutoCompleteClockOut,
+    List<Guid> AllowedKioskIds);

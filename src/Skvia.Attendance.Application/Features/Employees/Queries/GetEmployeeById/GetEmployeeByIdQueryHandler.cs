@@ -27,7 +27,11 @@ public class GetEmployeeByIdQueryHandler(IApplicationDbContext dbContext) : IQue
                 e.MainBranchId.HasValue ? dbContext.Branches.Where(b => b.Id == e.MainBranchId.Value).Select(b => b.Name).FirstOrDefault() : null,
                 e.Status,
                 e.MobileCheckInEnabled,
-                e.ApplicationUserId))
+                e.ApplicationUserId,
+                e.RequireFourPointAttendance,
+                e.IsAttendanceTracked,
+                e.AutoCompleteClockOut,
+                e.AllowedKioskIds))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (employee is null)

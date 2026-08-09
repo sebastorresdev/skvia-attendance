@@ -38,7 +38,10 @@ public sealed class UpdateEmployee : IEndpoint
             request.MainBranchId,
             request.MobileCheckInEnabled,
             request.ApplicationUserId,
-            request.RequireFourPointAttendance);
+            request.RequireFourPointAttendance,
+            request.IsAttendanceTracked,
+            request.AutoCompleteClockOut,
+            request.AllowedKioskIds);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
@@ -63,4 +66,7 @@ public record UpdateEmployeeRequest(
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
     string? ApplicationUserId = null,
-    bool? RequireFourPointAttendance = null);
+    bool RequireFourPointAttendance = false,
+    bool IsAttendanceTracked = true,
+    bool AutoCompleteClockOut = false,
+    List<Guid>? AllowedKioskIds = null);

@@ -14,4 +14,5 @@ public record SchedulePatternInput(
     DayOfWeek DayOfWeek,
     bool IsWorkDay,
     TimeOnly? StartTime,
-    TimeOnly? EndTime);
+    TimeOnly? EndTime,
+    Guid? BaseScheduleId = null);

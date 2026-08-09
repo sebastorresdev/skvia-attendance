@@ -67,5 +67,15 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             
         builder.Property(p => p.ApplicationUserId).IsRequired(false).HasMaxLength(450);
         builder.Property(p => p.MobileCheckInEnabled).IsRequired().HasDefaultValue(false);
+        builder.Property(p => p.RequireFourPointAttendance).IsRequired().HasDefaultValue(false);
+        builder.Property(p => p.IsAttendanceTracked).IsRequired().HasDefaultValue(true);
+        builder.Property(p => p.AutoCompleteClockOut).IsRequired().HasDefaultValue(false);
+
+        builder.Property(p => p.AllowedKioskIds)
+            .HasConversion(
+                v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                v => string.IsNullOrWhiteSpace(v) || !v.Contains("[") ? new List<Guid>() : System.Text.Json.JsonSerializer.Deserialize<List<Guid>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<Guid>())
+            .HasColumnType("jsonb")
+            .HasDefaultValueSql("'[]'::jsonb");
     }
 }

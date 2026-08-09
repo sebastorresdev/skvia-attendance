@@ -46,5 +46,9 @@ public class CreateEmployeeCommandValidator : AbstractValidator<CreateEmployeeCo
             .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
             .WithMessage("La URL de la foto debe ser una dirección absoluta válida (ej: https://...).")
             .When(x => !string.IsNullOrEmpty(x.PhotoUrl));
+
+        RuleFor(x => x.ApplicationUserId)
+            .NotEmpty().WithMessage("Debe seleccionar un usuario del sistema para habilitar la marcación móvil.")
+            .When(x => x.MobileCheckInEnabled);
     }
 }

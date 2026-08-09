@@ -10,7 +10,6 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
     public async Task<ErrorOr<Success>> HandleAsync(UpdateEmployeeCommand command, CancellationToken cancellationToken)
     {
         var employee = await dbContext.Employees
-            .Include(e => e.SchedulePatterns)
             .FirstOrDefaultAsync(e => e.Id == command.Id, cancellationToken);
 
         if (employee is null)
@@ -53,15 +52,11 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
         employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
         employee.LinkUser(command.ApplicationUserId);
         employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance);
-
-        if (command.SchedulePatterns != null)
+        employee.SetAttendanceOptions(command.IsAttendanceTracked, command.AutoCompleteClockOut);
+        
+        if (command.AllowedKioskIds != null)
         {
-            var patterns = command.SchedulePatterns.Select(p => 
-                Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedulePattern.Create(
-                    employee.Id, p.DayOfWeek, p.IsWorkDay, p.StartTime, p.EndTime
-                )).ToList();
-                
-            employee.SetSchedulePattern(patterns);
+            employee.SetAllowedKioskIds(command.AllowedKioskIds);
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Skvia.Attendance.Infrastructure.Data;
@@ -11,9 +12,11 @@ using Skvia.Attendance.Infrastructure.Data;
 namespace Skvia.Attendance.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260809020300_RemoveEmployeeSchedulePatternsAndAddEmployeeSettings")]
+    partial class RemoveEmployeeSchedulePatternsAndAddEmployeeSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -365,10 +368,8 @@ namespace Skvia.Attendance.Infrastructure.Migrations
 
                     b.Property<string>("AllowedKioskIds")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("jsonb")
-                        .HasColumnName("allowed_kiosk_ids")
-                        .HasDefaultValueSql("'[]'::jsonb");
+                        .HasColumnName("allowed_kiosk_ids");
 
                     b.Property<string>("ApplicationUserId")
                         .HasMaxLength(450)

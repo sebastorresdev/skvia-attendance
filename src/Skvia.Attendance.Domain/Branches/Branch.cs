@@ -13,7 +13,6 @@ public class Branch : BaseAuditableEntity
     public double? Latitude { get; private set; }
     public double? Longitude { get; private set; }
     public double? GeofenceRadiusMeters { get; private set; }
-    public bool RequireFourPointAttendance { get; private set; } = true;
     public bool RequirePhotoForMobile { get; private set; } = true;
 
     private readonly List<BranchUser> _branchUsers = [];
@@ -30,7 +29,6 @@ public class Branch : BaseAuditableEntity
         double? latitude = null,
         double? longitude = null,
         double? geofenceRadiusMeters = null,
-        bool requireFourPointAttendance = true,
         bool requirePhotoForMobile = true)
     {
         var branch = new Branch();
@@ -51,7 +49,6 @@ public class Branch : BaseAuditableEntity
         branch.Latitude = latitude;
         branch.Longitude = longitude;
         branch.GeofenceRadiusMeters = geofenceRadiusMeters;
-        branch.RequireFourPointAttendance = requireFourPointAttendance;
         branch.RequirePhotoForMobile = requirePhotoForMobile;
 
         return branch;
@@ -66,7 +63,6 @@ public class Branch : BaseAuditableEntity
         double? latitude = null,
         double? longitude = null,
         double? geofenceRadiusMeters = null,
-        bool? requireFourPointAttendance = null,
         bool? requirePhotoForMobile = null)
     {
         ArgumentNullException.ThrowIfNull(code);
@@ -87,7 +83,6 @@ public class Branch : BaseAuditableEntity
         if (latitude.HasValue) Latitude = latitude;
         if (longitude.HasValue) Longitude = longitude;
         if (geofenceRadiusMeters.HasValue) GeofenceRadiusMeters = geofenceRadiusMeters;
-        if (requireFourPointAttendance.HasValue) RequireFourPointAttendance = requireFourPointAttendance.Value;
         if (requirePhotoForMobile.HasValue) RequirePhotoForMobile = requirePhotoForMobile.Value;
     }
 }

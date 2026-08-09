@@ -12,7 +12,6 @@ public interface IApplicationDbContext
     DbSet<Branch> Branches { get; }
     DbSet<Employee> Employees { get; }
     DbSet<Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedule> EmployeeSchedules { get; }
-    DbSet<Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedulePattern> EmployeeSchedulePatterns { get; }
     DbSet<Skvia.Attendance.Domain.Schedules.Schedule> Schedules { get; }
     DbSet<Skvia.Attendance.Domain.Attendances.Attendance> Attendances { get; }
     DbSet<KioskDevice> KioskDevices { get; }

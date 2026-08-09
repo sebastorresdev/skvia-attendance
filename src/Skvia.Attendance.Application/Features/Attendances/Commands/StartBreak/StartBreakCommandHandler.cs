@@ -30,7 +30,7 @@ public class StartBreakCommandHandler(
         if (branch is null)
             return BranchErrors.NotFound;
 
-        bool isFourPointRequired = employee.RequireFourPointAttendance ?? branch.RequireFourPointAttendance;
+        bool isFourPointRequired = employee.RequireFourPointAttendance;
         if (!isFourPointRequired)
             return Error.Validation("Policy.Invalid", "Tu configuración de asistencia no requiere registro de refrigerio (2 puntos).");
 

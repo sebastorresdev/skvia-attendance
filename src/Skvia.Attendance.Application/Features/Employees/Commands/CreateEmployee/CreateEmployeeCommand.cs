@@ -20,5 +20,7 @@ public record CreateEmployeeCommand(
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
     string? ApplicationUserId = null,
-    bool? RequireFourPointAttendance = null,
-    List<Skvia.Attendance.Application.Features.Employees.DTOs.SchedulePatternDto>? SchedulePatterns = null) : ICommand<ErrorOr<Guid>>;
+    bool RequireFourPointAttendance = false,
+    bool IsAttendanceTracked = true,
+    bool AutoCompleteClockOut = false,
+    List<Guid>? AllowedKioskIds = null) : ICommand<ErrorOr<Guid>>;

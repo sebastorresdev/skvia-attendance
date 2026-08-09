@@ -44,19 +44,12 @@ public class CreateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
         employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
         employee.LinkUser(command.ApplicationUserId);
         
-        if (command.RequireFourPointAttendance.HasValue)
+        employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance);
+        employee.SetAttendanceOptions(command.IsAttendanceTracked, command.AutoCompleteClockOut);
+        
+        if (command.AllowedKioskIds != null)
         {
-            employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance.Value);
-        }
-
-        if (command.SchedulePatterns != null && command.SchedulePatterns.Count > 0)
-        {
-            var patterns = command.SchedulePatterns.Select(p => 
-                Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedulePattern.Create(
-                    employee.Id, p.DayOfWeek, p.IsWorkDay, p.StartTime, p.EndTime
-                )).ToList();
-                
-            employee.SetSchedulePattern(patterns);
+            employee.SetAllowedKioskIds(command.AllowedKioskIds);
         }
 
         dbContext.Employees.Add(employee);

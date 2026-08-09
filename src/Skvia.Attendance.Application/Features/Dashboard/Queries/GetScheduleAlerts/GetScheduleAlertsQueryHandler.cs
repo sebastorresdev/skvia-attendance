@@ -18,13 +18,13 @@ public class GetScheduleAlertsQueryHandler(
         var today = DateOnly.FromDateTime(clock.UtcNow.DateTime); // Ideally converted to local branch tz, but this is a global alert
         var thresholdDate = today.AddDays(15);
 
-        // Find all active employees who have a schedule pattern
-        var activeEmployeesWithPatterns = await dbContext.Employees
-            .Where(e => e.Status == EmployeeStatus.Active && e.SchedulePatterns.Any())
+        // Find all active employees
+        var activeEmployees = await dbContext.Employees
+            .Where(e => e.Status == EmployeeStatus.Active)
             .Select(e => new { e.Id, e.Code, e.FirstName, e.LastName })
             .ToListAsync(cancellationToken);
 
-        var employeeIds = activeEmployeesWithPatterns.Select(e => e.Id).ToList();
+        var employeeIds = activeEmployees.Select(e => e.Id).ToList();
 
         // Find the maximum scheduled date for these employees
         var maxSchedules = await dbContext.EmployeeSchedules
@@ -37,7 +37,7 @@ public class GetScheduleAlertsQueryHandler(
 
         var alerts = new List<ScheduleAlertDto>();
 
-        foreach (var emp in activeEmployeesWithPatterns)
+        foreach (var emp in activeEmployees)
         {
             maxSchedulesDict.TryGetValue(emp.Id, out var lastDate);
 
