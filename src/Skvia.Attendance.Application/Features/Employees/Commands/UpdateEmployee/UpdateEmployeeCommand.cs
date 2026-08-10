@@ -16,12 +16,13 @@ public record UpdateEmployeeCommand(
     string? Email = null,
     string? Phone = null,
     string? Position = null,
-    string? Department = null,
+    Guid? DepartmentId = null,
     string? PhotoUrl = null,
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
     string? ApplicationUserId = null,
     bool RequireFourPointAttendance = false,
     bool IsAttendanceTracked = true,
-    bool AutoCompleteClockOut = false,
-    List<Guid>? AllowedKioskIds = null) : ICommand<ErrorOr<Success>>;
+    bool? AutoCompleteClockOut = null,
+    int? TardinessToleranceMinutes = null,
+    List<Guid>? AllowedWorkplaceIds = null) : ICommand<ErrorOr<Success>>;

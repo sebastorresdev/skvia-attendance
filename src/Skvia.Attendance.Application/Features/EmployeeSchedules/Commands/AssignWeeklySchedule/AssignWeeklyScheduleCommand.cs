@@ -4,7 +4,6 @@ namespace Skvia.Attendance.Application.Features.EmployeeSchedules.Commands.Assig
 
 public record DailyScheduleRequest(
     DateOnly Date,
-    Guid BranchId,
     TimeOnly? StartTime,
     TimeOnly? EndTime,
     ScheduleDayType DayType,

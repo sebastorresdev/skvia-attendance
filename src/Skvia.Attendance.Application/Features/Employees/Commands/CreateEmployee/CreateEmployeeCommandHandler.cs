@@ -37,19 +37,19 @@ public class CreateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             email: command.Email,
             phone: command.Phone,
             position: command.Position,
-            department: command.Department,
+            departmentId: command.DepartmentId,
             photoUrl: command.PhotoUrl,
-            mainBranchId: command.MainBranchId);
+            mainBranchId: command.MainBranchId,
+            tardinessToleranceMinutes: command.TardinessToleranceMinutes);
 
+        employee.SetAttendanceOptions(command.IsAttendanceTracked, command.AutoCompleteClockOut);
         employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
         employee.LinkUser(command.ApplicationUserId);
-        
         employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance);
-        employee.SetAttendanceOptions(command.IsAttendanceTracked, command.AutoCompleteClockOut);
         
-        if (command.AllowedKioskIds != null)
+        if (command.AllowedWorkplaceIds != null)
         {
-            employee.SetAllowedKioskIds(command.AllowedKioskIds);
+            employee.SetAllowedWorkplaceIds(command.AllowedWorkplaceIds);
         }
 
         dbContext.Employees.Add(employee);

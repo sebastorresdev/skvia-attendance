@@ -5,6 +5,11 @@ namespace Skvia.Attendance.Application.Features.Schedules.Commands.UpdateSchedul
 
 public record UpdateScheduleCommand(
     Guid Id,
-    string Name,
+    string Code,
+    string Description,
+    string TimeZoneId,
     TimeOnly DefaultStartTime,
-    TimeOnly DefaultEndTime) : ICommand<ErrorOr<Success>>;
+    TimeOnly DefaultEndTime,
+    bool HasBreak = false,
+    TimeOnly? BreakStartTime = null,
+    TimeOnly? BreakEndTime = null) : ICommand<ErrorOr<Success>>;

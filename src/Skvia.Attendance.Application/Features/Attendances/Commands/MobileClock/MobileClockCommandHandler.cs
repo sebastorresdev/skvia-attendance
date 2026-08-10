@@ -7,6 +7,7 @@ using Skvia.Attendance.Application.Features.Attendances.Commands.EndBreak;
 using Skvia.Attendance.Application.Features.Attendances.Commands.StartBreak;
 using Skvia.Attendance.Domain.Attendances;
 using Skvia.Attendance.Domain.Common;
+using Skvia.Attendance.Application.Common.Utils;
 
 namespace Skvia.Attendance.Application.Features.Attendances.Commands.MobileClock;
 
@@ -22,10 +23,50 @@ public class MobileClockCommandHandler(
         var employee = await dbContext.Employees
             .FirstOrDefaultAsync(e => e.ApplicationUserId == command.ApplicationUserId || e.Code == command.UserName, cancellationToken);
             
-        if (employee is null || !employee.MainBranchId.HasValue)
+        if (employee is null || !employee.AllowedWorkplaceIds.Any())
         {
-            return Error.Validation("MobileClock.InvalidEmployee", "Empleado no encontrado o sin sede principal asignada.");
+            return Error.Validation("MobileClock.InvalidEmployee", "Empleado no encontrado o sin lugares de marcación asignados.");
         }
+
+        if (!command.Latitud.HasValue || !command.Longitud.HasValue)
+        {
+            return Error.Validation("MobileClock.LocationRequired", "La ubicación (Latitud y Longitud) es obligatoria para marcaciones móviles.");
+        }
+
+        var workplaces = await dbContext.Workplaces
+            .Where(w => employee.AllowedWorkplaceIds.Contains(w.Id))
+            .ToListAsync(cancellationToken);
+
+        Guid? validWorkplaceId = null;
+
+        foreach (var workplace in workplaces)
+        {
+            if (!workplace.Latitude.HasValue || !workplace.Longitude.HasValue)
+            {
+                // Si el lugar no tiene ubicación configurada, se permite marcar sin restricción de geocerca
+                validWorkplaceId = workplace.Id;
+                break;
+            }
+
+            var distance = GeoUtils.CalculateDistanceMeters(
+                command.Latitud.Value,
+                command.Longitud.Value,
+                workplace.Latitude.Value,
+                workplace.Longitude.Value);
+
+            if (distance <= workplace.GeofenceRadiusMeters)
+            {
+                validWorkplaceId = workplace.Id;
+                break;
+            }
+        }
+
+        if (validWorkplaceId is null)
+        {
+            return Error.Validation("MobileClock.OutOfRange", "Te encuentras fuera del área permitida para registrar tu asistencia en tus lugares asignados.");
+        }
+
+        var workplaceId = validWorkplaceId.Value;
 
         ErrorOr<Success> result;
         var photo = command.PhotoUrl ?? "mobile-default-photo.jpg"; // Default photo for testing
@@ -33,16 +74,16 @@ public class MobileClockCommandHandler(
         switch (command.TipoMarcacion.ToUpper())
         {
             case "ENTRADA":
-                result = await checkInHandler.HandleAsync(new CheckInCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
+                result = await checkInHandler.HandleAsync(new CheckInCommand(employee.Code, workplaceId, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
                 break;
             case "INICIO_REFRIGERIO":
-                result = await startBreakHandler.HandleAsync(new StartBreakCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
+                result = await startBreakHandler.HandleAsync(new StartBreakCommand(employee.Code, workplaceId, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
                 break;
             case "FIN_REFRIGERIO":
-                result = await endBreakHandler.HandleAsync(new EndBreakCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
+                result = await endBreakHandler.HandleAsync(new EndBreakCommand(employee.Code, workplaceId, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
                 break;
             case "SALIDA":
-                result = await checkOutHandler.HandleAsync(new CheckOutCommand(employee.Code, employee.MainBranchId.Value, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
+                result = await checkOutHandler.HandleAsync(new CheckOutCommand(employee.Code, workplaceId, photo, AttendanceSource.Mobile, command.Latitud, command.Longitud), cancellationToken);
                 break;
             default:
                 return Error.Validation("MobileClock.InvalidType", "Tipo de marcación inválido.");

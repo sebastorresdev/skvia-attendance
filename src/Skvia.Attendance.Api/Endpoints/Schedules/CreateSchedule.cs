@@ -19,7 +19,15 @@ public sealed class CreateSchedule : IEndpoint
         ICommandHandler<CreateScheduleCommand, ErrorOr<Guid>> handler,
         CancellationToken cancellationToken)
     {
-        var command = new CreateScheduleCommand(request.Name, request.DefaultStartTime, request.DefaultEndTime);
+        var command = new CreateScheduleCommand(
+            request.Code, 
+            request.Description, 
+            request.TimeZoneId, 
+            request.DefaultStartTime, 
+            request.DefaultEndTime,
+            request.HasBreak,
+            request.BreakStartTime,
+            request.BreakEndTime);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
@@ -28,4 +36,12 @@ public sealed class CreateSchedule : IEndpoint
     }
 }
 
-public record CreateScheduleRequest(string Name, TimeOnly DefaultStartTime, TimeOnly DefaultEndTime);
+public record CreateScheduleRequest(
+    string Code,
+    string Description,
+    string TimeZoneId,
+    TimeOnly DefaultStartTime, 
+    TimeOnly DefaultEndTime,
+    bool HasBreak = false,
+    TimeOnly? BreakStartTime = null,
+    TimeOnly? BreakEndTime = null);

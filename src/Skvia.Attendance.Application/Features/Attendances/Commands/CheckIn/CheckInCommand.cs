@@ -4,7 +4,7 @@ namespace Skvia.Attendance.Application.Features.Attendances.Commands.CheckIn;
 
 public record CheckInCommand(
     string EmployeeIdentifier, // Can be DNI or Code
-    Guid BranchId,
+    Guid WorkplaceId,
     string PhotoUrl,
     AttendanceSource Source,
     double? Latitude = null,

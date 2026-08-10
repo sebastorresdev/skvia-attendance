@@ -15,7 +15,6 @@ public class AssignWeeklyScheduleCommandValidator : AbstractValidator<AssignWeek
         RuleForEach(x => x.Days).ChildRules(days =>
         {
             days.RuleFor(d => d.Date).NotEmpty();
-            days.RuleFor(d => d.BranchId).NotEmpty();
             days.RuleFor(d => d.DayType).IsInEnum();
         });
     }

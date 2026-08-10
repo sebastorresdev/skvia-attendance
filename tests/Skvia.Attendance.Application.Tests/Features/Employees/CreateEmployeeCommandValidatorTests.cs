@@ -22,7 +22,6 @@ public class CreateEmployeeCommandValidatorTests
             Email: "juan@example.com",
             Phone: "+51 987654321",
             Position: "Developer",
-            Department: "IT",
             PhotoUrl: "https://example.com/photo.jpg");
 
         // Act

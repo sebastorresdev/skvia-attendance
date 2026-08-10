@@ -40,17 +40,17 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("check_in");
 
-                    b.Property<Guid>("CheckInBranchId")
+                    b.Property<Guid>("CheckInWorkplaceId")
                         .HasColumnType("uuid")
-                        .HasColumnName("check_in_branch_id");
+                        .HasColumnName("check_in_workplace_id");
 
                     b.Property<DateTimeOffset?>("CheckOut")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("check_out");
 
-                    b.Property<Guid?>("CheckOutBranchId")
+                    b.Property<Guid?>("CheckOutWorkplaceId")
                         .HasColumnType("uuid")
-                        .HasColumnName("check_out_branch_id");
+                        .HasColumnName("check_out_workplace_id");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date")
@@ -125,11 +125,11 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_attendances");
 
-                    b.HasIndex("CheckInBranchId", "Date")
-                        .HasDatabaseName("ix_attendances_check_in_branch_id_date");
+                    b.HasIndex("CheckInWorkplaceId", "Date")
+                        .HasDatabaseName("ix_attendances_check_in_workplace_id_date");
 
-                    b.HasIndex("CheckOutBranchId", "Date")
-                        .HasDatabaseName("ix_attendances_check_out_branch_id_date");
+                    b.HasIndex("CheckOutWorkplaceId", "Date")
+                        .HasDatabaseName("ix_attendances_check_out_workplace_id_date");
 
                     b.HasIndex("EmployeeId", "CheckIn")
                         .HasDatabaseName("ix_attendances_employee_id_check_in");
@@ -166,10 +166,6 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
-                    b.Property<double?>("GeofenceRadiusMeters")
-                        .HasColumnType("double precision")
-                        .HasColumnName("geofence_radius_meters");
-
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_modified");
@@ -178,32 +174,11 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("last_modified_by");
 
-                    b.Property<double?>("Latitude")
-                        .HasColumnType("double precision")
-                        .HasColumnName("latitude");
-
-                    b.Property<double?>("Longitude")
-                        .HasColumnType("double precision")
-                        .HasColumnName("longitude");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)")
                         .HasColumnName("name");
-
-                    b.Property<bool>("RequirePhotoForMobile")
-                        .HasColumnType("boolean")
-                        .HasColumnName("require_photo_for_mobile");
-
-                    b.Property<int>("TardinessToleranceMinutes")
-                        .HasColumnType("integer")
-                        .HasColumnName("tardiness_tolerance_minutes");
-
-                    b.Property<string>("TimeZoneId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("time_zone_id");
 
                     b.HasKey("Id")
                         .HasName("pk_branches");
@@ -254,16 +229,11 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                     b.ToTable("branch_users", (string)null);
                 });
 
-            modelBuilder.Entity("Skvia.Attendance.Domain.Branches.KioskDevice", b =>
+            modelBuilder.Entity("Skvia.Attendance.Domain.Departments.Department", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
-
-                    b.Property<Guid>("BranchId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("branch_id");
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone")
@@ -273,9 +243,10 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
 
                     b.Property<DateTimeOffset>("LastModified")
                         .HasColumnType("timestamp with time zone")
@@ -287,27 +258,14 @@ namespace Skvia.Attendance.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
                         .HasColumnName("name");
 
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)")
-                        .HasColumnName("token");
-
                     b.HasKey("Id")
-                        .HasName("pk_kiosk_devices");
+                        .HasName("pk_departments");
 
-                    b.HasIndex("BranchId")
-                        .HasDatabaseName("ix_kiosk_devices_branch_id");
-
-                    b.HasIndex("Token")
-                        .IsUnique()
-                        .HasDatabaseName("ix_kiosk_devices_token");
-
-                    b.ToTable("KioskDevices", (string)null);
+                    b.ToTable("departments", (string)null);
                 });
 
             modelBuilder.Entity("Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedule", b =>
@@ -328,10 +286,6 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("base_schedule_id");
 
-                    b.Property<Guid>("BranchId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("branch_id");
-
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date")
                         .HasColumnName("date");
@@ -347,9 +301,6 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_employee_schedules");
 
-                    b.HasIndex("BranchId", "Date")
-                        .HasDatabaseName("ix_employee_schedules_branch_id_date");
-
                     b.HasIndex("EmployeeId", "Date")
                         .IsUnique()
                         .HasDatabaseName("ix_employee_schedules_employee_id_date");
@@ -363,11 +314,11 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("AllowedKioskIds")
+                    b.Property<string>("AllowedWorkplaceIds")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("jsonb")
-                        .HasColumnName("allowed_kiosk_ids")
+                        .HasColumnName("allowed_workplace_ids")
                         .HasDefaultValueSql("'[]'::jsonb");
 
                     b.Property<string>("ApplicationUserId")
@@ -395,10 +346,9 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by");
 
-                    b.Property<string>("Department")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("department");
+                    b.Property<Guid?>("DepartmentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("department_id");
 
                     b.Property<string>("Email")
                         .HasMaxLength(150)
@@ -472,12 +422,21 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasDefaultValue(1)
                         .HasColumnName("status");
 
+                    b.Property<int>("TardinessToleranceMinutes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0)
+                        .HasColumnName("tardiness_tolerance_minutes");
+
                     b.HasKey("Id")
                         .HasName("pk_employees");
 
                     b.HasIndex("Code")
                         .IsUnique()
                         .HasDatabaseName("ix_employees_code");
+
+                    b.HasIndex("DepartmentId")
+                        .HasDatabaseName("ix_employees_department_id");
 
                     b.HasIndex("MainBranchId")
                         .HasDatabaseName("ix_employees_main_branch_id");
@@ -859,11 +818,81 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                     b.ToTable("justifications", (string)null);
                 });
 
+            modelBuilder.Entity("Skvia.Attendance.Domain.Kiosks.KioskDevice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("token");
+
+                    b.Property<Guid>("WorkplaceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("workplace_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_kiosk_devices");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasDatabaseName("ix_kiosk_devices_token");
+
+                    b.HasIndex("WorkplaceId")
+                        .HasDatabaseName("ix_kiosk_devices_workplace_id");
+
+                    b.ToTable("KioskDevices", (string)null);
+                });
+
             modelBuilder.Entity("Skvia.Attendance.Domain.Schedules.Schedule", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<TimeOnly?>("BreakEndTime")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("break_end_time");
+
+                    b.Property<TimeOnly?>("BreakStartTime")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("break_start_time");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("code");
 
                     b.Property<TimeOnly>("DefaultEndTime")
                         .HasColumnType("time without time zone")
@@ -873,11 +902,23 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasColumnType("time without time zone")
                         .HasColumnName("default_start_time");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("HasBreak")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("has_break");
+
+                    b.Property<string>("TimeZoneId")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
+                        .HasColumnName("time_zone_id");
 
                     b.HasKey("Id")
                         .HasName("pk_schedules");
@@ -885,20 +926,91 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                     b.ToTable("schedules", (string)null);
                 });
 
+            modelBuilder.Entity("Skvia.Attendance.Domain.Workplaces.Workplace", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("address");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by");
+
+                    b.Property<double>("GeofenceRadiusMeters")
+                        .HasColumnType("double precision")
+                        .HasColumnName("geofence_radius_meters");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified");
+
+                    b.Property<Guid?>("LastModifiedBy")
+                        .HasColumnType("uuid")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<bool>("RequirePhotoForMobile")
+                        .HasColumnType("boolean")
+                        .HasColumnName("require_photo_for_mobile");
+
+                    b.Property<string>("TimeZoneId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("time_zone_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_workplaces");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("ix_workplaces_code");
+
+                    b.ToTable("workplaces", (string)null);
+                });
+
             modelBuilder.Entity("Skvia.Attendance.Domain.Attendances.Attendance", b =>
                 {
-                    b.HasOne("Skvia.Attendance.Domain.Branches.Branch", "CheckInBranch")
+                    b.HasOne("Skvia.Attendance.Domain.Workplaces.Workplace", "CheckInWorkplace")
                         .WithMany()
-                        .HasForeignKey("CheckInBranchId")
+                        .HasForeignKey("CheckInWorkplaceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("fk_attendances_branches_check_in_branch_id");
+                        .HasConstraintName("fk_attendances_workplaces_check_in_workplace_id");
 
-                    b.HasOne("Skvia.Attendance.Domain.Branches.Branch", "CheckOutBranch")
+                    b.HasOne("Skvia.Attendance.Domain.Workplaces.Workplace", "CheckOutWorkplace")
                         .WithMany()
-                        .HasForeignKey("CheckOutBranchId")
+                        .HasForeignKey("CheckOutWorkplaceId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("fk_attendances_branches_check_out_branch_id");
+                        .HasConstraintName("fk_attendances_workplaces_check_out_workplace_id");
 
                     b.HasOne("Skvia.Attendance.Domain.Employees.Employee", "Employee")
                         .WithMany()
@@ -907,9 +1019,9 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_attendances_employees_employee_id");
 
-                    b.Navigation("CheckInBranch");
+                    b.Navigation("CheckInWorkplace");
 
-                    b.Navigation("CheckOutBranch");
+                    b.Navigation("CheckOutWorkplace");
 
                     b.Navigation("Employee");
                 });
@@ -935,27 +1047,8 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Skvia.Attendance.Domain.Branches.KioskDevice", b =>
-                {
-                    b.HasOne("Skvia.Attendance.Domain.Branches.Branch", "Branch")
-                        .WithMany()
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_kiosk_devices_branches_branch_id");
-
-                    b.Navigation("Branch");
-                });
-
             modelBuilder.Entity("Skvia.Attendance.Domain.EmployeeSchedules.EmployeeSchedule", b =>
                 {
-                    b.HasOne("Skvia.Attendance.Domain.Branches.Branch", "Branch")
-                        .WithMany()
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_employee_schedules_branches_branch_id");
-
                     b.HasOne("Skvia.Attendance.Domain.Employees.Employee", "Employee")
                         .WithMany("EmployeeSchedules")
                         .HasForeignKey("EmployeeId")
@@ -963,13 +1056,17 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_employee_schedules_employees_employee_id");
 
-                    b.Navigation("Branch");
-
                     b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Skvia.Attendance.Domain.Employees.Employee", b =>
                 {
+                    b.HasOne("Skvia.Attendance.Domain.Departments.Department", null)
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_employees_departments_department_id");
+
                     b.HasOne("Skvia.Attendance.Domain.Branches.Branch", null)
                         .WithMany()
                         .HasForeignKey("MainBranchId")
@@ -1098,6 +1195,18 @@ namespace Skvia.Attendance.Infrastructure.Migrations
                         .HasConstraintName("fk_justifications_employees_employee_id");
 
                     b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Skvia.Attendance.Domain.Kiosks.KioskDevice", b =>
+                {
+                    b.HasOne("Skvia.Attendance.Domain.Workplaces.Workplace", "Workplace")
+                        .WithMany()
+                        .HasForeignKey("WorkplaceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_kiosk_devices_workplaces_workplace_id");
+
+                    b.Navigation("Workplace");
                 });
 
             modelBuilder.Entity("Skvia.Attendance.Domain.Branches.Branch", b =>

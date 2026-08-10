@@ -20,6 +20,9 @@ public sealed class SeedAttendances : IEndpoint
         ITimeZoneProvider timeZoneProvider,
         CancellationToken cancellationToken)
     {
+        var workplace = await dbContext.Workplaces.FirstOrDefaultAsync(cancellationToken);
+        if (workplace is null) return TypedResults.Ok("No hay lugares de marcación para generar datos.");
+
         var branch = await dbContext.Branches.FirstOrDefaultAsync(cancellationToken);
         if (branch is null) return TypedResults.Ok("No hay sedes para generar datos.");
 
@@ -29,24 +32,24 @@ public sealed class SeedAttendances : IEndpoint
             var emp1 = Domain.Employees.Employee.Create(
                 "EMP001", "Juan", "Pérez",
                 Domain.Employees.DocumentIdentifier.Create(Domain.Employees.DocumentType.Dni, "70123456"),
-                DateTimeOffset.UtcNow, "juan.perez@skvia.pe", "987654321", "Desarrollador Senior", "TI", null, branch.Id);
+                DateTimeOffset.UtcNow, "juan.perez@skvia.pe", "987654321", "Desarrollador Senior", null, null, branch.Id);
 
             var emp2 = Domain.Employees.Employee.Create(
                 "EMP002", "María", "Gómez",
                 Domain.Employees.DocumentIdentifier.Create(Domain.Employees.DocumentType.Dni, "70654321"),
-                DateTimeOffset.UtcNow, "maria.gomez@skvia.pe", "987123456", "Analista de RRHH", "RRHH", null, branch.Id);
+                DateTimeOffset.UtcNow, "maria.gomez@skvia.pe", "987123456", "Analista de RRHH", null, null, branch.Id);
 
             var emp3 = Domain.Employees.Employee.Create(
                 "EMP003", "Carlos", "López",
                 Domain.Employees.DocumentIdentifier.Create(Domain.Employees.DocumentType.Dni, "70987654"),
-                DateTimeOffset.UtcNow, "carlos.lopez@skvia.pe", "987999888", "Soporte Técnico", "TI", null, branch.Id);
+                DateTimeOffset.UtcNow, "carlos.lopez@skvia.pe", "987999888", "Soporte Técnico", null, null, branch.Id);
 
             dbContext.Employees.AddRange(emp1, emp2, emp3);
             await dbContext.SaveChangesAsync(cancellationToken);
             employees = new List<Domain.Employees.Employee> { emp1, emp2, emp3 };
         }
 
-        var localTime = TimeZoneInfo.ConvertTime(clock.UtcNow, timeZoneProvider.GetTimeZone(branch.TimeZoneId));
+        var localTime = TimeZoneInfo.ConvertTime(clock.UtcNow, timeZoneProvider.GetTimeZone(workplace.TimeZoneId));
         var today = DateOnly.FromDateTime(localTime.DateTime);
         var random = new Random();
         int createdCount = 0;
@@ -68,20 +71,20 @@ public sealed class SeedAttendances : IEndpoint
                     int randomMinutes = random.Next(-30, 30);
                     var checkInTime = new DateTime(date.Year, date.Month, date.Day, 9, 0, 0).AddMinutes(randomMinutes);
                     // Convert to UTC for saving
-                    var checkInUtc = TimeZoneInfo.ConvertTimeToUtc(checkInTime, timeZoneProvider.GetTimeZone(branch.TimeZoneId));
+                    var checkInUtc = TimeZoneInfo.ConvertTimeToUtc(checkInTime, timeZoneProvider.GetTimeZone(workplace.TimeZoneId));
 
                     var attendance = Skvia.Attendance.Domain.Attendances.Attendance.CreateCheckIn(
                         employee.Id,
-                        branch.Id,
+                        workplace.Id,
                         "mock.jpg",
                         true,
                         assignedStart,
-                        branch.TimeZoneId,
+                        workplace.TimeZoneId,
                         clock, // not used directly in this mock block
                         timeZoneProvider,
                         AttendanceSource.Kiosk,
                         null, null, "MockDevice",
-                        branch.TardinessToleranceMinutes);
+                        employee.TardinessToleranceMinutes);
 
                     // Reflection or setting backing fields isn't easy here, 
                     // Let's just use EF Core reflection to set private CheckIn date for the mock
@@ -95,7 +98,7 @@ public sealed class SeedAttendances : IEndpoint
                     if (random.Next(100) < 90)
                     {
                         var checkOutTime = new DateTime(date.Year, date.Month, date.Day, 18, 0, 0).AddMinutes(random.Next(-10, 60)); // 18:00 to 19:00
-                        var checkOutUtc = TimeZoneInfo.ConvertTimeToUtc(checkOutTime, timeZoneProvider.GetTimeZone(branch.TimeZoneId));
+                        var checkOutUtc = TimeZoneInfo.ConvertTimeToUtc(checkOutTime, timeZoneProvider.GetTimeZone(workplace.TimeZoneId));
 
                         var checkOutProperty = typeof(Skvia.Attendance.Domain.Attendances.Attendance).GetProperty(nameof(attendance.CheckOut));
                         checkOutProperty?.SetValue(attendance, new DateTimeOffset(checkOutUtc, TimeSpan.Zero));

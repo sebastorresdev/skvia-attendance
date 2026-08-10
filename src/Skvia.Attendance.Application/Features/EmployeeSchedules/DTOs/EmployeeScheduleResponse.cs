@@ -6,8 +6,6 @@ public record EmployeeScheduleResponse(
     Guid Id,
     Guid EmployeeId,
     DateOnly Date,
-    Guid BranchId,
-    string BranchName,
     TimeOnly? AssignedStartTime,
     TimeOnly? AssignedEndTime,
     ScheduleDayType DayType,

@@ -14,9 +14,9 @@ public class GetAttendancesQueryHandler(
             .AsNoTracking()
             .Where(a => a.Date >= query.StartDate && a.Date <= query.EndDate);
 
-        if (query.BranchId.HasValue)
+        if (query.WorkplaceId.HasValue)
         {
-            queryable = queryable.Where(a => a.CheckInBranchId == query.BranchId.Value);
+            queryable = queryable.Where(a => a.CheckInWorkplaceId == query.WorkplaceId.Value);
         }
 
         if (query.EmployeeId.HasValue)
@@ -54,8 +54,8 @@ public class GetAttendancesQueryHandler(
                 a.EmployeeId,
                 a.Employee.FirstName + " " + a.Employee.LastName,
                 a.Employee.Code,
-                a.CheckInBranchId,
-                a.CheckInBranch.Name,
+                a.CheckInWorkplaceId,
+                a.CheckInWorkplace.Name,
                 a.Date,
                 null, // assignedStartTime
                 null, // assignedEndTime

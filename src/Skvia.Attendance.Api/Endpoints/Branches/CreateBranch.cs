@@ -19,7 +19,7 @@ public sealed class CreateBranch : IEndpoint
         ICommandHandler<CreateBranchCommand, ErrorOr<Guid>> handler,
         CancellationToken cancellationToken)
     {
-        var command = new CreateBranchCommand(request.Code, request.Name, request.Address, request.TardinessToleranceMinutes);
+        var command = new CreateBranchCommand(request.Code, request.Name, request.Address);
         var result = await handler.HandleAsync(command, cancellationToken);
 
         return result.Match(
@@ -28,5 +28,5 @@ public sealed class CreateBranch : IEndpoint
     }
 }
 
-public record CreateBranchRequest(string Code, string Name, string? Address, int TardinessToleranceMinutes = 0);
+public record CreateBranchRequest(string Code, string Name, string? Address);
 public record CreateBranchResponse(Guid Id);

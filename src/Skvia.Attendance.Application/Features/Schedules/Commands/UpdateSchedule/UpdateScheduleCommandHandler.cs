@@ -13,7 +13,18 @@ public class UpdateScheduleCommandHandler(IScheduleRepository scheduleRepository
         if (schedule is null)
             return Error.NotFound(description: "El turno no existe.");
 
-        schedule.UpdateTimes(command.Name, command.DefaultStartTime, command.DefaultEndTime);
+        var updateResult = schedule.UpdateTimes(
+            command.Code, 
+            command.Description,
+            command.TimeZoneId,
+            command.DefaultStartTime, 
+            command.DefaultEndTime,
+            command.HasBreak,
+            command.BreakStartTime,
+            command.BreakEndTime);
+
+        if (updateResult.IsError)
+            return updateResult.Errors;
 
         scheduleRepository.Update(schedule);
         await dbContext.SaveChangesAsync(cancellationToken);

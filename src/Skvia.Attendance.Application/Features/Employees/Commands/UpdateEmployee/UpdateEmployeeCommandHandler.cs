@@ -44,19 +44,20 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
             command.HireDate,
             command.Email,
             command.Phone,
-            command.Position,
-            command.Department,
-            command.PhotoUrl,
-            command.MainBranchId);
+            position: command.Position,
+            departmentId: command.DepartmentId,
+            photoUrl: command.PhotoUrl,
+            mainBranchId: command.MainBranchId,
+            tardinessToleranceMinutes: command.TardinessToleranceMinutes);
 
+        employee.SetAttendanceOptions(command.IsAttendanceTracked, command.AutoCompleteClockOut ?? employee.AutoCompleteClockOut);
         employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
         employee.LinkUser(command.ApplicationUserId);
         employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance);
-        employee.SetAttendanceOptions(command.IsAttendanceTracked, command.AutoCompleteClockOut);
         
-        if (command.AllowedKioskIds != null)
+        if (command.AllowedWorkplaceIds != null)
         {
-            employee.SetAllowedKioskIds(command.AllowedKioskIds);
+            employee.SetAllowedWorkplaceIds(command.AllowedWorkplaceIds);
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);

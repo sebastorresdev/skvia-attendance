@@ -66,6 +66,19 @@ public class IdentityUserAccountService(
                     dbContext.ApplicationUserRole.AddRange(userRoles);
                     await dbContext.SaveChangesAsync(cancellationToken);
                 }
+                else
+                {
+                    var defaultRole = await roleManager.FindByNameAsync("Usuario");
+                    if (defaultRole != null)
+                    {
+                        dbContext.ApplicationUserRole.Add(new ApplicationUserRole
+                        {
+                            RoleId = defaultRole.Id,
+                            UserId = newUser.Id
+                        });
+                        await dbContext.SaveChangesAsync(cancellationToken);
+                    }
+                }
 
                 if (command.BranchIds.Count != 0)
                 {

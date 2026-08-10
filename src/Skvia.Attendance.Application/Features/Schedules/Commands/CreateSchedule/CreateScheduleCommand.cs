@@ -4,6 +4,11 @@ using Skvia.Attendance.Application.Common.Interfaces;
 namespace Skvia.Attendance.Application.Features.Schedules.Commands.CreateSchedule;
 
 public record CreateScheduleCommand(
-    string Name,
+    string Code,
+    string Description,
+    string TimeZoneId,
     TimeOnly DefaultStartTime,
-    TimeOnly DefaultEndTime) : ICommand<ErrorOr<Guid>>;
+    TimeOnly DefaultEndTime,
+    bool HasBreak = false,
+    TimeOnly? BreakStartTime = null,
+    TimeOnly? BreakEndTime = null) : ICommand<ErrorOr<Guid>>;

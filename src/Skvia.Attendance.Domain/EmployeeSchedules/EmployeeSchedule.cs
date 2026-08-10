@@ -10,9 +10,6 @@ public class EmployeeSchedule : BaseEntity
 
     public DateOnly Date { get; private set; }
 
-    public Guid BranchId { get; private set; }
-    public Branch Branch { get; private set; } = null!;
-
     public TimeOnly? AssignedStartTime { get; private set; }
     public TimeOnly? AssignedEndTime { get; private set; }
 
@@ -25,7 +22,6 @@ public class EmployeeSchedule : BaseEntity
     private static ErrorOr<EmployeeSchedule> Create(
         Guid employeeId,
         DateOnly date,
-        Guid branchId,
         ScheduleDayType type,
         TimeOnly? startTime = null,
         TimeOnly? endTime = null,
@@ -33,9 +29,6 @@ public class EmployeeSchedule : BaseEntity
     {
         if (employeeId == Guid.Empty)
             throw new DomainException("El empleado es requerido.");
-
-        if (branchId == Guid.Empty)
-            throw new DomainException("La sucursal es requerida.");
 
         ErrorOr<Success> result = ValidateHoursForDayType(type, startTime, endTime);
 
@@ -46,7 +39,6 @@ public class EmployeeSchedule : BaseEntity
         {
             EmployeeId = employeeId,
             Date = date,
-            BranchId = branchId,
             AssignedStartTime = startTime,
             AssignedEndTime = endTime,
             BaseScheduleId = baseScheduleId,
@@ -54,20 +46,20 @@ public class EmployeeSchedule : BaseEntity
         };
     }
 
-    public static ErrorOr<EmployeeSchedule> CreateWorkDay(Guid employeeId, DateOnly date, Guid branchId, TimeOnly startTime, TimeOnly endTime, Guid? baseScheduleId = null)
-        => Create(employeeId, date, branchId, ScheduleDayType.WorkDay, startTime, endTime, baseScheduleId);
+    public static ErrorOr<EmployeeSchedule> CreateWorkDay(Guid employeeId, DateOnly date, TimeOnly startTime, TimeOnly endTime, Guid? baseScheduleId = null)
+        => Create(employeeId, date, ScheduleDayType.WorkDay, startTime, endTime, baseScheduleId);
 
-    public static ErrorOr<EmployeeSchedule> CreateRestDay(Guid employeeId, DateOnly date, Guid branchId)
-        => Create(employeeId, date, branchId, ScheduleDayType.DayOff);
+    public static ErrorOr<EmployeeSchedule> CreateRestDay(Guid employeeId, DateOnly date)
+        => Create(employeeId, date, ScheduleDayType.DayOff);
 
-    public static ErrorOr<EmployeeSchedule> CreateVacationDay(Guid employeeId, DateOnly date, Guid branchId)
-        => Create(employeeId, date, branchId, ScheduleDayType.Vacation);
+    public static ErrorOr<EmployeeSchedule> CreateVacationDay(Guid employeeId, DateOnly date)
+        => Create(employeeId, date, ScheduleDayType.Vacation);
 
-    public static ErrorOr<EmployeeSchedule> CreateMedicalLeaveDay(Guid employeeId, DateOnly date, Guid branchId)
-        => Create(employeeId, date, branchId, ScheduleDayType.MedicalLeave);
+    public static ErrorOr<EmployeeSchedule> CreateMedicalLeaveDay(Guid employeeId, DateOnly date)
+        => Create(employeeId, date, ScheduleDayType.MedicalLeave);
 
-    public static ErrorOr<EmployeeSchedule> CreateMakeUpDay(Guid employeeId, DateOnly date, Guid branchId, TimeOnly startTime, TimeOnly endTime, Guid? baseScheduleId = null)
-        => Create(employeeId, date, branchId, ScheduleDayType.MakeUpDay, startTime, endTime, baseScheduleId);
+    public static ErrorOr<EmployeeSchedule> CreateMakeUpDay(Guid employeeId, DateOnly date, TimeOnly startTime, TimeOnly endTime, Guid? baseScheduleId = null)
+        => Create(employeeId, date, ScheduleDayType.MakeUpDay, startTime, endTime, baseScheduleId);
 
     private static ErrorOr<Success> ValidateHoursForDayType(
         ScheduleDayType type,

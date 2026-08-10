@@ -19,7 +19,7 @@ public class GetEmployeeByIdQueryHandler(IApplicationDbContext dbContext) : IQue
                 e.DocumentIdentifier.Number,
                 e.Email != null ? e.Email.Value.Value : null,
                 e.Phone != null ? e.Phone.Value.Value : null,
-                e.Department,
+                e.DepartmentId,
                 e.Position,
                 e.HireDate,
                 e.PhotoUrl,
@@ -31,7 +31,8 @@ public class GetEmployeeByIdQueryHandler(IApplicationDbContext dbContext) : IQue
                 e.RequireFourPointAttendance,
                 e.IsAttendanceTracked,
                 e.AutoCompleteClockOut,
-                e.AllowedKioskIds))
+                e.TardinessToleranceMinutes,
+                e.AllowedWorkplaceIds))
             .FirstOrDefaultAsync(cancellationToken);
 
         if (employee is null)

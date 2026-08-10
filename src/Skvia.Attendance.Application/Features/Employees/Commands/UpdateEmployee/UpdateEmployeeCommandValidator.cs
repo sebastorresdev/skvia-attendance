@@ -41,8 +41,6 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
         RuleFor(x => x.Position)
             .MaximumLength(EmployeeConstants.PositionMaxLength).WithMessage($"El cargo no puede superar los {EmployeeConstants.PositionMaxLength} caracteres.");
 
-        RuleFor(x => x.Department)
-            .MaximumLength(EmployeeConstants.DepartmentMaxLength).WithMessage($"El departamento/área no puede superar los {EmployeeConstants.DepartmentMaxLength} caracteres.");
 
         RuleFor(x => x.PhotoUrl)
             .MaximumLength(EmployeeConstants.PhotoUrlMaxLength).WithMessage($"La URL de la foto no puede superar los {EmployeeConstants.PhotoUrlMaxLength} caracteres.")
@@ -53,5 +51,9 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
         RuleFor(x => x.ApplicationUserId)
             .NotEmpty().WithMessage("Debe seleccionar un usuario del sistema para habilitar la marcación móvil.")
             .When(x => x.MobileCheckInEnabled);
+
+        RuleFor(x => x.MobileCheckInEnabled)
+            .Equal(false).WithMessage("No se puede habilitar la marcación móvil si no se controla la asistencia.")
+            .When(x => !x.IsAttendanceTracked);
     }
 }

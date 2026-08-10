@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Skvia.Attendance.Application.Common.Security;
 using Skvia.Attendance.Application.Common.Security.Roles;
 using Skvia.Attendance.Domain.Branches;
+using Skvia.Attendance.Domain.Workplaces;
 using Skvia.Attendance.Domain.Identity;
 
 namespace Skvia.Attendance.Infrastructure.Data;
@@ -114,32 +115,49 @@ public class ApplicationDbContextInitialiser
         var branch = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_01");
         if (branch is null)
         {
-            branch = Branch.Create("SKVIA_01", "Sede Central - San Isidro", "Av. Javier Prado Este 1230, San Isidro, Lima", "America/Lima", 10);
+            branch = Branch.Create("SKVIA_01", "Sede Central - San Isidro", "Av. Javier Prado Este 1230, San Isidro, Lima");
             _context.Branches.Add(branch);
             await _context.SaveChangesAsync();
         }
         else if (branch.Name == "Sede principal")
         {
-            branch.Update("SKVIA_01", "Sede Central - San Isidro", "Av. Javier Prado Este 1230, San Isidro, Lima", "America/Lima", 10);
+            branch.Update("SKVIA_01", "Sede Central - San Isidro", "Av. Javier Prado Este 1230, San Isidro, Lima");
         }
 
         var branch2 = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_02");
         if (branch2 is null)
         {
-            branch2 = Branch.Create("SKVIA_02", "Sede Sur - Arequipa", "Av. Ejército 742, Yanahuara, Arequipa", "America/Lima", 5);
+            branch2 = Branch.Create("SKVIA_02", "Sede Sur - Arequipa", "Av. Ejército 742, Yanahuara, Arequipa");
             _context.Branches.Add(branch2);
             await _context.SaveChangesAsync();
         }
         else if (branch2.Name == "Sede base")
         {
-            branch2.Update("SKVIA_02", "Sede Sur - Arequipa", "Av. Ejército 742, Yanahuara, Arequipa", "America/Lima", 5);
+            branch2.Update("SKVIA_02", "Sede Sur - Arequipa", "Av. Ejército 742, Yanahuara, Arequipa");
         }
 
         var branch3 = await _context.Branches.FirstOrDefaultAsync(b => b.Code == "SKVIA_03");
         if (branch3 is null)
         {
-            branch3 = Branch.Create("SKVIA_03", "Sede Norte - Trujillo", "Calle Real 450, Trujillo", "America/Lima", 5);
+            branch3 = Branch.Create("SKVIA_03", "Sede Norte - Trujillo", "Calle Real 450, Trujillo");
             _context.Branches.Add(branch3);
+            await _context.SaveChangesAsync();
+        }
+
+        // Default Workplaces
+        var workplace1 = await _context.Workplaces.FirstOrDefaultAsync(w => w.Code == "WP_01");
+        if (workplace1 is null)
+        {
+            workplace1 = Workplace.Create("WP_01", "Lugar Central - San Isidro", "America/Lima", -12.0931, -77.0305, 200, "Av. Javier Prado Este 1230, San Isidro, Lima");
+            _context.Workplaces.Add(workplace1);
+            await _context.SaveChangesAsync();
+        }
+
+        var workplace2 = await _context.Workplaces.FirstOrDefaultAsync(w => w.Code == "WP_02");
+        if (workplace2 is null)
+        {
+            workplace2 = Workplace.Create("WP_02", "Lugar Sur - Arequipa", "America/Lima", -16.3988, -71.5350, 300, "Av. Ejército 742, Yanahuara, Arequipa");
+            _context.Workplaces.Add(workplace2);
             await _context.SaveChangesAsync();
         }
 
@@ -171,12 +189,12 @@ public class ApplicationDbContextInitialiser
             }
         }
 
-        var basicRole = await _roleManager.FindByNameAsync("basic");
+        var basicRole = await _roleManager.FindByNameAsync("Usuario");
         if (basicRole is null)
         {
             basicRole = new ApplicationRole
             {
-                Name = "basic",
+                Name = "Usuario",
                 Description = "Rol básico del sistema con accesos limitados",
                 CreatedAt = DateTime.UtcNow,
                 LastModifiedAt = DateTime.UtcNow,
@@ -205,6 +223,13 @@ public class ApplicationDbContextInitialiser
             {
                 await _roleManager.UpdateAsync(basicRole);
             }
+        }
+
+        var existingBasicClaims = await _roleManager.GetClaimsAsync(basicRole);
+        if (!existingBasicClaims.Any(c => c.Type == "permissions" && c.Value == Permission.System.Access))
+        {
+            var claim = new Claim("permissions", Permission.System.Access);
+            await _roleManager.AddClaimAsync(basicRole, claim);
         }
 
         // Default users

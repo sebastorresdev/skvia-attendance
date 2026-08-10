@@ -1,4 +1,4 @@
-using Skvia.Attendance.Domain.Branches;
+using Skvia.Attendance.Domain.Workplaces;
 using Skvia.Attendance.Domain.Employees;
 
 namespace Skvia.Attendance.Domain.Attendances;
@@ -12,8 +12,8 @@ public class Attendance : BaseEntity
 
     public DateTimeOffset CheckIn { get; private set; }
     public string PhotoCheckIn { get; private set; } = null!;
-    public Guid CheckInBranchId { get; private set; }
-    public Branch CheckInBranch { get; private set; } = null!;
+    public Guid CheckInWorkplaceId { get; private set; }
+    public Workplace CheckInWorkplace { get; private set; } = null!;
 
     public DateTimeOffset? BreakStart { get; private set; }
     public string? PhotoBreakStart { get; private set; }
@@ -22,8 +22,8 @@ public class Attendance : BaseEntity
 
     public DateTimeOffset? CheckOut { get; private set; }
     public string? PhotoCheckOut { get; private set; }
-    public Guid? CheckOutBranchId { get; private set; }
-    public Branch? CheckOutBranch { get; private set; }
+    public Guid? CheckOutWorkplaceId { get; private set; }
+    public Workplace? CheckOutWorkplace { get; private set; }
 
     public bool IsLate { get; private set; }
     public int MinutesLate { get; private set; }
@@ -40,7 +40,7 @@ public class Attendance : BaseEntity
 
     public static Attendance CreateCheckIn(
         Guid employeeId,
-        Guid branchId,
+        Guid workplaceId,
         string photoUrl,
         bool isValidCheckIn,
         TimeOnly scheduledStartTime,
@@ -51,10 +51,10 @@ public class Attendance : BaseEntity
         double? latitude = null,
         double? longitude = null,
         string? deviceId = null,
-        int branchTardinessToleranceMinutes = 0)
+        int tardinessToleranceMinutes = 0)
     {
         ArgumentOutOfRangeException.ThrowIfEqual(employeeId, Guid.Empty);
-        ArgumentOutOfRangeException.ThrowIfEqual(branchId, Guid.Empty);
+        ArgumentOutOfRangeException.ThrowIfEqual(workplaceId, Guid.Empty);
         ArgumentException.ThrowIfNullOrWhiteSpace(photoUrl);
 
         ArgumentNullException.ThrowIfNull(clock);
@@ -71,14 +71,14 @@ public class Attendance : BaseEntity
             ? (int)(currentTime - scheduledStartTime).TotalMinutes
             : 0;
             
-        var minutesLate = difference > branchTardinessToleranceMinutes ? difference : 0;
+        var minutesLate = difference > tardinessToleranceMinutes ? difference : 0;
 
         return new Attendance
         {
             EmployeeId = employeeId,
             Date = currentDate,
             CheckIn = utcNow,
-            CheckInBranchId = branchId,
+            CheckInWorkplaceId = workplaceId,
             PhotoCheckIn = photoUrl.Trim(),
             IsValidCheckIn = isValidCheckIn,
             MinutesLate = minutesLate,
@@ -112,16 +112,16 @@ public class Attendance : BaseEntity
         PhotoBreakEnd = photoUrl.Trim();
     }
 
-    public void RegisterCheckOut(Guid branchId, string photoUrl, bool isValidCheckOut, int totalMinutesScheduled, IClock clock)
+    public void RegisterCheckOut(Guid workplaceId, string photoUrl, bool isValidCheckOut, int totalMinutesScheduled, IClock clock)
     {
         ArgumentNullException.ThrowIfNull(clock);
-        ArgumentOutOfRangeException.ThrowIfEqual(branchId, Guid.Empty);
+        ArgumentOutOfRangeException.ThrowIfEqual(workplaceId, Guid.Empty);
         ArgumentException.ThrowIfNullOrWhiteSpace(photoUrl);
         if (CheckOut.HasValue) throw new DomainException("La asistencia ya tiene un check-out.");
         if (BreakStart.HasValue && !BreakEnd.HasValue) throw new DomainException("Termina el break primero.");
 
         CheckOut = clock.UtcNow;
-        CheckOutBranchId = branchId;
+        CheckOutWorkplaceId = workplaceId;
         PhotoCheckOut = photoUrl.Trim();
         IsValidCheckOut = isValidCheckOut;
 
@@ -143,7 +143,7 @@ public class Attendance : BaseEntity
         TimeOnly scheduledStartTime,
         string operationTimeZoneId,
         ITimeZoneProvider timeZoneProvider,
-        int branchTardinessToleranceMinutes = 0,
+        int tardinessToleranceMinutes = 0,
         int totalMinutesScheduled = 0)
     {
         ArgumentNullException.ThrowIfNull(timeZoneProvider);
@@ -156,7 +156,7 @@ public class Attendance : BaseEntity
             ? (int)(currentTime - scheduledStartTime).TotalMinutes
             : 0;
 
-        var minutesLate = difference > branchTardinessToleranceMinutes ? difference : 0;
+        var minutesLate = difference > tardinessToleranceMinutes ? difference : 0;
         MinutesLate = minutesLate;
         IsLate = minutesLate > 0;
 

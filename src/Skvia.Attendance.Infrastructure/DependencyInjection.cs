@@ -22,6 +22,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         builder.Services.AddSingleton<IClock, SystemClock>();
         builder.Services.AddSingleton<ITimeZoneProvider, SystemTimeZoneProvider>();
+        builder.Services.AddSingleton<IKioskPairingService, KioskPairingService>();
         builder.Services.Configure<SeedOptions>(builder.Configuration.GetSection(SeedOptions.SectionName));
 
         // 2. Registro clásico adaptado con las convenciones necesarias

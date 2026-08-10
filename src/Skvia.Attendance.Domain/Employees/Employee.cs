@@ -11,7 +11,7 @@ public class Employee : BaseAuditableEntity
     public Email? Email { get; private set; }
     public Phone? Phone { get; private set; }
     public string? Position { get; private set; }
-    public string? Department { get; private set; }
+    public Guid? DepartmentId { get; private set; }
     public DateTimeOffset HireDate { get; private set; }
     public string? PhotoUrl { get; private set; }
     public Guid? MainBranchId { get; private set; }
@@ -22,7 +22,8 @@ public class Employee : BaseAuditableEntity
     public bool RequireFourPointAttendance { get; private set; } = false;
     public bool IsAttendanceTracked { get; private set; } = true;
     public bool AutoCompleteClockOut { get; private set; } = false;
-    public List<Guid> AllowedKioskIds { get; private set; } = [];
+    public int TardinessToleranceMinutes { get; private set; } = 0;
+    public List<Guid> AllowedWorkplaceIds { get; private set; } = [];
 
     private readonly List<EmployeeSchedule> _employeeSchedules = [];
     public IReadOnlyCollection<EmployeeSchedule> EmployeeSchedules => _employeeSchedules.AsReadOnly();
@@ -38,9 +39,10 @@ public class Employee : BaseAuditableEntity
         string? email = null,
         string? phone = null,
         string? position = null,
-        string? department = null,
+        Guid? departmentId = null,
         string? photoUrl = null,
-        Guid? mainBranchId = null)
+        Guid? mainBranchId = null,
+        int tardinessToleranceMinutes = 0)
     {
         var employee = new Employee();
 
@@ -60,11 +62,12 @@ public class Employee : BaseAuditableEntity
         employee.Email = email != null ? Employees.Email.Create(email) : null;
         employee.Phone = phone != null ? Employees.Phone.Create(phone) : null;
         employee.Position = position?.Trim();
-        employee.Department = department?.Trim();
+        employee.DepartmentId = departmentId;
         employee.PhotoUrl = photoUrl?.Trim();
         employee.MainBranchId = mainBranchId;
         employee.Status = EmployeeStatus.Active;
         employee.IsAttendanceTracked = true;
+        employee.TardinessToleranceMinutes = tardinessToleranceMinutes >= 0 ? tardinessToleranceMinutes : 0;
 
         return employee;
     }
@@ -78,9 +81,10 @@ public class Employee : BaseAuditableEntity
         string? email = null,
         string? phone = null,
         string? position = null,
-        string? department = null,
+        Guid? departmentId = null,
         string? photoUrl = null,
-        Guid? mainBranchId = null)
+        Guid? mainBranchId = null,
+        int? tardinessToleranceMinutes = null)
     {
         ArgumentNullException.ThrowIfNull(code);
         ArgumentNullException.ThrowIfNull(firstName);
@@ -98,16 +102,18 @@ public class Employee : BaseAuditableEntity
         Email = email != null ? Employees.Email.Create(email) : null;
         Phone = phone != null ? Employees.Phone.Create(phone) : null;
         Position = position?.Trim();
-        Department = department?.Trim();
+        DepartmentId = departmentId;
         PhotoUrl = photoUrl?.Trim();
         MainBranchId = mainBranchId;
+        if (tardinessToleranceMinutes.HasValue && tardinessToleranceMinutes.Value >= 0)
+            TardinessToleranceMinutes = tardinessToleranceMinutes.Value;
     }
 
-    public void UpdateProfile(string? phone, string? position, string? department, string? photoUrl)
+    public void UpdateProfile(string? phone, string? position, Guid? departmentId, string? photoUrl)
     {
         Phone = phone != null ? Employees.Phone.Create(phone) : null;
         Position = position?.Trim();
-        Department = department?.Trim();
+        DepartmentId = departmentId;
         PhotoUrl = photoUrl?.Trim();
     }
 
@@ -128,6 +134,10 @@ public class Employee : BaseAuditableEntity
 
     public void EnableMobileCheckIn(bool enabled)
     {
+        if (enabled && !IsAttendanceTracked)
+        {
+            throw new InvalidOperationException("No se puede habilitar la marcación móvil si no se controla la asistencia.");
+        }
         MobileCheckInEnabled = enabled;
     }
 
@@ -135,15 +145,16 @@ public class Employee : BaseAuditableEntity
     {
         IsAttendanceTracked = isAttendanceTracked;
         AutoCompleteClockOut = autoCompleteClockOut;
+        
+        if (!isAttendanceTracked)
+        {
+            MobileCheckInEnabled = false;
+        }
     }
 
-    public void SetAllowedKioskIds(IEnumerable<Guid>? kioskIds)
+    public void SetAllowedWorkplaceIds(IEnumerable<Guid>? workplaceIds)
     {
-        AllowedKioskIds.Clear();
-        if (kioskIds != null)
-        {
-            AllowedKioskIds.AddRange(kioskIds.Distinct());
-        }
+        AllowedWorkplaceIds = workplaceIds != null ? workplaceIds.Distinct().ToList() : [];
     }
 
     public void AddEmployeeSchedule(EmployeeSchedule employeeSchedule)

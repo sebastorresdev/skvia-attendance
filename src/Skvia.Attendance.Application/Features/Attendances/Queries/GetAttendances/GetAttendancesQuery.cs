@@ -6,7 +6,7 @@ namespace Skvia.Attendance.Application.Features.Attendances.Queries.GetAttendanc
 public record GetAttendancesQuery(
     DateOnly StartDate,
     DateOnly EndDate,
-    Guid? BranchId = null,
+    Guid? WorkplaceId = null,
     string? EmployeeSearch = null,
     Guid? EmployeeId = null,
     string? StatusFilter = null) : IQuery<ErrorOr<List<AttendanceResponse>>>;

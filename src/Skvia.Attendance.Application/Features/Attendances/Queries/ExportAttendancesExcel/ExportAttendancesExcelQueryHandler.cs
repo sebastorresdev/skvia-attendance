@@ -12,7 +12,7 @@ public class ExportAttendancesExcelQueryHandler(
 
         if (query.BranchId.HasValue)
         {
-            queryable = queryable.Where(a => a.CheckInBranchId == query.BranchId.Value);
+            queryable = queryable.Where(a => a.CheckInWorkplaceId == query.BranchId.Value);
         }
 
         if (query.EmployeeId.HasValue)
@@ -49,7 +49,7 @@ public class ExportAttendancesExcelQueryHandler(
                 a.Date,
                 a.Employee.Code,
                 $"{a.Employee.LastName}, {a.Employee.FirstName}",
-                a.CheckInBranch.Name,
+                a.CheckInWorkplace.Name,
                 a.CheckIn,
                 a.CheckOut,
                 a.MinutesLate,

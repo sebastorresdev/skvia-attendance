@@ -14,7 +14,7 @@ public class AttendanceDomainTests
 
         var attendance = Skvia.Attendance.Domain.Attendances.Attendance.CreateCheckIn(
             employeeId: Guid.NewGuid(),
-            branchId: Guid.NewGuid(),
+            workplaceId: Guid.NewGuid(),
             photoUrl: "photo.png",
             isValidCheckIn: true,
             scheduledStartTime: new TimeOnly(9, 0),
@@ -32,7 +32,7 @@ public class AttendanceDomainTests
     [Fact]
     public void CreateWorkDay_RequiresHoursForWorkingDays()
     {
-        var result = EmployeeSchedule.CreateWorkDay(Guid.NewGuid(), new DateOnly(2024, 6, 10), Guid.NewGuid(), new TimeOnly(8, 0), new TimeOnly(18, 0));
+        var result = EmployeeSchedule.CreateWorkDay(Guid.NewGuid(), new DateOnly(2024, 6, 10), new TimeOnly(8, 0), new TimeOnly(18, 0));
 
         Assert.True(result.IsError is false);
         Assert.True(result.Value is not null);

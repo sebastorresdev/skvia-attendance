@@ -11,7 +11,7 @@ public record EmployeeResponse(
     string DocumentNumber,
     string? Email,
     string? Phone,
-    string? Department,
+    Guid? DepartmentId,
     string? Position,
     string? PhotoUrl,
     Guid? MainBranchId,

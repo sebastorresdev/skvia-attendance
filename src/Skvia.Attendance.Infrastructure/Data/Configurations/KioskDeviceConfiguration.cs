@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Skvia.Attendance.Domain.Branches;
+using Skvia.Attendance.Domain.Kiosks;
 
 namespace Skvia.Attendance.Infrastructure.Data.Configurations;
 
@@ -20,9 +20,9 @@ public class KioskDeviceConfiguration : IEntityTypeConfiguration<KioskDevice>
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.HasOne(x => x.Branch)
+        builder.HasOne(x => x.Workplace)
             .WithMany()
-            .HasForeignKey(x => x.BranchId)
+            .HasForeignKey(x => x.WorkplaceId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(x => x.Token).IsUnique();

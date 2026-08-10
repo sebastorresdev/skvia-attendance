@@ -14,7 +14,7 @@ public class CreateBranchCommandHandler(IApplicationDbContext dbContext) : IComm
         if (branchExisting)
             return BranchErrors.DuplicateBranch(command.Code);
 
-        var branch = Branch.Create(command.Code, command.Name, command.Address, tardinessToleranceMinutes: command.TardinessToleranceMinutes);
+        var branch = Branch.Create(command.Code, command.Name, command.Address);
 
         dbContext.Branches.Add(branch);
         await dbContext.SaveChangesAsync(cancellationToken);

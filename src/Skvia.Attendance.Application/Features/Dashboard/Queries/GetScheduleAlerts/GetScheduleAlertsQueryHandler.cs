@@ -7,9 +7,8 @@ using Skvia.Attendance.Domain.Employees;
 namespace Skvia.Attendance.Application.Features.Dashboard.Queries.GetScheduleAlerts;
 
 public class GetScheduleAlertsQueryHandler(
-    IApplicationDbContext dbContext, 
-    IClock clock, 
-    ITimeZoneProvider timeZoneProvider) : IQueryHandler<GetScheduleAlertsQuery, ErrorOr<List<ScheduleAlertDto>>>
+    IApplicationDbContext dbContext,
+    IClock clock) : IQueryHandler<GetScheduleAlertsQuery, ErrorOr<List<ScheduleAlertDto>>>
 {
     public async Task<ErrorOr<List<ScheduleAlertDto>>> HandleAsync(GetScheduleAlertsQuery query, CancellationToken cancellationToken)
     {

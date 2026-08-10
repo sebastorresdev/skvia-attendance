@@ -11,7 +11,7 @@ public record EmployeeDetailResponse(
     string DocumentNumber,
     string? Email,
     string? Phone,
-    string? Department,
+    Guid? DepartmentId,
     string? Position,
     DateTimeOffset HireDate,
     string? PhotoUrl,
@@ -23,4 +23,5 @@ public record EmployeeDetailResponse(
     bool RequireFourPointAttendance,
     bool IsAttendanceTracked,
     bool AutoCompleteClockOut,
-    List<Guid> AllowedKioskIds);
+    int TardinessToleranceMinutes,
+    List<Guid> AllowedWorkplaceIds);

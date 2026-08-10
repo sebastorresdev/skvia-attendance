@@ -9,15 +9,12 @@ public class GetEmployeeScheduleQueryHandler(IApplicationDbContext dbContext)
     {
         return await dbContext.EmployeeSchedules
             .AsNoTracking()
-            .Include(x => x.Branch)
             .Where(es => es.EmployeeId == request.EmployeeId && es.Date >= request.StartDate && es.Date <= request.EndDate)
             .OrderBy(es => es.Date)
             .Select(es => new EmployeeScheduleResponse(
                 es.Id,
                 es.EmployeeId,
                 es.Date,
-                es.BranchId,
-                es.Branch.Name,
                 es.AssignedStartTime,
                 es.AssignedEndTime,
                 es.DayType,

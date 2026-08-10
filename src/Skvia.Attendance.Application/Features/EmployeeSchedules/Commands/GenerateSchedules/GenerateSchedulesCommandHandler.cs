@@ -34,6 +34,30 @@ public class GenerateSchedulesCommandHandler(IApplicationDbContext dbContext) : 
             return Error.Validation("Schedules.NoPattern", "Debe enviar un patrón de horario configurado.");
         }
 
+        if (employee.RequireFourPointAttendance && command.Patterns != null)
+        {
+            var baseScheduleIds = command.Patterns
+                .Where(p => p.IsWorkDay && p.BaseScheduleId.HasValue)
+                .Select(p => p.BaseScheduleId!.Value)
+                .Distinct()
+                .ToList();
+
+            if (baseScheduleIds.Count > 0)
+            {
+                var invalidSchedules = await dbContext.Schedules
+                    .Where(s => baseScheduleIds.Contains(s.Id) && !s.HasBreak)
+                    .Select(s => s.Code)
+                    .ToListAsync(cancellationToken);
+
+                if (invalidSchedules.Count > 0)
+                {
+                    return Error.Validation(
+                        "Schedules.FourPointMismatch",
+                        $"El empleado requiere 4 marcaciones obligatorias (con refrigerio), pero los horarios asignados ({string.Join(", ", invalidSchedules)}) no contempla refrigerio (solo 2 marcaciones).");
+                }
+            }
+        }
+
         var patternsDict = command.Patterns.ToDictionary(p => p.DayOfWeek);
 
         // Get existing schedules for the period
@@ -60,19 +84,19 @@ public class GenerateSchedulesCommandHandler(IApplicationDbContext dbContext) : 
 
             if (!patternsDict.TryGetValue(date.DayOfWeek, out var pattern))
             {
-                var restDayResult = EmployeeSchedule.CreateRestDay(employee.Id, date, branchId);
+                var restDayResult = EmployeeSchedule.CreateRestDay(employee.Id, date);
                 if (!restDayResult.IsError) newSchedules.Add(restDayResult.Value);
                 continue;
             }
 
             if (pattern.IsWorkDay && pattern.StartTime.HasValue && pattern.EndTime.HasValue)
             {
-                var workDayResult = EmployeeSchedule.CreateWorkDay(employee.Id, date, branchId, pattern.StartTime.Value, pattern.EndTime.Value, pattern.BaseScheduleId);
+                var workDayResult = EmployeeSchedule.CreateWorkDay(employee.Id, date, pattern.StartTime.Value, pattern.EndTime.Value, pattern.BaseScheduleId);
                 if (!workDayResult.IsError) newSchedules.Add(workDayResult.Value);
             }
             else
             {
-                var restDayResult = EmployeeSchedule.CreateRestDay(employee.Id, date, branchId);
+                var restDayResult = EmployeeSchedule.CreateRestDay(employee.Id, date);
                 if (!restDayResult.IsError) newSchedules.Add(restDayResult.Value);
             }
         }

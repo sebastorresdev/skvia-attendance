@@ -8,8 +8,8 @@ namespace Skvia.Attendance.Application.Features.KioskDevices.Queries.GetDevices;
 public record KioskDeviceDto(
     Guid Id,
     string Name,
-    Guid BranchId,
-    string BranchName,
+    Guid WorkplaceId,
+    string WorkplaceName,
     bool IsActive,
     DateTimeOffset CreatedAt);
 

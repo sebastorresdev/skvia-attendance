@@ -38,14 +38,14 @@ public class AttendanceConfiguration : IEntityTypeConfiguration<Domain.Attendanc
             .HasForeignKey(a => a.EmployeeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(a => a.CheckInBranch)
+        builder.HasOne(a => a.CheckInWorkplace)
             .WithMany()
-            .HasForeignKey(a => a.CheckInBranchId)
+            .HasForeignKey(a => a.CheckInWorkplaceId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(a => a.CheckOutBranch)
+        builder.HasOne(a => a.CheckOutWorkplace)
             .WithMany()
-            .HasForeignKey(a => a.CheckOutBranchId)
+            .HasForeignKey(a => a.CheckOutWorkplaceId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // --- ÍNDICES OPTIMIZADOS (Poder Relacional) ---
@@ -57,7 +57,7 @@ public class AttendanceConfiguration : IEntityTypeConfiguration<Domain.Attendanc
         builder.HasIndex(a => new { a.EmployeeId, a.CheckIn });
 
         // 3. Índice compuesto para ver asistencias por Sede en fechas específicas 🏬
-        builder.HasIndex(a => new { a.CheckInBranchId, a.Date });
-        builder.HasIndex(a => new { a.CheckOutBranchId, a.Date });
+        builder.HasIndex(a => new { a.CheckInWorkplaceId, a.Date });
+        builder.HasIndex(a => new { a.CheckOutWorkplaceId, a.Date });
     }
 }

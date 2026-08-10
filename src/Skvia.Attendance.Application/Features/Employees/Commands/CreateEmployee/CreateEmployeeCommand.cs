@@ -15,7 +15,7 @@ public record CreateEmployeeCommand(
     string? Email = null,
     string? Phone = null,
     string? Position = null,
-    string? Department = null,
+    Guid? DepartmentId = null,
     string? PhotoUrl = null,
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
@@ -23,4 +23,5 @@ public record CreateEmployeeCommand(
     bool RequireFourPointAttendance = false,
     bool IsAttendanceTracked = true,
     bool AutoCompleteClockOut = false,
-    List<Guid>? AllowedKioskIds = null) : ICommand<ErrorOr<Guid>>;
+    int TardinessToleranceMinutes = 0,
+    List<Guid>? AllowedWorkplaceIds = null) : ICommand<ErrorOr<Guid>>;

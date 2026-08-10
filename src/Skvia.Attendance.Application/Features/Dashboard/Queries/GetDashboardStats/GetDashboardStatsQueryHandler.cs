@@ -34,7 +34,7 @@ public class GetDashboardStatsQueryHandler(
 
         if (query.BranchId.HasValue)
         {
-            todayAttendancesQuery = todayAttendancesQuery.Where(a => a.CheckInBranchId == query.BranchId.Value);
+            todayAttendancesQuery = todayAttendancesQuery.Where(a => a.CheckInWorkplaceId == query.BranchId.Value);
         }
 
         var todayCheckIns = await todayAttendancesQuery.CountAsync(cancellationToken);
@@ -48,7 +48,7 @@ public class GetDashboardStatsQueryHandler(
 
         if (query.BranchId.HasValue)
         {
-            todaySchedulesQuery = todaySchedulesQuery.Where(s => s.BranchId == query.BranchId.Value);
+            todaySchedulesQuery = todaySchedulesQuery.Where(s => s.Employee.MainBranchId == query.BranchId.Value);
         }
 
         var todaySchedulesCount = await todaySchedulesQuery.CountAsync(cancellationToken);
@@ -62,7 +62,7 @@ public class GetDashboardStatsQueryHandler(
 
         if (query.BranchId.HasValue)
         {
-            weeklyAttendancesQuery = weeklyAttendancesQuery.Where(a => a.CheckInBranchId == query.BranchId.Value);
+            weeklyAttendancesQuery = weeklyAttendancesQuery.Where(a => a.CheckInWorkplaceId == query.BranchId.Value);
         }
 
         var weeklyAttendances = await weeklyAttendancesQuery
@@ -83,8 +83,8 @@ public class GetDashboardStatsQueryHandler(
         var branchBreakdown = await dbContext.Attendances
             .AsNoTracking()
             .Where(a => a.Date == today)
-            .GroupBy(a => new { a.CheckInBranchId, a.CheckInBranch.Name })
-            .Select(g => new BranchAttendanceItemDto(g.Key.CheckInBranchId, g.Key.Name, g.Count()))
+            .GroupBy(a => new { a.CheckInWorkplaceId, a.CheckInWorkplace.Name })
+            .Select(g => new BranchAttendanceItemDto(g.Key.CheckInWorkplaceId, g.Key.Name, g.Count()))
             .ToListAsync(cancellationToken);
 
         // 7. Recent Activities Today (Top 10)
@@ -96,7 +96,7 @@ public class GetDashboardStatsQueryHandler(
                 $"{a.Employee.FirstName} {a.Employee.LastName}",
                 a.Employee.Code,
                 a.Employee.PhotoUrl,
-                a.CheckInBranch.Name,
+                a.CheckInWorkplace.Name,
                 a.CheckIn,
                 a.IsLate,
                 a.MinutesLate

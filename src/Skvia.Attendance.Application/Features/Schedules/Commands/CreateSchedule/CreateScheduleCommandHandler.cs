@@ -8,11 +8,22 @@ public class CreateScheduleCommandHandler(IScheduleRepository scheduleRepository
 {
     public async Task<ErrorOr<Guid>> HandleAsync(CreateScheduleCommand command, CancellationToken cancellationToken)
     {
-        var schedule = Schedule.Create(command.Name, command.DefaultStartTime, command.DefaultEndTime);
+        var scheduleResult = Schedule.Create(
+            command.Code, 
+            command.Description,
+            command.TimeZoneId,
+            command.DefaultStartTime, 
+            command.DefaultEndTime,
+            command.HasBreak,
+            command.BreakStartTime,
+            command.BreakEndTime);
 
-        await scheduleRepository.AddAsync(schedule, cancellationToken);
+        if (scheduleResult.IsError)
+            return scheduleResult.Errors;
+
+        await scheduleRepository.AddAsync(scheduleResult.Value, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return schedule.Id;
+        return scheduleResult.Value.Id;
     }
 }

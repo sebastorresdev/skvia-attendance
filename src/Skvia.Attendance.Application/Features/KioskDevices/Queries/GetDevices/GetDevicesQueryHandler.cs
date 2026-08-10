@@ -10,13 +10,13 @@ public class GetDevicesQueryHandler(
     public async Task<ErrorOr<IReadOnlyList<KioskDeviceDto>>> HandleAsync(GetDevicesQuery query, CancellationToken cancellationToken)
     {
         var devices = await dbContext.KioskDevices
-            .Include(d => d.Branch)
+            .Include(d => d.Workplace)
             .OrderByDescending(d => d.Created)
             .Select(d => new KioskDeviceDto(
                 d.Id,
                 d.Name,
-                d.BranchId,
-                d.Branch.Name,
+                d.WorkplaceId,
+                d.Workplace.Name,
                 d.IsActive,
                 d.Created))
             .ToListAsync(cancellationToken);

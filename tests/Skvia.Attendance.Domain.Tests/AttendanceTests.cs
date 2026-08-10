@@ -21,7 +21,7 @@ public class AttendanceTests
     {
         // Arrange
         var employeeId = Guid.NewGuid();
-        var branchId = Guid.NewGuid();
+        var workplaceId = Guid.NewGuid();
         var photoUrl = "https://example.com/checkin.jpg";
         var scheduledStart = new TimeOnly(8, 0);
         var clockTime = new DateTimeOffset(2026, 8, 8, 8, 0, 0, TimeSpan.Zero);
@@ -31,19 +31,19 @@ public class AttendanceTests
         // Act
         var attendance = AttendanceEntity.CreateCheckIn(
             employeeId,
-            branchId,
+            workplaceId,
             photoUrl,
             isValidCheckIn: true,
             scheduledStartTime: scheduledStart,
             operationTimeZoneId: "UTC",
             clock: clock,
             timeZoneProvider: tzProvider,
-            branchTardinessToleranceMinutes: 5);
+            tardinessToleranceMinutes: 5);
 
         // Assert
         attendance.Should().NotBeNull();
         attendance.EmployeeId.Should().Be(employeeId);
-        attendance.CheckInBranchId.Should().Be(branchId);
+        attendance.CheckInWorkplaceId.Should().Be(workplaceId);
         attendance.PhotoCheckIn.Should().Be(photoUrl);
         attendance.IsLate.Should().BeFalse();
         attendance.MinutesLate.Should().Be(0);
@@ -55,7 +55,7 @@ public class AttendanceTests
     {
         // Arrange
         var employeeId = Guid.NewGuid();
-        var branchId = Guid.NewGuid();
+        var workplaceId = Guid.NewGuid();
         var photoUrl = "https://example.com/checkin.jpg";
         var scheduledStart = new TimeOnly(8, 0);
         var clockTime = new DateTimeOffset(2026, 8, 8, 8, 20, 0, TimeSpan.Zero); // 20 min late
@@ -65,14 +65,14 @@ public class AttendanceTests
         // Act
         var attendance = AttendanceEntity.CreateCheckIn(
             employeeId,
-            branchId,
+            workplaceId,
             photoUrl,
             isValidCheckIn: true,
             scheduledStartTime: scheduledStart,
             operationTimeZoneId: "UTC",
             clock: clock,
             timeZoneProvider: tzProvider,
-            branchTardinessToleranceMinutes: 10);
+            tardinessToleranceMinutes: 10);
 
         // Assert
         attendance.IsLate.Should().BeTrue();

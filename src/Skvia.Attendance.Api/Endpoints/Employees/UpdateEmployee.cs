@@ -33,7 +33,7 @@ public sealed class UpdateEmployee : IEndpoint
             request.Email,
             request.Phone,
             request.Position,
-            request.Department,
+            request.DepartmentId,
             request.PhotoUrl,
             request.MainBranchId,
             request.MobileCheckInEnabled,
@@ -41,7 +41,8 @@ public sealed class UpdateEmployee : IEndpoint
             request.RequireFourPointAttendance,
             request.IsAttendanceTracked,
             request.AutoCompleteClockOut,
-            request.AllowedKioskIds);
+            request.TardinessToleranceMinutes,
+            request.AllowedWorkplaceIds);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
@@ -61,12 +62,13 @@ public record UpdateEmployeeRequest(
     string? Email = null,
     string? Phone = null,
     string? Position = null,
-    string? Department = null,
+    Guid? DepartmentId = null,
     string? PhotoUrl = null,
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
     string? ApplicationUserId = null,
     bool RequireFourPointAttendance = false,
     bool IsAttendanceTracked = true,
-    bool AutoCompleteClockOut = false,
-    List<Guid>? AllowedKioskIds = null);
+    bool? AutoCompleteClockOut = null,
+    int? TardinessToleranceMinutes = null,
+    List<Guid>? AllowedWorkplaceIds = null);

@@ -30,7 +30,7 @@ public sealed class CreateEmployee : IEndpoint
             request.Email,
             request.Phone,
             request.Position,
-            request.Department,
+            request.DepartmentId,
             request.PhotoUrl,
             request.MainBranchId,
             request.MobileCheckInEnabled,
@@ -38,7 +38,8 @@ public sealed class CreateEmployee : IEndpoint
             request.RequireFourPointAttendance,
             request.IsAttendanceTracked,
             request.AutoCompleteClockOut,
-            request.AllowedKioskIds);
+            request.TardinessToleranceMinutes,
+            request.AllowedWorkplaceIds);
 
         var result = await handler.HandleAsync(command, cancellationToken);
 
@@ -58,7 +59,7 @@ public record CreateEmployeeRequest(
     string? Email = null,
     string? Phone = null,
     string? Position = null,
-    string? Department = null,
+    Guid? DepartmentId = null,
     string? PhotoUrl = null,
     Guid? MainBranchId = null,
     bool MobileCheckInEnabled = false,
@@ -66,5 +67,6 @@ public record CreateEmployeeRequest(
     bool RequireFourPointAttendance = false,
     bool IsAttendanceTracked = true,
     bool AutoCompleteClockOut = false,
-    List<Guid>? AllowedKioskIds = null);
+    int TardinessToleranceMinutes = 0,
+    List<Guid>? AllowedWorkplaceIds = null);
 public record CreateEmployeeResponse(Guid Id);

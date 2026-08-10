@@ -70,7 +70,7 @@ public sealed class RegisterAttendance : IEndpoint
 
         var command = new CheckInCommand(
             request.EmployeeIdentifier, 
-            request.BranchId, 
+            request.WorkplaceId, 
             request.PhotoUrl,
             source,
             request.Latitude,
@@ -94,7 +94,7 @@ public sealed class RegisterAttendance : IEndpoint
 
         var command = new CheckOutCommand(
             request.EmployeeIdentifier, 
-            request.BranchId, 
+            request.WorkplaceId, 
             request.PhotoUrl,
             source,
             request.Latitude,
@@ -110,7 +110,7 @@ public sealed class RegisterAttendance : IEndpoint
 
 public record AttendanceRequest(
     string EmployeeIdentifier, 
-    Guid BranchId, 
+    Guid WorkplaceId, 
     string PhotoUrl,
     AttendanceSource? Source,
     double? Latitude,

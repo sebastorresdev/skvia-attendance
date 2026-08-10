@@ -10,13 +10,12 @@ namespace Skvia.Attendance.Application.Features.Attendances.Commands.Recalculate
 
 public class RecalculateAttendanceCommandHandler(
     IApplicationDbContext dbContext,
-    IClock clock,
     ITimeZoneProvider timeZoneProvider) : ICommandHandler<RecalculateAttendanceCommand, ErrorOr<Success>>
 {
     public async Task<ErrorOr<Success>> HandleAsync(RecalculateAttendanceCommand command, CancellationToken cancellationToken)
     {
         var attendance = await dbContext.Attendances
-            .Include(a => a.CheckInBranch)
+            .Include(a => a.CheckInWorkplace)
             .FirstOrDefaultAsync(a => a.Id == command.AttendanceId, cancellationToken);
 
         if (attendance is null)
@@ -51,9 +50,9 @@ public class RecalculateAttendanceCommandHandler(
 
         attendance.Recalculate(
             employeeSchedule.AssignedStartTime.Value,
-            attendance.CheckInBranch.TimeZoneId,
+            attendance.CheckInWorkplace.TimeZoneId,
             timeZoneProvider,
-            attendance.CheckInBranch.TardinessToleranceMinutes,
+            employee.TardinessToleranceMinutes, // Replaced branch tolerance with employee tolerance
             totalScheduledMinutes);
 
         await dbContext.SaveChangesAsync(cancellationToken);

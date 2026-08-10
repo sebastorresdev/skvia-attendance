@@ -13,6 +13,9 @@ public class AssignWeeklyScheduleCommandHandler(
         if (employee is null)
             return Error.NotFound(description: "Empleado no encontrado.");
 
+        if (!employee.IsAttendanceTracked)
+            return Error.Validation(description: "No se puede asignar horarios a un empleado que no tiene activado el control de asistencia.");
+
         var hireDateOnly = DateOnly.FromDateTime(employee.HireDate.Date);
 
         // 2. Obtener horarios existentes para esta semana y eliminarlos
@@ -33,23 +36,21 @@ public class AssignWeeklyScheduleCommandHandler(
                 return Error.Validation("Employee.InvalidScheduleDate",
                     $"No se puede programar horario para la fecha {day.Date:dd/MM/yyyy} porque es anterior a la fecha de ingreso del empleado ({hireDateOnly:dd/MM/yyyy}).");
             }
-
-            // Validar si la sucursal existe si no es un día libre/vacaciones que tal vez no envíe sucursal
-            // En Retail, hasta los días libres suelen asignarse a la sucursal base, pero por seguridad verificamos:
-            if (day.BranchId != Guid.Empty)
+            
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            if (day.Date < today)
             {
-                var branchExists = await context.Branches.AnyAsync(b => b.Id == day.BranchId, cancellationToken);
-                if (!branchExists)
-                    return Error.NotFound(description: $"Sucursal no encontrada para el día {day.Date}.");
+                return Error.Validation("Employee.InvalidScheduleDate",
+                    $"No se puede programar horario para fechas pasadas ({day.Date:dd/MM/yyyy}).");
             }
 
             ErrorOr<EmployeeSchedule> scheduleResult = day.DayType switch
             {
-                ScheduleDayType.WorkDay => EmployeeSchedule.CreateWorkDay(request.EmployeeId, day.Date, day.BranchId, day.StartTime!.Value, day.EndTime!.Value, day.BaseScheduleId),
-                ScheduleDayType.DayOff => EmployeeSchedule.CreateRestDay(request.EmployeeId, day.Date, day.BranchId),
-                ScheduleDayType.Vacation => EmployeeSchedule.CreateVacationDay(request.EmployeeId, day.Date, day.BranchId),
-                ScheduleDayType.MedicalLeave => EmployeeSchedule.CreateMedicalLeaveDay(request.EmployeeId, day.Date, day.BranchId),
-                ScheduleDayType.MakeUpDay => EmployeeSchedule.CreateMakeUpDay(request.EmployeeId, day.Date, day.BranchId, day.StartTime!.Value, day.EndTime!.Value, day.BaseScheduleId),
+                ScheduleDayType.WorkDay => EmployeeSchedule.CreateWorkDay(request.EmployeeId, day.Date, day.StartTime!.Value, day.EndTime!.Value, day.BaseScheduleId),
+                ScheduleDayType.DayOff => EmployeeSchedule.CreateRestDay(request.EmployeeId, day.Date),
+                ScheduleDayType.Vacation => EmployeeSchedule.CreateVacationDay(request.EmployeeId, day.Date),
+                ScheduleDayType.MedicalLeave => EmployeeSchedule.CreateMedicalLeaveDay(request.EmployeeId, day.Date),
+                ScheduleDayType.MakeUpDay => EmployeeSchedule.CreateMakeUpDay(request.EmployeeId, day.Date, day.StartTime!.Value, day.EndTime!.Value, day.BaseScheduleId),
                 _ => Error.Validation(description: "Tipo de día no válido.")
             };
 

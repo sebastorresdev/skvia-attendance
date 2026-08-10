@@ -14,14 +14,13 @@ public class BranchTests
         var address = " Av. Central 123 ";
 
         // Act
-        var branch = Branch.Create(code, name, address, tardinessToleranceMinutes: 10);
+        var branch = Branch.Create(code, name, address);
 
         // Assert
         branch.Should().NotBeNull();
         branch.Code.Should().Be("LIM-01");
         branch.Name.Should().Be("Sede Principal Lima");
         branch.Address.Should().Be("Av. Central 123");
-        branch.TardinessToleranceMinutes.Should().Be(10);
     }
 
     [Fact]
@@ -31,12 +30,11 @@ public class BranchTests
         var branch = Branch.Create("LIM-01", "Sede Lima");
 
         // Act
-        branch.Update("LIM-02", "Sede Miraflores", "Av. Larco 456", tardinessToleranceMinutes: 15);
+        branch.Update("LIM-02", "Sede Miraflores", "Av. Larco 456");
 
         // Assert
         branch.Code.Should().Be("LIM-02");
         branch.Name.Should().Be("Sede Miraflores");
         branch.Address.Should().Be("Av. Larco 456");
-        branch.TardinessToleranceMinutes.Should().Be(15);
     }
 }

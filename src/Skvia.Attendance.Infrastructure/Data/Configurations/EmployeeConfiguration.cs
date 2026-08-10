@@ -56,7 +56,12 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .IsRequired(false);
 
         builder.Property(p => p.Position).IsRequired(false).HasMaxLength(EmployeeConstants.PositionMaxLength);
-        builder.Property(p => p.Department).IsRequired(false).HasMaxLength(EmployeeConstants.DepartmentMaxLength);
+        
+        builder.HasOne<Skvia.Attendance.Domain.Departments.Department>()
+            .WithMany()
+            .HasForeignKey(e => e.DepartmentId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.Property(p => p.HireDate).IsRequired();
         builder.Property(p => p.PhotoUrl).IsRequired(false).HasMaxLength(EmployeeConstants.PhotoUrlMaxLength);
         
@@ -71,7 +76,9 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(p => p.IsAttendanceTracked).IsRequired().HasDefaultValue(true);
         builder.Property(p => p.AutoCompleteClockOut).IsRequired().HasDefaultValue(false);
 
-        builder.Property(p => p.AllowedKioskIds)
+        builder.Property(p => p.TardinessToleranceMinutes).IsRequired().HasDefaultValue(0);
+
+        builder.Property(p => p.AllowedWorkplaceIds)
             .HasConversion(
                 v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
                 v => string.IsNullOrWhiteSpace(v) || !v.Contains("[") ? new List<Guid>() : System.Text.Json.JsonSerializer.Deserialize<List<Guid>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<Guid>())

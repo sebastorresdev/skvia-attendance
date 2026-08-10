@@ -13,7 +13,12 @@ public class GetSchedulesQueryHandler(IScheduleRepository scheduleRepository) : 
 
         return schedules.Select(s => new ScheduleResponse(
             s.Id,
-            s.Name,
+            s.Code,
+            s.Description,
+            s.TimeZoneId,
+            s.HasBreak,
+            s.BreakStartTime,
+            s.BreakEndTime,
             s.DefaultStartTime,
             s.DefaultEndTime
         )).ToList();

@@ -5,10 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Domain.Branches;
+using Skvia.Attendance.Domain.Departments;
 using Skvia.Attendance.Domain.Employees;
 using Skvia.Attendance.Domain.EmployeeSchedules;
 using Skvia.Attendance.Domain.Identity;
 using Skvia.Attendance.Domain.Schedules;
+using Skvia.Attendance.Domain.Kiosks;
+using Skvia.Attendance.Domain.Workplaces;
 
 namespace Skvia.Attendance.Infrastructure.Data;
 
@@ -19,6 +22,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<BranchUser> BranchUsers => Set<BranchUser>();
     public DbSet<Branch> Branches => Set<Branch>();
+    public DbSet<Department> Departments => Set<Department>();
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<EmployeeSchedule> EmployeeSchedules => Set<EmployeeSchedule>();
     public DbSet<Schedule> Schedules => Set<Schedule>();
@@ -27,6 +31,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Domain.Attendances.Attendance> Attendances => Set<Domain.Attendances.Attendance>();
     public DbSet<KioskDevice> KioskDevices => Set<KioskDevice>();
+    public DbSet<Workplace> Workplaces => Set<Workplace>();
     public DbSet<Domain.Justifications.Justification> Justifications => Set<Domain.Justifications.Justification>();
 
     protected override void OnModelCreating(ModelBuilder builder)

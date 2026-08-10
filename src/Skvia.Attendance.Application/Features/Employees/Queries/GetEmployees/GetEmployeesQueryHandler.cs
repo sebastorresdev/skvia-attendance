@@ -21,7 +21,7 @@ public class GetEmployeesQueryHandler(IApplicationDbContext dbContext) : IQueryH
                 e.DocumentIdentifier.Number,
                 e.Email != null ? e.Email.Value.Value : null,
                 e.Phone != null ? e.Phone.Value.Value : null,
-                e.Department,
+                e.DepartmentId,
                 e.Position,
                 e.PhotoUrl,
                 e.MainBranchId,
