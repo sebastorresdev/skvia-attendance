@@ -8,71 +8,99 @@ public class KioskPairingService : IKioskPairingService
     private static readonly ConcurrentDictionary<string, KioskPairingState> _pairingCodes = new();
     private static readonly Random _random = new();
 
-    public string GeneratePairingCode()
+    public string RegisterPairingCode(
+        Guid? deviceId,
+        string name,
+        Guid workplaceId,
+        string? workplaceName,
+        string token,
+        string? existingCode = null,
+        DateTime? existingExpiresAt = null)
     {
-        // Cleanup expired codes
         var now = DateTime.UtcNow;
+
+        // Cleanup expired codes
         foreach (var key in _pairingCodes.Keys)
         {
-            if (_pairingCodes.TryGetValue(key, out var state) && state.ExpiresAt < now)
+            if (_pairingCodes.TryGetValue(key, out var s) && s.ExpiresAt < now)
             {
                 _pairingCodes.TryRemove(key, out _);
             }
         }
 
-        string code;
-        do
+        // Remove any existing active pairing code for the same deviceId if present
+        if (deviceId.HasValue)
         {
-            code = _random.Next(100000, 999999).ToString();
-        } while (_pairingCodes.ContainsKey(code));
+            foreach (var kvp in _pairingCodes)
+            {
+                if (kvp.Value.DeviceId == deviceId.Value)
+                {
+                    _pairingCodes.TryRemove(kvp.Key, out _);
+                }
+            }
+        }
+
+        string code;
+        DateTime expiresAt;
+
+        if (!string.IsNullOrWhiteSpace(existingCode) && existingExpiresAt.HasValue && existingExpiresAt.Value > now)
+        {
+            code = existingCode;
+            expiresAt = existingExpiresAt.Value;
+        }
+        else
+        {
+            do
+            {
+                code = _random.Next(100000, 999999).ToString();
+            } while (_pairingCodes.ContainsKey(code));
+            expiresAt = now.AddMinutes(30);
+        }
 
         var newState = new KioskPairingState(
             Code: code,
-            IsApproved: false,
-            Token: null,
-            WorkplaceId: null,
-            ExpiresAt: now.AddMinutes(15));
+            DeviceId: deviceId,
+            Name: name,
+            WorkplaceId: workplaceId,
+            WorkplaceName: workplaceName,
+            Token: token,
+            ExpiresAt: expiresAt);
 
         _pairingCodes[code] = newState;
         return code;
     }
 
-    public KioskPairingState? GetPairingState(string code)
+    public KioskPairingState? ClaimPairingCode(string code)
     {
-        if (_pairingCodes.TryGetValue(code, out var state))
+        var cleanCode = code.Replace("-", "").Replace(" ", "").Trim();
+        if (_pairingCodes.TryGetValue(cleanCode, out var state))
         {
             if (state.ExpiresAt < DateTime.UtcNow)
             {
-                _pairingCodes.TryRemove(code, out _);
+                _pairingCodes.TryRemove(cleanCode, out _);
+                return null;
+            }
+
+            _pairingCodes.TryRemove(cleanCode, out _);
+            return state;
+        }
+
+        return null;
+    }
+
+    public KioskPairingState? GetPairingState(string code)
+    {
+        var cleanCode = code.Replace("-", "").Replace(" ", "").Trim();
+        if (_pairingCodes.TryGetValue(cleanCode, out var state))
+        {
+            if (state.ExpiresAt < DateTime.UtcNow)
+            {
+                _pairingCodes.TryRemove(cleanCode, out _);
                 return null;
             }
             return state;
         }
+
         return null;
-    }
-
-    public bool ApprovePairingCode(string code, string token, Guid workplaceId)
-    {
-        if (_pairingCodes.TryGetValue(code, out var state))
-        {
-            if (state.ExpiresAt < DateTime.UtcNow)
-            {
-                _pairingCodes.TryRemove(code, out _);
-                return false;
-            }
-
-            var approvedState = state with
-            {
-                IsApproved = true,
-                Token = token,
-                WorkplaceId = workplaceId,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(5) // Keep approved state for 5 mins so remote client can retrieve it
-            };
-
-            _pairingCodes[code] = approvedState;
-            return true;
-        }
-
-        return false;
     }
 }

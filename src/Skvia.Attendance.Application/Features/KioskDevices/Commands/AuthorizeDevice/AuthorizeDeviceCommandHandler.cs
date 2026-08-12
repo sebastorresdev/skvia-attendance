@@ -8,9 +8,9 @@ using System.Security.Cryptography;
 namespace Skvia.Attendance.Application.Features.KioskDevices.Commands.AuthorizeDevice;
 
 public class AuthorizeDeviceCommandHandler(
-    IApplicationDbContext dbContext) : ICommandHandler<AuthorizeDeviceCommand, ErrorOr<string>>
+    IApplicationDbContext dbContext) : ICommandHandler<AuthorizeDeviceCommand, ErrorOr<AuthorizeDeviceResult>>
 {
-    public async Task<ErrorOr<string>> HandleAsync(AuthorizeDeviceCommand command, CancellationToken cancellationToken)
+    public async Task<ErrorOr<AuthorizeDeviceResult>> HandleAsync(AuthorizeDeviceCommand command, CancellationToken cancellationToken)
     {
         var workplace = await dbContext.Workplaces.FindAsync(new object[] { command.WorkplaceId }, cancellationToken);
         if (workplace is null)
@@ -29,6 +29,13 @@ public class AuthorizeDeviceCommandHandler(
         dbContext.KioskDevices.Add(device);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return token; // Return token to be sent to the Kiosk
+        return new AuthorizeDeviceResult(
+            device.Id,
+            device.Name,
+            device.WorkplaceId,
+            workplace.Name,
+            device.Token,
+            string.Empty,
+            DateTime.UtcNow);
     }
 }

@@ -17,7 +17,11 @@ public class GetDevicesQueryHandler(
                 d.Name,
                 d.WorkplaceId,
                 d.Workplace.Name,
+                (int)d.Status,
                 d.IsActive,
+                d.PairingCode,
+                d.PairingCodeExpiresAt,
+                d.LinkedAt,
                 d.Created))
             .ToListAsync(cancellationToken);
 

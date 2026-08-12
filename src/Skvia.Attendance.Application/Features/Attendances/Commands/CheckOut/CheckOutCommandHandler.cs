@@ -3,6 +3,7 @@ using Skvia.Attendance.Domain.Attendances;
 using Skvia.Attendance.Domain.Common;
 using Skvia.Attendance.Domain.Employees;
 using Skvia.Attendance.Domain.Workplaces;
+using Skvia.Attendance.Domain.Kiosks;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +39,8 @@ public class CheckOutCommandHandler(
                 return Error.Unauthorized("Kiosk.Unauthorized", "Dispositivo no autorizado.");
 
             var device = await dbContext.KioskDevices
-                .FirstOrDefaultAsync(d => d.Token == command.Token && d.IsActive, cancellationToken);
+                .FirstOrDefaultAsync(d => d.Token == command.Token && d.Status == KioskDeviceStatus.Linked, cancellationToken);
+
 
             if (device is null)
                 return Error.Unauthorized("Kiosk.Unauthorized", "Dispositivo revocado o no encontrado.");

@@ -1,6 +1,5 @@
 using ErrorOr;
 using Skvia.Attendance.Application.Common.Interfaces;
-
 using Skvia.Attendance.Application.Common.Security;
 
 namespace Skvia.Attendance.Application.Features.KioskDevices.Queries.GetDevices;
@@ -10,7 +9,11 @@ public record KioskDeviceDto(
     string Name,
     Guid WorkplaceId,
     string WorkplaceName,
+    int Status,
     bool IsActive,
+    string? PairingCode,
+    DateTime? PairingCodeExpiresAt,
+    DateTime? LinkedAt,
     DateTimeOffset CreatedAt);
 
 [AuthorizeCommand(Permissions = Permission.KioskDevices.View)]

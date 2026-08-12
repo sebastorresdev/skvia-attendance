@@ -1,6 +1,6 @@
 using ErrorOr;
 using Skvia.Attendance.Application.Common.Interfaces;
-using Skvia.Attendance.Domain.Common;
+using Skvia.Attendance.Domain.Kiosks;
 
 namespace Skvia.Attendance.Application.Features.KioskDevices.Commands.RevokeDevice;
 
@@ -14,7 +14,12 @@ public class RevokeDeviceCommandHandler(
         if (device is null)
             return Error.NotFound("KioskDevice.NotFound", "Dispositivo no encontrado.");
 
-        device.Revoke();
+        if (device.Status != KioskDeviceStatus.Linked)
+        {
+            return Error.Validation("KioskDevice.InvalidState", "Solo se pueden inhabilitar kioskos que se encuentren actualmente Vinculados.");
+        }
+
+        device.Disable();
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success;

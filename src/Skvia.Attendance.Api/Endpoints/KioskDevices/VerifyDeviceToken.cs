@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Skvia.Attendance.Application.Common.Interfaces;
+using Skvia.Attendance.Domain.Kiosks;
 
 namespace Skvia.Attendance.Api.Endpoints.KioskDevices;
 
@@ -20,24 +21,45 @@ public sealed class VerifyDeviceToken : IEndpoint
     {
         if (string.IsNullOrWhiteSpace(request.Token))
         {
-            return TypedResults.Ok(new VerifyDeviceTokenResponse(false, null, null, null));
+            return TypedResults.Ok(new VerifyDeviceTokenResponse(false, null, null, null, null));
         }
 
         var device = await dbContext.KioskDevices
             .AsNoTracking()
             .Include(d => d.Workplace)
-            .FirstOrDefaultAsync(d => d.Token == request.Token && d.IsActive, cancellationToken);
+            .FirstOrDefaultAsync(d => d.Token == request.Token, cancellationToken);
 
         if (device is null)
         {
-            return TypedResults.Ok(new VerifyDeviceTokenResponse(false, null, null, null));
+            return TypedResults.Ok(new VerifyDeviceTokenResponse(false, null, null, null, null));
+        }
+
+        if (device.Status == KioskDeviceStatus.Revoked)
+        {
+            return TypedResults.Ok(new VerifyDeviceTokenResponse(
+                IsValid: false,
+                Name: device.Name,
+                WorkplaceId: device.WorkplaceId,
+                WorkplaceName: device.Workplace?.Name,
+                Status: (int)KioskDeviceStatus.Revoked));
+        }
+
+        if (device.Status != KioskDeviceStatus.Linked)
+        {
+            return TypedResults.Ok(new VerifyDeviceTokenResponse(
+                IsValid: false,
+                Name: device.Name,
+                WorkplaceId: device.WorkplaceId,
+                WorkplaceName: device.Workplace?.Name,
+                Status: (int)device.Status));
         }
 
         return TypedResults.Ok(new VerifyDeviceTokenResponse(
             IsValid: true,
             Name: device.Name,
             WorkplaceId: device.WorkplaceId,
-            WorkplaceName: device.Workplace.Name));
+            WorkplaceName: device.Workplace?.Name,
+            Status: (int)KioskDeviceStatus.Linked));
     }
 }
 
@@ -47,4 +69,5 @@ public record VerifyDeviceTokenResponse(
     bool IsValid,
     string? Name,
     Guid? WorkplaceId,
-    string? WorkplaceName);
+    string? WorkplaceName,
+    int? Status);
