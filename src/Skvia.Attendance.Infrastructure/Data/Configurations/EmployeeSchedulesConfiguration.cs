@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Skvia.Attendance.Domain.EmployeeSchedules;
 
 namespace Skvia.Attendance.Infrastructure.Data.Configurations;
@@ -15,11 +17,16 @@ public class EmployeeSchedulesConfiguration : IEntityTypeConfiguration<EmployeeS
             .IsRequired()
             .HasConversion<int>();
 
-        builder.HasIndex(s => new { s.EmployeeId, s.Date }).IsUnique();
+        builder.HasIndex(es => new { es.EmployeeId, es.EffectiveFrom });
 
         builder.HasOne(es => es.Employee)
             .WithMany(e => e.EmployeeSchedules)
             .HasForeignKey(es => es.EmployeeId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(es => es.Schedule)
+            .WithMany()
+            .HasForeignKey(es => es.ScheduleId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

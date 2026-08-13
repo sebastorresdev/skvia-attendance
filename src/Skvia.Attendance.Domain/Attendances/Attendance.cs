@@ -178,4 +178,24 @@ public class Attendance : BaseEntity
                 OvertimeMinutes = 0;
         }
     }
+
+    public void RecalculateNonWorkDay()
+    {
+        MinutesLate = 0;
+        IsLate = false;
+
+        if (CheckOut.HasValue)
+        {
+            int totalMinutes = (int)(CheckOut.Value - CheckIn).TotalMinutes;
+
+            if (BreakStart.HasValue && BreakEnd.HasValue)
+            {
+                int breakMinutes = (int)(BreakEnd.Value - BreakStart.Value).TotalMinutes;
+                if (breakMinutes > 0) totalMinutes -= breakMinutes;
+            }
+
+            MinutesWorked = Math.Max(totalMinutes, 0);
+            OvertimeMinutes = MinutesWorked;
+        }
+    }
 }

@@ -13,18 +13,17 @@ namespace Skvia.Attendance.Application.Features.Attendances.Commands.CheckIn;
 public class CheckInCommandHandler(
     IApplicationDbContext dbContext,
     IClock clock,
-    ITimeZoneProvider timeZoneProvider) : ICommandHandler<CheckInCommand, ErrorOr<Success>>
+    ITimeZoneProvider timeZoneProvider,
+    IScheduleResolverService scheduleResolver) : ICommandHandler<CheckInCommand, ErrorOr<Success>>
 {
     public async Task<ErrorOr<Success>> HandleAsync(CheckInCommand command, CancellationToken cancellationToken)
     {
         // 1. Find Employee by Code or DNI
         var identifier = command.EmployeeIdentifier.Trim().ToUpper();
         var employee = await dbContext.Employees
-            .Include(e => e.EmployeeSchedules)
             .FirstOrDefaultAsync(e => 
                 (e.Code == identifier || e.DocumentIdentifier.Number == identifier) 
-                && e.Status == EmployeeStatus.Active, 
-                cancellationToken);
+                && e.Status == EmployeeStatus.Active, cancellationToken);
 
         if (employee is null)
             return Error.NotFound("Employee.NotFound", "No se encontró un empleado activo con ese código o DNI.");
@@ -83,16 +82,16 @@ public class CheckInCommandHandler(
         if (currentDate < hireDateOnly)
             return Error.Validation("Employee.NotHiredYet", $"No se puede registrar asistencia antes de la fecha de ingreso del empleado ({hireDateOnly:dd/MM/yyyy}).");
 
-        // 3. Find Schedule for today
-        var schedule = employee.EmployeeSchedules.FirstOrDefault(s => s.Date == currentDate);
+        // 3. Find Resolved Schedule for today
+        var schedule = await scheduleResolver.ResolveForDayAsync(employee.Id, currentDate, cancellationToken);
         
-        if (schedule is null)
-            return Error.Validation("Schedule.NotFound", "No tienes horario asignado para el día de hoy.");
-
-        if (schedule.DayType != Skvia.Attendance.Domain.EmployeeSchedules.ScheduleDayType.WorkDay)
+        if (schedule is null || schedule.DayType == Skvia.Attendance.Domain.EmployeeSchedules.ScheduleDayType.DayOff)
             return Error.Validation("Schedule.NotWorkday", "Hoy no es un día laborable según tu horario.");
 
-        if (!schedule.AssignedStartTime.HasValue)
+        if (schedule.DayType != Skvia.Attendance.Domain.EmployeeSchedules.ScheduleDayType.WorkDay && schedule.DayType != Skvia.Attendance.Domain.EmployeeSchedules.ScheduleDayType.MakeUpDay)
+            return Error.Validation("Schedule.NotWorkday", "Hoy no es un día laborable según tu horario.");
+
+        if (!schedule.StartTime.HasValue)
             return Error.Validation("Schedule.Invalid", "Tu horario de hoy no tiene hora de entrada configurada.");
 
         // 3.5 Check if already checked in today
@@ -109,7 +108,7 @@ public class CheckInCommandHandler(
             command.WorkplaceId,
             command.PhotoUrl,
             true, // isValidCheckIn
-            schedule.AssignedStartTime.Value,
+            schedule.StartTime.Value,
             workplace.TimeZoneId,
             clock,
             timeZoneProvider,

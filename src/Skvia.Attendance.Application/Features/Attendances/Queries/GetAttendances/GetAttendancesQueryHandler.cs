@@ -2,11 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Skvia.Attendance.Application.Common.Interfaces;
 using Skvia.Attendance.Application.Common.Messaging;
 using ErrorOr;
+using System.Linq;
 
 namespace Skvia.Attendance.Application.Features.Attendances.Queries.GetAttendances;
 
 public class GetAttendancesQueryHandler(
-    IApplicationDbContext dbContext) : IQueryHandler<GetAttendancesQuery, ErrorOr<List<AttendanceResponse>>>
+    IApplicationDbContext dbContext,
+    IScheduleResolverService scheduleResolver) : IQueryHandler<GetAttendancesQuery, ErrorOr<List<AttendanceResponse>>>
 {
     public async Task<ErrorOr<List<AttendanceResponse>>> HandleAsync(GetAttendancesQuery query, CancellationToken cancellationToken)
     {
@@ -65,6 +67,29 @@ public class GetAttendancesQueryHandler(
                 a.IsLate
             ))
             .ToListAsync(cancellationToken);
+
+        var employeeIds = responseList.Select(r => r.EmployeeId).Distinct().ToList();
+        if (employeeIds.Count > 0)
+        {
+            var grid = await scheduleResolver.ResolveGridAsync(employeeIds, query.StartDate, query.EndDate, cancellationToken);
+
+            responseList = responseList.Select(r =>
+            {
+                if (grid.TryGetValue(r.EmployeeId, out var days))
+                {
+                    var day = days.FirstOrDefault(d => d.Date == r.Date);
+                    if (day is not null && day.StartTime.HasValue)
+                    {
+                        return r with
+                        {
+                            AssignedStartTime = day.StartTime?.ToTimeSpan(),
+                            AssignedEndTime = day.EndTime?.ToTimeSpan()
+                        };
+                    }
+                }
+                return r;
+            }).ToList();
+        }
 
         return responseList;
     }

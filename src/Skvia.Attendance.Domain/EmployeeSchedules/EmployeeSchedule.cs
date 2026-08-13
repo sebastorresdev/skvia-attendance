@@ -1,5 +1,5 @@
-using Skvia.Attendance.Domain.Branches;
 using Skvia.Attendance.Domain.Employees;
+using Skvia.Attendance.Domain.Schedules;
 
 namespace Skvia.Attendance.Domain.EmployeeSchedules;
 
@@ -8,16 +8,57 @@ public class EmployeeSchedule : BaseEntity
     public Guid EmployeeId { get; private set; }
     public Employee Employee { get; private set; } = null!;
 
-    public DateOnly Date { get; private set; }
+    public Guid? ScheduleId { get; private set; }
+    public Schedule? Schedule { get; private set; }
 
+    public DateOnly EffectiveFrom { get; private set; }
+    public DateOnly? EffectiveTo { get; private set; }
+
+    // Compatibilidad y soporte diario
+    public DateOnly Date { get; private set; }
     public TimeOnly? AssignedStartTime { get; private set; }
     public TimeOnly? AssignedEndTime { get; private set; }
-
     public Guid? BaseScheduleId { get; private set; }
-
     public ScheduleDayType DayType { get; private set; }
 
     private EmployeeSchedule() { }
+
+    public static ErrorOr<EmployeeSchedule> CreateAssignment(
+        Guid employeeId,
+        Guid scheduleId,
+        DateOnly effectiveFrom,
+        DateOnly? effectiveTo = null)
+    {
+        if (employeeId == Guid.Empty)
+            return Error.Validation("EmployeeSchedule.InvalidEmployee", "El empleado es requerido.");
+
+        if (scheduleId == Guid.Empty)
+            return Error.Validation("EmployeeSchedule.InvalidSchedule", "La plantilla de horario es requerida.");
+
+        if (effectiveTo.HasValue && effectiveTo.Value < effectiveFrom)
+            return Error.Validation("EmployeeSchedule.InvalidRange", "La fecha final de vigencia no puede ser menor a la fecha inicial.");
+
+        return new EmployeeSchedule
+        {
+            EmployeeId = employeeId,
+            ScheduleId = scheduleId,
+            BaseScheduleId = scheduleId,
+            EffectiveFrom = effectiveFrom,
+            EffectiveTo = effectiveTo,
+            Date = effectiveFrom,
+            DayType = ScheduleDayType.WorkDay
+        };
+    }
+
+    public ErrorOr<Success> UpdateRange(DateOnly effectiveFrom, DateOnly? effectiveTo)
+    {
+        if (effectiveTo.HasValue && effectiveTo.Value < effectiveFrom)
+            return Error.Validation("EmployeeSchedule.InvalidRange", "La fecha final de vigencia no puede ser menor a la fecha inicial.");
+
+        EffectiveFrom = effectiveFrom;
+        EffectiveTo = effectiveTo;
+        return Result.Success;
+    }
 
     private static ErrorOr<EmployeeSchedule> Create(
         Guid employeeId,
@@ -39,9 +80,12 @@ public class EmployeeSchedule : BaseEntity
         {
             EmployeeId = employeeId,
             Date = date,
+            EffectiveFrom = date,
+            EffectiveTo = date,
             AssignedStartTime = startTime,
             AssignedEndTime = endTime,
             BaseScheduleId = baseScheduleId,
+            ScheduleId = baseScheduleId,
             DayType = type
         };
     }
@@ -92,3 +136,4 @@ public class EmployeeSchedule : BaseEntity
         return errors.Count == 0 ? Result.Success : errors;
     }
 }
+

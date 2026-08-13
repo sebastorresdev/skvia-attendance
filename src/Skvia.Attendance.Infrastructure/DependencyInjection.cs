@@ -85,6 +85,7 @@ public static class DependencyInjection
         builder.Services.AddScoped<IUserAccountService, IdentityUserAccountService>();
         builder.Services.AddScoped<IRoleService, IdentityRoleService>();
         builder.Services.AddScoped<IAttendanceExcelExporter, AttendanceExcelExporter>();
+        builder.Services.AddScoped<IScheduleResolverService, ScheduleResolverService>();
         
         // Repositories
         builder.Services.AddScoped<Skvia.Attendance.Domain.EmployeeSchedules.IEmployeeScheduleRepository, Skvia.Attendance.Infrastructure.Data.Repositories.EmployeeScheduleRepository>();

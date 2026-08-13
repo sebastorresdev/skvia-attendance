@@ -25,6 +25,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Department> Departments => Set<Department>();
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<EmployeeSchedule> EmployeeSchedules => Set<EmployeeSchedule>();
+    public DbSet<ScheduleException> ScheduleExceptions => Set<ScheduleException>();
     public DbSet<Schedule> Schedules => Set<Schedule>();
     public DbSet<ApplicationUserRole> ApplicationUserRole => Set<ApplicationUserRole>();
     public override DatabaseFacade Database => base.Database;
