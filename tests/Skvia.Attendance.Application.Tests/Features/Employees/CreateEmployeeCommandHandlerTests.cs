@@ -45,6 +45,33 @@ public class CreateEmployeeCommandHandlerTests
     }
 
     [Fact]
+    public async Task HandleAsync_WhenApplicationUserIdIsEmpty_ShouldCreateEmployeeWithoutLinkingUser()
+    {
+        // Arrange
+        await using var dbContext = CreateInMemoryDbContext();
+        var handler = new CreateEmployeeCommandHandler(dbContext);
+        var command = new CreateEmployeeCommand(
+            Code: "EMP001",
+            FirstName: "Juan",
+            LastName: "Pérez",
+            DocumentType: DocumentType.Dni,
+            DocumentNumber: "12345678",
+            HireDate: DateTimeOffset.UtcNow,
+            ApplicationUserId: "   ");
+
+        // Act
+        var result = await handler.HandleAsync(command, CancellationToken.None);
+
+        // Assert
+        result.IsError.Should().BeFalse();
+        result.Value.Should().NotBeEmpty();
+
+        var createdEmployee = await dbContext.Employees.FirstOrDefaultAsync(e => e.Id == result.Value);
+        createdEmployee.Should().NotBeNull();
+        createdEmployee!.ApplicationUserId.Should().BeNull();
+    }
+
+    [Fact]
     public async Task HandleAsync_WhenCodeAlreadyExists_ShouldReturnDuplicateCodeError()
     {
         // Arrange

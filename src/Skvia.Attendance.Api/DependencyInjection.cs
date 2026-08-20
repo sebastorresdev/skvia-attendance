@@ -25,12 +25,38 @@ public static class DependencyInjection
             .AddCheck("self", () => HealthCheckResult.Healthy(), tags: ["live"])
             .AddCheck<DatabaseHealthCheck>("database", tags: ["ready"]);
 
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? ["http://localhost:4200", "http://localhost:8080"];
+
         builder.Services.AddCors(opt =>
         {
             opt.AddPolicy("AllowAll", policy =>
-                policy.AllowAnyOrigin()
-                      .AllowAnyHeader()
-                      .AllowAnyMethod());
+            {
+                if (allowedOrigins.Contains("*"))
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                }
+                else
+                {
+                    policy.SetIsOriginAllowed(origin =>
+                    {
+                        if (builder.Environment.IsDevelopment())
+                        {
+                            if (Uri.TryCreate(origin, UriKind.Absolute, out var uri) &&
+                                (uri.Host is "localhost" or "127.0.0.1"))
+                            {
+                                return true;
+                            }
+                        }
+                        return allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase);
+                    })
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+                }
+            });
         });
 
         builder.Services.AddRequestTimeouts(options =>
@@ -53,6 +79,12 @@ public static class DependencyInjection
             options.AddFixedWindowLimiter("StrictLogin", opt =>
             {
                 opt.PermitLimit = 5;
+                opt.Window = TimeSpan.FromMinutes(1);
+                opt.QueueLimit = 0;
+            });
+            options.AddFixedWindowLimiter("DefaultApi", opt =>
+            {
+                opt.PermitLimit = 120;
                 opt.Window = TimeSpan.FromMinutes(1);
                 opt.QueueLimit = 0;
             });

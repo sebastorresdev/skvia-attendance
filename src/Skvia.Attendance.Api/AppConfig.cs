@@ -11,7 +11,9 @@ public static class AppConfig
 {
     public static async Task AddConfigAsync(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        var disableDatabaseInitialisation = app.Configuration.GetValue<bool>("Database:DisableInitialization", false);
+
+        if (app.Environment.IsDevelopment() && !disableDatabaseInitialisation)
         {
             await app.InitialiseDatabaseAsync();
 
@@ -29,6 +31,27 @@ public static class AppConfig
         }
 
         app.UseExceptionHandler();
+
+        app.Use(async (context, next) =>
+        {
+            context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+            context.Response.Headers["X-Frame-Options"] = "DENY";
+            context.Response.Headers["Referrer-Policy"] = "no-referrer";
+            context.Response.Headers["X-XSS-Protection"] = "0";
+            context.Response.Headers["Cache-Control"] = "no-store";
+
+            if (!context.Request.IsHttps && !app.Environment.IsDevelopment())
+            {
+                context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+            }
+
+            await next();
+        });
+
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHsts();
+        }
 
         // app.UseHttpsRedirection();
 

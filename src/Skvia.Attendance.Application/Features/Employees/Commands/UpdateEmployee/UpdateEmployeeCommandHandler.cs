@@ -52,7 +52,12 @@ public class UpdateEmployeeCommandHandler(IApplicationDbContext dbContext) : ICo
 
         employee.SetAttendanceOptions(command.IsAttendanceTracked, command.AutoCompleteClockOut ?? employee.AutoCompleteClockOut);
         employee.EnableMobileCheckIn(command.MobileCheckInEnabled);
-        employee.LinkUser(command.ApplicationUserId);
+
+        if (!string.IsNullOrWhiteSpace(command.ApplicationUserId))
+        {
+            employee.LinkUser(command.ApplicationUserId);
+        }
+
         employee.SetRequireFourPointAttendance(command.RequireFourPointAttendance);
         
         if (command.AllowedWorkplaceIds != null)

@@ -107,7 +107,13 @@ public class ApplicationDbContextInitialiser
 
         if (string.IsNullOrWhiteSpace(adminPassword))
         {
-            _logger.LogWarning("No se configuró una contraseña para el usuario administrador; se omite el seed.");
+            _logger.LogWarning("Seed habilitado pero sin contraseña configurada. Para activar el seed usa la variable de entorno SKVIA_ADMIN_PASSWORD o la sección Seed:AdminPassword. Se omite el seed.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(adminUserName) || string.IsNullOrWhiteSpace(adminEmail))
+        {
+            _logger.LogWarning("Seed habilitado con configuración incompleta de usuario administrador. Se omite el seed.");
             return;
         }
 

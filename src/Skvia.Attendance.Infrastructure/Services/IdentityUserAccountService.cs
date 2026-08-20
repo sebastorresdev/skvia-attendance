@@ -1,6 +1,7 @@
 using System.Security.Claims;
 
 using Microsoft.AspNetCore.Identity;
+using Npgsql;
 
 using Skvia.Attendance.Application.Common.Constants;
 using Skvia.Attendance.Application.Common.DTOs;
@@ -276,50 +277,57 @@ public class IdentityUserAccountService(
 
     public async Task<ErrorOr<ClaimsPrincipal>> AuthenticateAsync(LoginCommand command, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByNameAsync(command.UserName);
-        if (user is null)
+        try
         {
-            return Error.Unauthorized("Credenciales Invalidas.");
-        }
+            var user = await userManager.FindByNameAsync(command.UserName);
+            if (user is null)
+            {
+                return Error.Unauthorized("Credenciales Invalidas.");
+            }
 
-        if (await userManager.IsLockedOutAsync(user))
-        {
-            return Error.Unauthorized("Usuario Bloqueado.");
-        }
-
-        if (!user.IsActive)
-        {
-            return Error.Unauthorized("Tu cuenta está inactiva. Ponte en contacto con el servicio de asistencia para obtener ayuda.");
-        }
-
-        var isPasswordValid = await userManager.CheckPasswordAsync(user, command.Password);
-        if (!isPasswordValid)
-        {
-            await userManager.AccessFailedAsync(user);
             if (await userManager.IsLockedOutAsync(user))
             {
-                return Error.Unauthorized("La cuenta ha sido bloqueada debido a múltiples intentos fallidos de inicio de sesión.");
+                return Error.Unauthorized("Usuario Bloqueado.");
             }
 
-            return Error.Unauthorized("El nombre de usuario o la contraseña son incorrectos. Inténtalo de nuevo.");
-        }
-
-        var principal = await signInManager.CreateUserPrincipalAsync(user);
-
-        var userIdString = user.Id.ToString();
-        var employee = await dbContext.Employees
-            .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.ApplicationUserId == userIdString, cancellationToken);
-
-        if (employee != null && employee.MobileCheckInEnabled)
-        {
-            if (principal.Identity is ClaimsIdentity identity)
+            if (!user.IsActive)
             {
-                identity.AddClaim(new Claim(CustomClaimTypes.Permission, "mobile_check_in"));
+                return Error.Unauthorized("Tu cuenta está inactiva. Ponte en contacto con el servicio de asistencia para obtener ayuda.");
             }
-        }
 
-        return principal;
+            var isPasswordValid = await userManager.CheckPasswordAsync(user, command.Password);
+            if (!isPasswordValid)
+            {
+                await userManager.AccessFailedAsync(user);
+                if (await userManager.IsLockedOutAsync(user))
+                {
+                    return Error.Unauthorized("La cuenta ha sido bloqueada debido a múltiples intentos fallidos de inicio de sesión.");
+                }
+
+                return Error.Unauthorized("El nombre de usuario o la contraseña son incorrectos. Inténtalo de nuevo.");
+            }
+
+            var principal = await signInManager.CreateUserPrincipalAsync(user);
+
+            var userIdString = user.Id.ToString();
+            var employee = await dbContext.Employees
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.ApplicationUserId == userIdString, cancellationToken);
+
+            if (employee != null && employee.MobileCheckInEnabled)
+            {
+                if (principal.Identity is ClaimsIdentity identity)
+                {
+                    identity.AddClaim(new Claim(CustomClaimTypes.Permission, "mobile_check_in"));
+                }
+            }
+
+            return principal;
+        }
+        catch (Exception ex) when (ex is NpgsqlException or TimeoutException or DbUpdateException)
+        {
+            return Error.Unauthorized("Credenciales inválidas o servicio de autenticación no disponible en este momento.");
+        }
     }
 
     public async Task<ErrorOr<UserDetailResponse>> GetUserByIdAsync(Guid userId, CancellationToken cancellationToken)

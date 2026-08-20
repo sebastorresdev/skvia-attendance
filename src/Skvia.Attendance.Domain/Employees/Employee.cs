@@ -124,7 +124,12 @@ public class Employee : BaseAuditableEntity
 
     public void LinkUser(string? applicationUserId)
     {
-        ApplicationUserId = applicationUserId;
+        if (string.IsNullOrWhiteSpace(applicationUserId))
+        {
+            throw new ArgumentException("El identificador de usuario no puede estar vacío.", nameof(applicationUserId));
+        }
+
+        ApplicationUserId = applicationUserId.Trim();
     }
 
     public void SetRequireFourPointAttendance(bool require)

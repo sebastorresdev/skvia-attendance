@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,20 +26,36 @@ public static class DependencyInjection
         builder.Services.AddSingleton<IKioskPairingService, KioskPairingService>();
         builder.Services.Configure<SeedOptions>(builder.Configuration.GetSection(SeedOptions.SectionName));
 
+        var connectionString = builder.Configuration.GetConnectionString("skvia-attendance-db");
+        var isTestingEnvironment = builder.Environment.IsEnvironment("Testing")
+            || string.Equals(builder.Configuration["ASPNETCORE_ENVIRONMENT"], "Testing", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(builder.Configuration["DOTNET_ENVIRONMENT"], "Testing", StringComparison.OrdinalIgnoreCase)
+            || builder.Configuration.GetValue<bool>("UseInMemoryDatabase");
+        var useInMemory = isTestingEnvironment || string.IsNullOrWhiteSpace(connectionString);
+
         // 2. Registro clásico adaptado con las convenciones necesarias
         builder.Services.AddDbContext<ApplicationDbContext>((sp, opt) =>
         {
             var interceptor = sp.GetRequiredService<ISaveChangesInterceptor>();
 
-            // Nota: El connectionString real ya lo manejará automáticamente el orquestador a nivel de infraestructura
-            string? connectionString = builder.Configuration.GetConnectionString("skvia-attendance-db");
+            if (useInMemory)
+            {
+                opt.UseInMemoryDatabase("skvia-testing-db");
+            }
+            else
+            {
+                opt.UseNpgsql(connectionString).AddInterceptors(interceptor);
+            }
 
-            opt.UseNpgsql(connectionString).AddInterceptors(interceptor);
             opt.UseSnakeCaseNamingConvention();
+            opt.AddInterceptors(interceptor);
         });
 
-        // Aspire
-        builder.EnrichNpgsqlDbContext<ApplicationDbContext>();
+        if (!useInMemory)
+        {
+            // Aspire
+            builder.EnrichNpgsqlDbContext<ApplicationDbContext>();
+        }
 
         // Database
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());

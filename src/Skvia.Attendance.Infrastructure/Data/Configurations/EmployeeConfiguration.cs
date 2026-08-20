@@ -15,6 +15,9 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.Property(p => p.Id).ValueGeneratedNever();
         builder.Property(p => p.Code).IsRequired().HasMaxLength(EmployeeConstants.CodeMaxLength);
         builder.HasIndex(p => p.Code).IsUnique();
+        builder.HasIndex(p => p.Status);
+        builder.HasIndex(p => p.DepartmentId);
+        builder.HasIndex(p => p.MainBranchId);
         builder.Property(p => p.FirstName).IsRequired().HasMaxLength(EmployeeConstants.FirstNameMaxLength);
         builder.Property(p => p.LastName).IsRequired().HasMaxLength(EmployeeConstants.LastNameMaxLength);
 
@@ -71,6 +74,7 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .HasDefaultValue(EmployeeStatus.Active);
             
         builder.Property(p => p.ApplicationUserId).IsRequired(false).HasMaxLength(450);
+        builder.HasIndex(p => p.ApplicationUserId).IsUnique();
         builder.Property(p => p.MobileCheckInEnabled).IsRequired().HasDefaultValue(false);
         builder.Property(p => p.RequireFourPointAttendance).IsRequired().HasDefaultValue(false);
         builder.Property(p => p.IsAttendanceTracked).IsRequired().HasDefaultValue(true);

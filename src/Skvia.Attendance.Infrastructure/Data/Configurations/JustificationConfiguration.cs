@@ -20,6 +20,11 @@ public class JustificationConfiguration : IEntityTypeConfiguration<Justification
         builder.Property(j => j.ReviewerNotes)
             .HasMaxLength(500);
 
+        builder.HasIndex(j => j.EmployeeId);
+        builder.HasIndex(j => j.Status);
+        builder.HasIndex(j => new { j.EmployeeId, j.Date });
+        builder.HasIndex(j => new { j.Status, j.Date });
+
         builder.HasOne(j => j.Employee)
             .WithMany()
             .HasForeignKey(j => j.EmployeeId)

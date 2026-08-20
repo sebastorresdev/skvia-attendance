@@ -30,7 +30,12 @@ public class CurrentUserProvider(IHttpContextAccessor _httpContextAccessor) : IC
         var roles = GetClaimValues(ClaimTypes.Role);
         var permissions = GetClaimValues(CustomClaimTypes.Permission);
 
-        return new CurrentUserResponse(id, roles, permissions);
+        return new CurrentUserResponse(
+            id,
+            roles,
+            permissions,
+            ManagedUserIds: [],
+            ScopeKeys: []);
     }
 
     private List<string> GetClaimValues(string claimType) =>

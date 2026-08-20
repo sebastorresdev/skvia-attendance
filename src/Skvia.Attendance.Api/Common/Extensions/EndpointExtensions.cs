@@ -23,7 +23,7 @@ public static class EndpointExtensions
         {
             var routeGroup = app.MapGroup($"/api/v1/{group.Key}")
                 .WithTags(group.Key)
-                .RequireAuthorization(); // <--- AÑADIDO: Requiere autorización para todo el grupo
+                .RequireRateLimiting("DefaultApi");
 
             foreach (var type in group)
             {
