@@ -1,0 +1,38 @@
+using Skvia.Erp.Api.Common.Extensions;
+using Skvia.Erp.Application.Common.Messaging;
+using ErrorOr;
+using Skvia.Erp.Api.Models;
+using Skvia.Erp.Application.Features.Branches.Commands.CreateBranch;
+
+namespace Skvia.Erp.Api.Endpoints.Branches;
+
+public sealed class CreateBranch : IEndpoint
+{
+    public static void Map(RouteGroupBuilder group)
+        => group.MapPost("/", Handle)
+            .WithName(nameof(CreateBranch))
+            .WithSummary("Crear sucursal")
+            .WithDescription("Crea una nueva sucursal/sede en el sistema.")
+            .Produces<CreateBranchResponse>(StatusCodes.Status201Created)
+            .Produces<ApiProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ApiProblemDetails>(StatusCodes.Status409Conflict);
+
+    private static async Task<IResult> Handle(
+        CreateBranchRequest request,
+        ICommandHandler<CreateBranchCommand, ErrorOr<Guid>> handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateBranchCommand(request.Code, request.Name, request.Address);
+        var result = await handler.HandleAsync(command, cancellationToken);
+
+        return result.Match(
+            branchId => TypedResults.Created($"/api/v1/branches/{branchId}", new CreateBranchResponse(branchId)),
+            errors => errors.ToProblem());
+    }
+}
+
+public record CreateBranchRequest(string Code, string Name, string? Address);
+public record CreateBranchResponse(Guid Id);
+
+
+

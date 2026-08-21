@@ -29,20 +29,20 @@ La capa Application está empezando a depender de detalles concretos de Infrastr
    - Los handlers de Application deberían trabajar con interfaces, no con `UserManager` directamente.
 
 3. Eliminar referencias de Application a namespaces de Infrastructure.
-   - Ejemplo actual: `Skvia.Attendance.Infrastructure.Identity.Domain` usado en handlers de Application.
+   - Ejemplo actual: `Skvia.Erp.Infrastructure.Identity.Domain` usado en handlers de Application.
    - Esto debe corregirse y mover la definición de errores relacionados a un namespace correcto de Domain, por ejemplo:
-     - `Skvia.Attendance.Domain.Identity`
+     - `Skvia.Erp.Domain.Identity`
 
 4. Mantener `IApplicationDbContext` como la única dependencia de persistencia visible desde Application.
    - Eso ya está bien orientado, pero conviene extender el patrón a otros servicios como identidad, archivos, correos o permisos.
 
 ### Archivos que probablemente se modificarían
 
-- `src/Skvia.Attendance.Application/Features/Users/Commands/CreateUser/CreateUserCommandHandler.cs`
-- `src/Skvia.Attendance.Application/Features/Users/Commands/ResetPassword/ResetPasswordCommandHandler.cs`
-- `src/Skvia.Attendance.Application/Features/Users/Commands/UpdateUser/UpdateUserCommandHandler.cs`
-- `src/Skvia.Attendance.Application/Features/Users/Queries/GetUserById/GetUserByIdQueryHandler.cs`
-- `src/Skvia.Attendance.Domain/Identity/UserErrors.cs`
+- `src/Skvia.Erp.Application/Features/Users/Commands/CreateUser/CreateUserCommandHandler.cs`
+- `src/Skvia.Erp.Application/Features/Users/Commands/ResetPassword/ResetPasswordCommandHandler.cs`
+- `src/Skvia.Erp.Application/Features/Users/Commands/UpdateUser/UpdateUserCommandHandler.cs`
+- `src/Skvia.Erp.Application/Features/Users/Queries/GetUserById/GetUserByIdQueryHandler.cs`
+- `src/Skvia.Erp.Domain/Identity/UserErrors.cs`
 
 ### Resultado esperado
 
@@ -83,10 +83,10 @@ La capa Domain contiene lógica de negocio, pero todavía mezcla decisiones téc
 
 ### Archivos que probablemente se modificarían
 
-- `src/Skvia.Attendance.Domain/Attendances/Attendance.cs`
-- `src/Skvia.Attendance.Domain/EmployeeSchedules/EmployeeSchedule.cs`
-- `src/Skvia.Attendance.Domain/Common/` (nueva ubicación de abstracciones compartidas)
-- `src/Skvia.Attendance.Infrastructure/` (implementación concreta de `IClock` y `ITimeZoneProvider`)
+- `src/Skvia.Erp.Domain/Attendances/Attendance.cs`
+- `src/Skvia.Erp.Domain/EmployeeSchedules/EmployeeSchedule.cs`
+- `src/Skvia.Erp.Domain/Common/` (nueva ubicación de abstracciones compartidas)
+- `src/Skvia.Erp.Infrastructure/` (implementación concreta de `IClock` y `ITimeZoneProvider`)
 
 ### Resultado esperado
 
@@ -147,10 +147,10 @@ El seeding inicial del sistema está haciendo cosas muy prácticas pero poco seg
 
 ### Archivos que probablemente se modificarían
 
-- `src/Skvia.Attendance.Infrastructure/Data/ApplicationDbContextInitialiser.cs`
-- `src/Skvia.Attendance.Api/appsettings.json`
-- `src/Skvia.Attendance.Api/appsettings.Development.json`
-- `src/Skvia.Attendance.Api/Program.cs` o el lugar donde se invoca la inicialización
+- `src/Skvia.Erp.Infrastructure/Data/ApplicationDbContextInitialiser.cs`
+- `src/Skvia.Erp.Api/appsettings.json`
+- `src/Skvia.Erp.Api/appsettings.Development.json`
+- `src/Skvia.Erp.Api/Program.cs` o el lugar donde se invoca la inicialización
 
 ### Resultado esperado
 
@@ -207,9 +207,9 @@ El proyecto tiene una estructura muy buena, pero aún no muestra una base sólid
 
 ### Estructura sugerida de test projects
 
-- `tests/Skvia.Attendance.Domain.Tests`
-- `tests/Skvia.Attendance.Application.Tests`
-- `tests/Skvia.Attendance.Api.Tests`
+- `tests/Skvia.Erp.Domain.Tests`
+- `tests/Skvia.Erp.Application.Tests`
+- `tests/Skvia.Erp.Api.Tests`
 
 ### Resultado esperado
 
@@ -243,3 +243,4 @@ El proyecto se considerará mejorado cuando:
 ## Resumen corto
 
 Si aplico estas mejoras, el proyecto pasará de ser un backend funcional a un backend mucho más sólido, limpio y preparado para crecer.
+

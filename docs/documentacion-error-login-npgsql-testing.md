@@ -50,7 +50,7 @@ con un problema de tipo autenticación, no un error interno.
 
 Archivo origen:
 
-- tests/Skvia.Attendance.Application.Tests/Integration/ApiAuthAndErrorTests.cs
+- tests/Skvia.Erp.Application.Tests/Integration/ApiAuthAndErrorTests.cs
 
 Prueba relevante:
 
@@ -79,7 +79,7 @@ Resultado real verificado:
 
 El `DbContext` se registra en infraestructura con configuración basada en PostgreSQL:
 
-- src/Skvia.Attendance.Infrastructure/DependencyInjection.cs
+- src/Skvia.Erp.Infrastructure/DependencyInjection.cs
 
 Aunque el proyecto usa entorno `Testing`, el proveedor de base de datos puede seguir apuntando a `Npgsql` si la conexión está presente o si la condición del entorno no está correctamente detectada.
 
@@ -89,7 +89,7 @@ Esto provoca que la app intente abrir conexiones reales a PostgreSQL incluso en 
 
 El punto crítico está en:
 
-- src/Skvia.Attendance.Infrastructure/Services/IdentityUserAccountService.cs
+- src/Skvia.Erp.Infrastructure/Services/IdentityUserAccountService.cs
 
 El método `AuthenticateAsync` ejecuta esta lógica:
 
@@ -116,7 +116,7 @@ El problema aparece porque en una autenticación fallida la aplicación puede se
 
 El host de tests también se configura en:
 
-- tests/Skvia.Attendance.Application.Tests/Integration/ApiAuthAndErrorTests.cs
+- tests/Skvia.Erp.Application.Tests/Integration/ApiAuthAndErrorTests.cs
 
 y se intentó inflar un escenario con `WebApplicationFactory` usando `UseEnvironment("Testing")`, pero no se estaba garantizando que el `DbContext` usara `UseInMemoryDatabase` de forma consecuente.
 
@@ -175,7 +175,7 @@ configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
 {
     ["Database:DisableInitialization"] = "true",
     ["UseInMemoryDatabase"] = "true",
-    ["ConnectionStrings:skvia-attendance-db"] = string.Empty
+    ["ConnectionStrings:skvia-erp-db"] = string.Empty
 });
 ```
 
@@ -207,7 +207,7 @@ Cuando el problema real sea de credenciales o de disponibilidad de la BD durante
 Ejecutar esta comprobación tras la corrección:
 
 ```bash
-dotnet test tests/Skvia.Attendance.Application.Tests/Skvia.Attendance.Application.Tests.csproj --filter "ApiAuthAndErrorTests" --nologo
+dotnet test tests/Skvia.Erp.Application.Tests/Skvia.Erp.Application.Tests.csproj --filter "ApiAuthAndErrorTests" --nologo
 ```
 
 Debe devolver:
@@ -224,3 +224,5 @@ Debe devolver:
 Este problema todavía estaba en curso al momento de documentar la causa raíz. La última verificación evidencia que la corrección aún no está cerrada, pero la causa técnica quedó aislada y documentada.
 
 La documentación sirve como base para implementar la corrección definitiva sin volver a introducir el mismo fallo.
+
+
